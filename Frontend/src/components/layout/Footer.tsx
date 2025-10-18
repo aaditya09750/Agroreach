@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ARLogo from '../../assets/AR Logo.png';
 
 // Scroll to top handler
@@ -7,95 +8,106 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const Subscription: React.FC = () => (
-  <div className="bg-gray-50">
-    <div className="container mx-auto px-4 sm:px-6 lg:px-[120px] py-8 flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8">
-      {/* Newsletter Section */}
-      <div className="text-center lg:text-left">
-        <h3 className="text-xl font-semibold text-text-dark">Subscribe Our Newsletter</h3>
-        <p className="text-sm text-text-muted mt-1">Be the first to know about our latest updates.</p>
-      </div>
-
-      {/* Logo Section */}
-      <div className="flex items-center gap-2">
-        <img src={ARLogo} alt="Agroreach Logo" className="h-8 w-8 object-contain" />
-        <span className="text-2xl font-semibold text-text-dark">Agroreach</span>
-      </div>
-
-      {/* Input Section */}
-      <div className="flex w-full max-w-md">
-        <input
-          type="email"
-          placeholder="Your email address"
-          className="w-full px-4 py-3 rounded-l-full border border-gray-100 focus:outline-none text-sm bg-white"
-        />
-        <button className="bg-primary text-white font-semibold px-6 py-3 rounded-r-full hover:bg-opacity-90 transition-colors whitespace-nowrap">
-          Subscribe
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-
-const FooterLinks: React.FC = () => (
-  <div className="bg-background-dark text-text-muted pt-16 pb-12">
-    <div className="container mx-auto px-4 sm:px-6 lg:px-[120px]">
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 xl:gap-20">
-        {/* Logo and Contact Section */}
-        <div className="lg:w-[280px] flex-shrink-0">
-          <Link to="/" onClick={scrollToTop} className="flex items-center gap-2 mb-4">
-            <img src={ARLogo} alt="Agroreach Logo" className="h-5 w-5 object-contain" />
-            <span className="text-1xl font-medium text-white -tracking-[0.03em]"> About Agroreach</span>
-          </Link>
-          <p className="text-sm text-gray-400 mb-6 leading-relaxed">Fresh, healthy, and handpicked products delivered straight from our farms to your doorstep. Pure goodness, just the way nature made it!</p>
-          <div className="flex items-center gap-2 text-sm flex-nowrap">
-            <a href="tel:+91 84335 09521" className="text-white font-small border-b-2 border-primary pb-1 whitespace-nowrap">+91 84335 09521</a>
-            <span className="text-gray-400">or</span>
-            <a href="mailto:agroreach@gmail.com" className="text-white font-small border-b-2 border-primary pb-1 whitespace-nowrap">agroreach@gmail.com</a>
-          </div>
+const Subscription: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="bg-gray-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-[120px] py-8 flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8">
+        {/* Newsletter Section */}
+        <div className="text-center lg:text-left">
+          <h3 className="text-xl font-semibold text-text-dark">{t('footer.subscribeTitle')}</h3>
+          <p className="text-sm text-text-muted mt-1">{t('footer.subscribeDesc')}</p>
         </div>
 
-        {/* Three List Columns with Equal Spacing */}
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-10 xl:gap-12">
-          <div>
-            <h4 className="text-base font-medium text-white mb-5">My Account</h4>
-            <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link to="/dashboard" onClick={scrollToTop} className="hover:text-white transition-colors">My Account</Link></li>
-              <li><Link to="/order-history" onClick={scrollToTop} className="hover:text-white transition-colors">Order History</Link></li>
-              <li><Link to="/settings" onClick={scrollToTop} className="hover:text-white transition-colors">Settings</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-base font-medium text-white mb-5">Helps</h4>
-            <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link to="/contact" onClick={scrollToTop} className="hover:text-white transition-colors">Contact</Link></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms & Condition</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-base font-medium text-white mb-5">Proxy</h4>
-            <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link to="/about" onClick={scrollToTop} className="hover:text-white transition-colors">About</Link></li>
-              <li><Link to="/shop" onClick={scrollToTop} className="hover:text-white transition-colors">Shop</Link></li>
-              <li><a href="/order-history" className="hover:text-white transition-colors">Track Order</a></li>
-            </ul>
-          </div>
+        {/* Logo Section */}
+        <div className="flex items-center gap-2">
+          <img src={ARLogo} alt="Agroreach Logo" className="h-8 w-8 object-contain" />
+          <span className="text-2xl font-semibold text-text-dark">Agroreach</span>
+        </div>
+
+        {/* Input Section */}
+        <div className="flex w-full max-w-md">
+          <input
+            type="email"
+            placeholder={t('footer.emailPlaceholder')}
+            className="w-full px-4 py-3 rounded-l-full border border-gray-100 focus:outline-none text-sm bg-white"
+          />
+          <button className="bg-primary text-white font-semibold px-6 py-3 rounded-r-full hover:bg-opacity-90 transition-colors whitespace-nowrap">
+            {t('footer.subscribe')}
+          </button>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
-const Copyright: React.FC = () => (
-  <div className="bg-background-dark border-t border-gray-800">
-    <div className="container mx-auto px-4 sm:px-6 lg:px-[120px] py-5 flex flex-col md:flex-row justify-between items-center gap-4">
-      {/* Copyright Text */}
-      <p className="text-sm text-gray-400 text-center md:text-left">Agroreach eCommerce © 2025. All Rights Reserved</p>
 
-      {/* Social Media Icons */}
-      <div className="flex items-center gap-3">
+const FooterLinks: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="bg-background-dark text-text-muted pt-16 pb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-[120px]">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 xl:gap-20">
+          {/* Logo and Contact Section */}
+          <div className="lg:w-[280px] flex-shrink-0">
+            <Link to="/" onClick={scrollToTop} className="flex items-center gap-2 mb-4">
+              <img src={ARLogo} alt="Agroreach Logo" className="h-5 w-5 object-contain" />
+              <span className="text-1xl font-medium text-white -tracking-[0.03em]">{t('footer.aboutAgroreach')}</span>
+            </Link>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">{t('footer.aboutDesc')}</p>
+            <div className="flex items-center gap-2 text-sm flex-nowrap">
+              <a href="tel:+91 84335 09521" className="text-white font-small border-b-2 border-primary pb-1 whitespace-nowrap">+91 84335 09521</a>
+              <span className="text-gray-400">or</span>
+              <a href="mailto:agroreach@gmail.com" className="text-white font-small border-b-2 border-primary pb-1 whitespace-nowrap">agroreach@gmail.com</a>
+            </div>
+          </div>
+
+          {/* Three List Columns with Equal Spacing */}
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-10 xl:gap-12">
+            <div>
+              <h4 className="text-base font-medium text-white mb-5">{t('footer.myAccount')}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><Link to="/dashboard" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.myAccount')}</Link></li>
+                <li><Link to="/order-history" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.orderHistory')}</Link></li>
+                <li><Link to="/settings" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.settings')}</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-base font-medium text-white mb-5">{t('footer.helps')}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><Link to="/contact" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.contact')}</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.termsCondition')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.privacyPolicy')}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-base font-medium text-white mb-5">{t('footer.proxy')}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><Link to="/about" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.about')}</Link></li>
+                <li><Link to="/shop" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.shop')}</Link></li>
+                <li><a href="/order-history" className="hover:text-white transition-colors">{t('footer.trackOrder')}</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Copyright: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="bg-background-dark border-t border-gray-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-[120px] py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* Copyright Text */}
+        <p className="text-sm text-gray-400 text-center md:text-left">{t('footer.copyright')}</p>
+
+        {/* Social Media Icons */}
+        <div className="flex items-center gap-3">
         <a
           href="#"
           aria-label="Instagram"
@@ -134,7 +146,8 @@ const Copyright: React.FC = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 const Footer: React.FC = () => {
   return (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Truck, Headphones, ShoppingBag, Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -22,26 +23,28 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
 );
 
 const Features: React.FC = () => {
+  const { t } = useTranslation();
+  
   const featuresData = [
     {
       icon: <Truck size={32} strokeWidth={1.5} />,
-      title: 'Free Shipping',
-      description: 'Free shipping on all your order',
+      title: t('features.freeShipping'),
+      description: t('features.freeShippingDesc'),
     },
     {
       icon: <Headphones size={32} strokeWidth={1.5} />,
-      title: 'Customer Support 24/7',
-      description: 'Instant access to Support',
+      title: t('features.customerSupport'),
+      description: t('features.customerSupportDesc'),
     },
     {
       icon: <ShoppingBag size={32} strokeWidth={1.5} />,
-      title: '100% Secure Payment',
-      description: 'We ensure your money is save',
+      title: t('features.securePayment'),
+      description: t('features.securePaymentDesc'),
     },
     {
       icon: <Package size={32} strokeWidth={1.5} />,
-      title: 'Money-Back Guarantee',
-      description: '30 Days Money-Back Guarantee',
+      title: t('features.moneyBack'),
+      description: t('features.moneyBackDesc'),
     },
   ];
 

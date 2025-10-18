@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './i18n/config'; // Import i18n configuration
 import HomePage from './pages/user/HomePage';
 import ShopPage from './pages/user/ShopPage';
 import ContactPage from './pages/user/ContactPage';
@@ -14,6 +15,7 @@ import SettingsPage from './pages/user/SettingsPage';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { UserProvider } from './context/UserContext';
 import { OrderProvider } from './context/OrderContext';
 import CartNotification from './components/ui/CartNotification';
@@ -23,35 +25,37 @@ import OrderNotification from './components/ui/OrderNotification';
 function App() {
   return (
     <CurrencyProvider>
-      <ProductProvider>
-        <CartProvider>
-          <UserProvider>
-            <OrderProvider>
-              <Router>
-                <div className="w-full overflow-x-hidden font-poppins">
-                  <CartNotification />
-                  <UserNotification />
-                  <OrderNotification />
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/shop" element={<ShopPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/signin" element={<SignInPage />} />
-                    <Route path="/signup" element={<SignUpPage />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/order-history" element={<OrderHistoryPage />} />
-                    <Route path="/dashboard/order/:orderId" element={<OrderDetailPage />} />
-                    <Route path="/cart" element={<CartPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                  </Routes>
-                </div>
-              </Router>
-            </OrderProvider>
-          </UserProvider>
-        </CartProvider>
-      </ProductProvider>
+      <LanguageProvider>
+        <ProductProvider>
+          <CartProvider>
+            <UserProvider>
+              <OrderProvider>
+                <Router>
+                  <div className="w-full overflow-x-hidden font-poppins">
+                    <CartNotification />
+                    <UserNotification />
+                    <OrderNotification />
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/shop" element={<ShopPage />} />
+                      <Route path="/contact" element={<ContactPage />} />
+                      <Route path="/about" element={<AboutPage />} />
+                      <Route path="/signin" element={<SignInPage />} />
+                      <Route path="/signup" element={<SignUpPage />} />
+                      <Route path="/dashboard" element={<DashboardPage />} />
+                      <Route path="/order-history" element={<OrderHistoryPage />} />
+                      <Route path="/dashboard/order/:orderId" element={<OrderDetailPage />} />
+                      <Route path="/cart" element={<CartPage />} />
+                      <Route path="/checkout" element={<CheckoutPage />} />
+                      <Route path="/settings" element={<SettingsPage />} />
+                    </Routes>
+                  </div>
+                </Router>
+              </OrderProvider>
+            </UserProvider>
+          </CartProvider>
+        </ProductProvider>
+      </LanguageProvider>
     </CurrencyProvider>
   );
 }

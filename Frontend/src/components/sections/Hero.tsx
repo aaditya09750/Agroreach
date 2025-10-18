@@ -1,48 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import img1 from '../../assets/Home/img (1).png';
 import img2 from '../../assets/Home/img (2).png';
 import img3 from '../../assets/Home/img (3).png';
-
-const heroSlides = [
-  {
-    id: 1,
-    tag: 'WELCOME TO SHOPERY',
-    title: 'Fresh & Healthy\nOrganic Food',
-    saleText: 'Sale up to',
-    saleAmount: '30% OFF',
-    description: 'Free shipping on all your order. we deliver, you enjoy',
-    image: img1,
-    bgClass: 'bg-[#EDF2EE]'
-  },
-  {
-    id: 2,
-    tag: 'SUMMER SALE',
-    title: 'Best Deals on\nFresh Fruits',
-    saleText: 'Up to',
-    saleAmount: '40% OFF',
-    description: 'Limited time offer on seasonal fruits. Order now!',
-    image: img2,
-    bgClass: 'bg-[#FFF3E6]'
-  },
-  {
-    id: 3,
-    tag: 'NEW ARRIVALS',
-    title: 'Farm Fresh\nVegetables',
-    saleText: 'Discount',
-    saleAmount: '25% OFF',
-    description: 'Get the freshest vegetables delivered to your door',
-    image: img3,
-    bgClass: 'bg-[#E8F5E9]'
-  }
-];
 
 const Hero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  
+  const heroSlides = [
+    {
+      id: 1,
+      tag: t('hero.welcomeTag'),
+      title: t('hero.title1'),
+      saleText: t('hero.saleText1'),
+      saleAmount: t('hero.saleAmount1'),
+      description: t('hero.description1'),
+      image: img1,
+      bgClass: 'bg-[#EDF2EE]'
+    },
+    {
+      id: 2,
+      tag: t('hero.summerSaleTag'),
+      title: t('hero.title2'),
+      saleText: t('hero.saleText2'),
+      saleAmount: t('hero.saleAmount2'),
+      description: t('hero.description2'),
+      image: img2,
+      bgClass: 'bg-[#FFF3E6]'
+    },
+    {
+      id: 3,
+      tag: t('hero.newArrivalsTag'),
+      title: t('hero.title3'),
+      saleText: t('hero.saleText3'),
+      saleAmount: t('hero.saleAmount3'),
+      description: t('hero.description3'),
+      image: img3,
+      bgClass: 'bg-[#E8F5E9]'
+    }
+  ];
 
   // Create extended slides array with first slide duplicated at the end for seamless loop
   const extendedSlides = [...heroSlides, heroSlides[0]];
@@ -145,7 +147,7 @@ const Hero: React.FC = () => {
                         onMouseLeave={() => setIsPaused(false)}
                         className="bg-[#00B207] text-white font-semibold text-sm md:text-base py-3 md:py-4 px-8 md:px-10 rounded-full inline-flex items-center gap-2 md:gap-3 hover:bg-[#2C742F] transition-all duration-300"
                       >
-                        Shop now <ArrowRight size={18} strokeWidth={2.5} />
+                        {t('hero.shopNow')} <ArrowRight size={18} strokeWidth={2.5} />
                       </button>
                     </div>
                     

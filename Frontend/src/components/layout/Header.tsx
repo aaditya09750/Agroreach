@@ -2,14 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MapPin, ChevronDown, Search, ShoppingCart, Phone, X } from 'lucide-react';
 import { BsPersonCircle } from "react-icons/bs";
+import { useTranslation } from 'react-i18next';
 import ARLogo from '../../assets/AR Logo.png';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { shopProducts, Product } from '../../data/products';
 
 const CurrencyDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { currency, setCurrency } = useCurrency();
+  const { setLanguage } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,6 +28,10 @@ const CurrencyDropdown: React.FC = () => {
 
   const handleSelectCurrency = (selectedCurrency: 'USD' | 'INR') => {
     setCurrency(selectedCurrency);
+    // Reset language to English when switching to USD
+    if (selectedCurrency === 'USD') {
+      setLanguage('English');
+    }
     setIsOpen(false);
   };
 
@@ -61,8 +68,71 @@ const CurrencyDropdown: React.FC = () => {
   );
 };
 
+const LanguageDropdown: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { language, setLanguage, getLanguageCode } = useLanguage();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelectLanguage = (selectedLanguage: 'English' | 'Marathi' | 'Hindi') => {
+    setLanguage(selectedLanguage);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <div 
+        className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{getLanguageCode()}</span>
+        <ChevronDown size={12} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 bg-white border border-border-color rounded-md shadow-lg py-1 min-w-[100px] z-[100]">
+          <button
+            onClick={() => handleSelectLanguage('English')}
+            className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 transition-colors ${
+              language === 'English' ? 'text-primary font-medium' : 'text-text-dark-gray'
+            }`}
+          >
+            English
+          </button>
+          <button
+            onClick={() => handleSelectLanguage('Marathi')}
+            className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 transition-colors ${
+              language === 'Marathi' ? 'text-primary font-medium' : 'text-text-dark-gray'
+            }`}
+          >
+            मराठी
+          </button>
+          <button
+            onClick={() => handleSelectLanguage('Hindi')}
+            className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 transition-colors ${
+              language === 'Hindi' ? 'text-primary font-medium' : 'text-text-dark-gray'
+            }`}
+          >
+            हिन्दी
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const TopBar: React.FC = () => {
   const { currency } = useCurrency();
+  const { t } = useTranslation();
   const address = currency === 'INR' 
     ? 'Manchar Ambegaon - 410503, Pune, Maharashtra, India'
     : 'Lincoln- 344, Illinois, Chicago, USA';
@@ -72,19 +142,21 @@ const TopBar: React.FC = () => {
       <div className="container mx-auto px-8 flex justify-between items-center py-2 text-xs text-text-dark-gray">
         <div className="flex items-center gap-2">
           <MapPin size={14} />
-          <span>Store Location: {address}</span>
+          <span>{t('header.storeLocation')}: {address}</span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 cursor-pointer">
-            <span>Eng</span>
-            <ChevronDown size={12} />
-          </div>
+          {currency === 'INR' && (
+            <>
+              <LanguageDropdown />
+              <div className="border-l border-border-color h-3"></div>
+            </>
+          )}
           <CurrencyDropdown />
           <div className="border-l border-border-color h-3"></div>
           <div className="flex items-center gap-1">
-            <Link to="/signin" className="hover:text-primary">Sign In</Link>
+            <Link to="/signin" className="hover:text-primary">{t('header.signIn')}</Link>
             <span>/</span>
-            <Link to="/signup" className="hover:text-primary">Sign Up</Link>
+            <Link to="/signup" className="hover:text-primary">{t('header.signUp')}</Link>
           </div>
         </div>
       </div>
@@ -95,6 +167,7 @@ const TopBar: React.FC = () => {
 const MidBar: React.FC = () => {
   const { getCartCount, getCartTotal } = useCart();
   const { convertPrice, getCurrencySymbol } = useCurrency();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -184,7 +257,7 @@ const MidBar: React.FC = () => {
             <span className="pl-3 pr-2"><Search size={15} className="text-text-dark" /></span>
             <input 
               type="text" 
-              placeholder="Search Products Here..." 
+              placeholder={t('header.searchPlaceholder')}
               className="w-full py-2.5 outline-none text-sm pr-8"
               value={searchQuery}
               onChange={handleSearchChange}
@@ -204,7 +277,7 @@ const MidBar: React.FC = () => {
             onClick={handleSearch}
             className="bg-primary text-white font-medium px-5 hover:bg-opacity-90 transition-colors text-sm"
           >
-            Search
+            {t('header.search')}
           </button>
         </div>
 
@@ -263,7 +336,7 @@ const MidBar: React.FC = () => {
             ) : (
               <div className="px-4 py-8 text-center">
                 <Search size={40} className="mx-auto text-gray-300 mb-3" />
-                <p className="text-sm font-medium text-gray-600 mb-1">No products found</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">{t('common.noResults')}</p>
                 <p className="text-xs text-gray-400">
                   "{searchQuery}" is not available in our store
                 </p>
@@ -288,7 +361,7 @@ const MidBar: React.FC = () => {
             )}
           </Link>
           <div className="hidden md:block">
-            <p className="text-xs text-text-light">Shopping cart:</p>
+            <p className="text-xs text-text-light">{t('header.shoppingCart')}:</p>
             <p className="text-sm font-medium text-primary">{currencySymbol}{convertedTotal.toFixed(2)}</p>
           </div>
         </div>
@@ -301,6 +374,7 @@ const MidBar: React.FC = () => {
 const NavBar: React.FC = () => {
     const { pathname } = useLocation();
     const { currency } = useCurrency();
+    const { t } = useTranslation();
 
     const phoneNumber = currency === 'INR' 
         ? '+91 84335 09521' 
@@ -311,19 +385,19 @@ const NavBar: React.FC = () => {
             <div className="container mx-auto px-8 flex justify-between items-center text-sm">
                 <nav className="hidden lg:flex items-center gap-8">
                     <Link to="/" className={`py-3.5 font-medium transition-colors ${pathname === '/' ? 'text-white' : 'text-gray-300 hover:text-primary'}`}>
-                        Home
+                        {t('header.home')}
                     </Link>
                     <Link to="/shop" className={`py-3.5 transition-colors ${pathname.startsWith('/shop') ? 'text-white' : 'text-gray-300 hover:text-primary'}`}>
-                        Shop
+                        {t('header.shop')}
                     </Link>
                     <Link to="/dashboard" className={`py-3.5 transition-colors ${pathname.startsWith('/dashboard') ? 'text-white' : 'text-gray-300 hover:text-primary'}`}>
-                        My Account
+                        {t('header.myAccount')}
                     </Link>
                     <Link to="/about" className={`py-3.5 transition-colors ${pathname === '/about' ? 'text-white font-medium' : 'text-gray-300 hover:text-primary'}`}>
-                        About Us
+                        {t('header.aboutUs')}
                     </Link>
                     <Link to="/contact" className={`py-3.5 transition-colors ${pathname === '/contact' ? 'text-white font-medium' : 'text-gray-300 hover:text-primary'}`}>
-                        Contact Us
+                        {t('header.contactUs')}
                     </Link>
                 </nav>
                 <div className="flex items-center gap-2 text-gray-300 font-medium">
