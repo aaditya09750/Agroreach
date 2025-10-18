@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import AboutDetailModal from '../modal/AboutDetailModal';
 
 const AboutIntro: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
+    <>
     <section className="flex flex-col md:flex-row items-center justify-center gap-10">
       <div className="relative shadow-2xl shadow-primary/40 rounded-2xl overflow-hidden shrink-0">
         <img 
@@ -51,13 +55,20 @@ const AboutIntro: React.FC = () => {
           From seasonal vegetables to year-round availability, Agroreach empowers sustainable agriculture while delivering freshness you can taste in every bite.
         </p>
         
-        <button className="flex items-center gap-2 mt-8 hover:-translate-y-0.5 transition bg-gradient-to-r from-primary to-primary/80 py-3 px-8 rounded-full text-white font-medium">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 mt-8 hover:-translate-y-0.5 transition bg-gradient-to-r from-primary to-primary/80 py-3 px-8 rounded-full text-white font-medium"
+        >
           <span>Read more</span>
           <ArrowRight size={16} />
         </button>
       </div>
     </section>
+
+    {isModalOpen && <AboutDetailModal onClose={() => setIsModalOpen(false)} />}
+    </>
   );
 };
 
 export default AboutIntro;
+

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ARLogo from '../../assets/AR Logo.png';
+import TermsConditionsModal from '../modal/TermsConditionsModal';
+import PrivacyPolicyModal from '../modal/PrivacyPolicyModal';
 
 // Scroll to top handler
 const scrollToTop = () => {
@@ -45,8 +47,11 @@ const Subscription: React.FC = () => {
 
 const FooterLinks: React.FC = () => {
   const { t } = useTranslation();
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   
   return (
+    <>
     <div className="bg-background-dark text-text-muted pt-16 pb-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-[120px]">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 xl:gap-20">
@@ -78,8 +83,22 @@ const FooterLinks: React.FC = () => {
               <h4 className="text-base font-medium text-white mb-5">{t('footer.helps')}</h4>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><Link to="/contact" onClick={scrollToTop} className="hover:text-white transition-colors">{t('footer.contact')}</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t('footer.termsCondition')}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t('footer.privacyPolicy')}</a></li>
+                <li>
+                  <button 
+                    onClick={() => setIsTermsModalOpen(true)}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    {t('footer.termsCondition')}
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setIsPrivacyModalOpen(true)}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    {t('footer.privacyPolicy')}
+                  </button>
+                </li>
               </ul>
             </div>
             <div>
@@ -94,6 +113,11 @@ const FooterLinks: React.FC = () => {
         </div>
       </div>
     </div>
+
+    {/* Modals */}
+    {isTermsModalOpen && <TermsConditionsModal onClose={() => setIsTermsModalOpen(false)} />}
+    {isPrivacyModalOpen && <PrivacyPolicyModal onClose={() => setIsPrivacyModalOpen(false)} />}
+    </>
   );
 };
 
