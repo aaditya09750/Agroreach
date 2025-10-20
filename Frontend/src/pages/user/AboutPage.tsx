@@ -7,6 +7,7 @@ import AboutFeatures from '../../components/sections/AboutFeatures';
 import WeDeliveredSection from '../../components/sections/WeDeliveredSection';
 import AwesomeTeam from '../../components/sections/AwesomeTeam';
 import Testimonials from '../../components/sections/Testimonials';
+import LatestBlog from '../../components/sections/LatestBlog';
 
 const AboutPage: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const AboutPage: React.FC = () => {
         </div>
          <AwesomeTeam />
           <Testimonials />
+          <LatestBlog />
       </main>
       <Footer />
     </div>
