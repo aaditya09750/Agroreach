@@ -134,7 +134,7 @@ const TopBar: React.FC = () => {
   const { currency } = useCurrency();
   const { t } = useTranslation();
   const address = currency === 'INR' 
-    ? 'Manchar Ambegaon - 410503, Pune, Maharashtra, India'
+    ? 'Ambegaon - 410503, Pune, Maharashtra, India'
     : 'Lincoln- 344, Illinois, Chicago, USA';
 
   return (

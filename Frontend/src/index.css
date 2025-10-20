@@ -82,3 +82,42 @@ body {
     transparent 100%
   );
 }
+
+/* Floating Particle Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-15px) translateX(10px);
+  }
+  50% {
+    transform: translateY(-30px) translateX(-5px);
+  }
+  75% {
+    transform: translateY(-15px) translateX(5px);
+  }
+}
+
+@keyframes float-rotate {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) translateX(15px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(-35px) translateX(-10px) rotate(180deg);
+  }
+  75% {
+    transform: translateY(-15px) translateX(8px) rotate(270deg);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-rotate {
+  animation: float-rotate 5s ease-in-out infinite;
+}

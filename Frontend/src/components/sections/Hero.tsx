@@ -6,6 +6,29 @@ import img1 from '../../assets/Home/img (1).png';
 import img2 from '../../assets/Home/img (2).png';
 import img3 from '../../assets/Home/img (3).png';
 
+// Floating Particle Component
+const FloatingParticle: React.FC<{ 
+  emoji: string; 
+  left?: string; 
+  top?: string; 
+  right?: string; 
+  bottom?: string;
+  size?: string;
+  blur?: string;
+}> = ({ emoji, left, top, right, bottom, size = 'text-5xl', blur = 'blur-sm' }) => (
+  <div 
+    className={`absolute ${size} pointer-events-none opacity-30 ${blur}`}
+    style={{ 
+      left, 
+      top, 
+      right, 
+      bottom
+    }}
+  >
+    {emoji}
+  </div>
+);
+
 const Hero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -46,7 +69,6 @@ const Hero: React.FC = () => {
     }
   ];
 
-  // Create extended slides array with first slide duplicated at the end for seamless loop
   const extendedSlides = [...heroSlides, heroSlides[0]];
 
   // Infinite auto-scroll functionality - only left to right
@@ -71,11 +93,9 @@ const Hero: React.FC = () => {
   // Handle seamless loop - reset to first slide when reaching the duplicate
   useEffect(() => {
     if (currentSlide === heroSlides.length) {
-      // Wait for transition to complete, then instantly reset to first slide
       const timer = setTimeout(() => {
         setIsTransitioning(false);
         setCurrentSlide(0);
-        // Re-enable transition after reset
         setTimeout(() => {
           setIsTransitioning(true);
         }, 50);
@@ -113,6 +133,28 @@ const Hero: React.FC = () => {
                 <div 
                   className={`relative rounded-lg overflow-hidden ${slide.bgClass}`}
                 >
+                  {/* Floating Decorative Particles - Evenly distributed across the banner */}
+                  {/* Top Row */}
+                  <FloatingParticle emoji="🍃" top="8%" left="5%" size="text-4xl" blur="blur-md" />
+                  <FloatingParticle emoji="🍊" top="12%" left="15%" size="text-5xl" blur="blur-sm" />
+                  <FloatingParticle emoji="🍃" top="6%" left="45%" size="text-3xl" blur="blur-md" />
+                  <FloatingParticle emoji="🍎" top="10%" right="25%" size="text-5xl" blur="blur-sm" />
+                  <FloatingParticle emoji="🍃" top="8%" right="8%" size="text-4xl" blur="blur-md" />
+                  
+                  {/* Middle Row */}
+                  <FloatingParticle emoji="🥕" top="35%" left="3%" size="text-5xl" blur="blur-sm" />
+                  <FloatingParticle emoji="🍃" top="40%" left="25%" size="text-3xl" blur="blur-md" />
+                  <FloatingParticle emoji="🍃" top="38%" right="35%" size="text-4xl" blur="blur-md" />
+                  <FloatingParticle emoji="🍋" top="42%" right="12%" size="text-5xl" blur="blur-sm" />
+                  
+                  {/* Bottom Row */}
+                  <FloatingParticle emoji="🍃" bottom="8%" left="8%" size="text-4xl" blur="blur-md" />
+                  <FloatingParticle emoji="🍅" bottom="12%" left="20%" size="text-5xl" blur="blur-sm" />
+                  <FloatingParticle emoji="🍃" bottom="10%" left="48%" size="text-3xl" blur="blur-md" />
+                  <FloatingParticle emoji="🍃" bottom="8%" right="40%" size="text-4xl" blur="blur-md" />
+                  <FloatingParticle emoji="🥬" bottom="15%" right="15%" size="text-5xl" blur="blur-sm" />
+                  <FloatingParticle emoji="🍃" bottom="6%" right="5%" size="text-3xl" blur="blur-md" />
+                  
                   {/* Main Hero Container */}
                   <div className="relative px-8 md:px-12 lg:px-16 pt-10 md:pt-12 lg:pt-16 pb-20 md:pb-24 lg:pb-28">
                     

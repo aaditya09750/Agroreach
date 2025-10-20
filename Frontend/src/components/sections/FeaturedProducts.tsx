@@ -7,15 +7,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { useProduct } from '../../context/ProductContext';
 import { Star, ShoppingCart, ArrowRight } from 'lucide-react';
 
-// Import images
-import productImg1 from '../../assets/Products/img (1).png';
-import productImg2 from '../../assets/Products/img (2).png';
-import productImg4 from '../../assets/Products/img (4).png';
-import productImg5 from '../../assets/Products/img (5).png';
-import productImg6 from '../../assets/Products/img (6).png';
-import productImg7 from '../../assets/Products/img (7).png';
-import productImg13 from '../../assets/Products/img (13).png';
-import productImg14 from '../../assets/Products/img (14).png';
+// Import banner image
 import bannerImage from '../../assets/Home/Banner.png';
 
 interface SmallProductCardProps {
@@ -110,23 +102,44 @@ const BannerCard: React.FC = () => {
 const FeaturedProducts: React.FC = () => {
   const featuredProductsData = shopProducts.slice(0, 5);
 
-  const hotDeals = [
-    { image: productImg4, name: 'Fresh Mango', price: 14.99, rating: 4, productId: 4 },
-    { image: productImg2, name: 'Chinese Cabbage', price: 14.99, rating: 4, productId: 2 },
-    { image: productImg14, name: 'Fresh Cauliflower', price: 14.99, rating: 4, productId: 14 },
-  ];
+  // Hot Deals - Get products by ID and map to SmallProductCard format
+  const hotDeals = [4, 2, 14].map(id => {
+    const product = shopProducts.find(p => p.id === id);
+    return product ? {
+      image: product.image,
+      name: product.name,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      rating: product.rating,
+      productId: product.id
+    } : null;
+  }).filter(Boolean) as SmallProductCardProps[];
 
-  const bestSeller = [
-    { image: productImg6, name: 'Red Chili', price: 14.99, rating: 4, productId: 6 },
-    { image: productImg1, name: 'Fresh Corn', price: 14.99, oldPrice: 20.99, rating: 4, productId: 1 },
-    { image: productImg5, name: 'Red Tomatoes', price: 14.99, rating: 4, productId: 5 },
-  ];
+  // Best Seller - Get products by ID and map to SmallProductCard format
+  const bestSeller = [6, 1, 5].map(id => {
+    const product = shopProducts.find(p => p.id === id);
+    return product ? {
+      image: product.image,
+      name: product.name,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      rating: product.rating,
+      productId: product.id
+    } : null;
+  }).filter(Boolean) as SmallProductCardProps[];
 
-  const topRated = [
-    { image: productImg1, name: 'Fresh Corn', price: 14.99, rating: 4, productId: 1 },
-    { image: productImg13, name: 'Green Apple', price: 14.99, oldPrice: 20.99, rating: 4, productId: 13 },
-    { image: productImg7, name: 'Red Capsicum', price: 14.99, rating: 4, productId: 7 },
-  ];
+  // Top Rated - Get products by ID and map to SmallProductCard format
+  const topRated = [1, 13, 7].map(id => {
+    const product = shopProducts.find(p => p.id === id);
+    return product ? {
+      image: product.image,
+      name: product.name,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      rating: product.rating,
+      productId: product.id
+    } : null;
+  }).filter(Boolean) as SmallProductCardProps[];
 
   return (
     <section>

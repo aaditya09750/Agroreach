@@ -4,6 +4,7 @@ import { X, Star, ShoppingCart } from 'lucide-react';
 import ProductImageGallery from './ProductImageGallery';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useProduct } from '../../context/ProductContext';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -24,8 +25,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addToCart } = useCart();
   const { convertPrice, getCurrencySymbol } = useCurrency();
-
-  // Convert prices
+  const { getProductViewCount } = useProduct();
+  const viewCount = getProductViewCount(product.id);
   const convertedPrice = convertPrice(product.price);
   const currencySymbol = getCurrencySymbol();
   
@@ -66,7 +67,6 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
   };
 
   const handleAddToCart = () => {
-    // Check if product is out of stock
     if (product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock') {
       alert('This product is out of stock and cannot be added to cart.');
       return;
@@ -132,7 +132,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               {/* Rating and SKU */}
               <div className="flex items-center gap-3 mb-4">
                 <StarRating rating={product.rating} />
-                <span className="text-sm text-text-dark">{product.reviewCount || 0} Review</span>
+                <span className="text-sm text-text-dark">{viewCount} Review</span>
               </div>
 
               {/* Price */}
