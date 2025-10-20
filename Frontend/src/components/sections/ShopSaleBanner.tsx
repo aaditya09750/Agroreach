@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import shopBanner from '../../assets/Shop Bannar.jpg';
+import CircularText from '../ui/CircularText';
 
 const TimerBox: React.FC<{ value: string; label: string }> = ({ value, label }) => (
   <div className="text-center">
@@ -9,7 +10,6 @@ const TimerBox: React.FC<{ value: string; label: string }> = ({ value, label }) 
   </div>
 );
 
-// Floating Particle Component
 const FloatingParticle: React.FC<{ 
   emoji: string; 
   left?: string; 
@@ -72,6 +72,7 @@ const getTimerEndDate = (): Date => {
 
 const ShopSaleBanner: React.FC = () => {
   const [endDate] = useState<Date>(() => getTimerEndDate());
+  const [isHovering, setIsHovering] = useState(false);
 
   const calculateTimeLeft = (): TimeLeft => {
     const difference = endDate.getTime() - new Date().getTime();
@@ -153,9 +154,21 @@ const ShopSaleBanner: React.FC = () => {
             Shop Now <ArrowRight size={18} />
           </button>
         </div>
-        <div className="w-40 h-40 bg-warning rounded-full flex flex-col items-center justify-center text-white">
-            <p className="text-5xl font-bold">38 %</p>
-            <p className="text-lg font-semibold">OFF</p>
+        <div 
+          className="relative w-52 h-52 flex items-center justify-center cursor-pointer"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <CircularText 
+            text="• BEST PRICE • LIMITED OFFER • FRESH DEALS • SAVE NOW " 
+            spinDuration={isHovering ? 5 : 22}
+            onHover="speedUp"
+            className="text-warning pointer-events-none"
+          />
+          <div className="w-40 h-40 bg-warning rounded-full flex flex-col items-center justify-center text-white shadow-lg z-10 pointer-events-none">
+            <p className="text-5xl font-bold">38%</p>
+            <p className="text-xl font-semibold tracking-wider">OFF</p>
+          </div>
         </div>
       </div>
     </div>

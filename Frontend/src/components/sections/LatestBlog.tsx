@@ -17,10 +17,14 @@ const BlogCard: React.FC<BlogCardProps> = ({ image, title, category }) => (
       />
     </div>
     <div className="p-4">
-      <p className="text-xs text-primary font-medium mb-1.5">{category}</p>
+      <p className="text-[15px] text-primary font-medium mb-1.5">{category}</p>
       <h3 className="text-sm text-text-dark font-medium leading-relaxed line-clamp-2 min-h-[40px]">
         {title}
       </h3>
+      <button className="text-xs text-primary font-medium mt-2 hover:underline flex items-center gap-1">
+        Read More
+        <ArrowRight size={10} />
+      </button>
     </div>
   </div>
 );

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './i18n/config'; // Import i18n configuration
 import HomePage from './pages/user/HomePage';
 import ShopPage from './pages/user/ShopPage';
@@ -21,8 +22,23 @@ import { OrderProvider } from './context/OrderContext';
 import CartNotification from './components/ui/CartNotification';
 import UserNotification from './components/ui/UserNotification';
 import OrderNotification from './components/ui/OrderNotification';
+import SkeletonLoader from './components/ui/SkeletonLoader';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <SkeletonLoader />;
+  }
   return (
     <CurrencyProvider>
       <LanguageProvider>
