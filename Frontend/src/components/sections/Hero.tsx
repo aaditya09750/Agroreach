@@ -6,28 +6,6 @@ import img1 from '../../assets/Home/img (1).png';
 import img2 from '../../assets/Home/img (2).png';
 import img3 from '../../assets/Home/img (3).png';
 
-// Floating Particle Component
-const FloatingParticle: React.FC<{ 
-  emoji: string; 
-  left?: string; 
-  top?: string; 
-  right?: string; 
-  bottom?: string;
-  size?: string;
-  blur?: string;
-}> = ({ emoji, left, top, right, bottom, size = 'text-5xl', blur = 'blur-sm' }) => (
-  <div 
-    className={`absolute ${size} pointer-events-none opacity-30 ${blur}`}
-    style={{ 
-      left, 
-      top, 
-      right, 
-      bottom
-    }}
-  >
-    {emoji}
-  </div>
-);
 
 const Hero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -35,7 +13,7 @@ const Hero: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(true);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
+
   const heroSlides = [
     {
       id: 1,
@@ -117,7 +95,7 @@ const Hero: React.FC = () => {
   return (
     <div className="px-4 md:px-6 lg:px-8 xl:px-12">
       {/* Hero Section */}
-      <div 
+      <div
         className="relative rounded-lg overflow-hidden max-w-[1400px] mx-auto"
       >
         {/* Carousel Container */}
@@ -126,38 +104,17 @@ const Hero: React.FC = () => {
             className={`flex transform ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''} ${translateClasses[currentSlide] || 'translate-x-[0%]'}`}
           >
             {extendedSlides.map((slide, index) => (
-              <div 
+              <div
                 key={`${slide.id}-${index}`}
                 className="min-w-full"
               >
-                <div 
+                <div
                   className={`relative rounded-lg overflow-hidden ${slide.bgClass}`}
                 >
-                  {/* Floating Decorative Particles - Evenly distributed across the banner */}
-                  {/* Top Row */}
-                  <FloatingParticle emoji="🍃" top="8%" left="5%" size="text-4xl" blur="blur-md" />
-                  <FloatingParticle emoji="🍊" top="12%" left="15%" size="text-5xl" blur="blur-sm" />
-                  <FloatingParticle emoji="🍃" top="6%" left="45%" size="text-3xl" blur="blur-md" />
-                  <FloatingParticle emoji="🍎" top="10%" right="25%" size="text-5xl" blur="blur-sm" />
-                  <FloatingParticle emoji="🍃" top="8%" right="8%" size="text-4xl" blur="blur-md" />
-                  
-                  {/* Middle Row */}
-                  <FloatingParticle emoji="🥕" top="35%" left="3%" size="text-5xl" blur="blur-sm" />
-                  <FloatingParticle emoji="🍃" top="40%" left="25%" size="text-3xl" blur="blur-md" />
-                  <FloatingParticle emoji="🍃" top="38%" right="35%" size="text-4xl" blur="blur-md" />
-                  <FloatingParticle emoji="🍋" top="42%" right="12%" size="text-5xl" blur="blur-sm" />
-                  
-                  {/* Bottom Row */}
-                  <FloatingParticle emoji="🍃" bottom="8%" left="8%" size="text-4xl" blur="blur-md" />
-                  <FloatingParticle emoji="🍅" bottom="12%" left="20%" size="text-5xl" blur="blur-sm" />
-                  <FloatingParticle emoji="🍃" bottom="10%" left="48%" size="text-3xl" blur="blur-md" />
-                  <FloatingParticle emoji="🍃" bottom="8%" right="40%" size="text-4xl" blur="blur-md" />
-                  <FloatingParticle emoji="🥬" bottom="15%" right="15%" size="text-5xl" blur="blur-sm" />
-                  <FloatingParticle emoji="🍃" bottom="6%" right="5%" size="text-3xl" blur="blur-md" />
-                  
+
                   {/* Main Hero Container */}
                   <div className="relative px-8 md:px-12 lg:px-16 pt-10 md:pt-12 lg:pt-16 pb-20 md:pb-24 lg:pb-28">
-                    
+
                     {/* Left Content Section */}
                     <div className="relative z-10 max-w-lg">
                       <p className="text-xs md:text-sm font-semibold text-[#00B207] tracking-wider uppercase mb-3">
@@ -172,7 +129,7 @@ const Hero: React.FC = () => {
                           </React.Fragment>
                         ))}
                       </h1>
-                      
+
                       <div className="mb-6">
                         <p className="text-xl md:text-2xl lg:text-[28px] text-[#1A1A1A] mb-2 leading-tight">
                           {slide.saleText}{' '}
@@ -182,8 +139,8 @@ const Hero: React.FC = () => {
                           {slide.description}
                         </p>
                       </div>
-                      
-                      <button 
+
+                      <button
                         onClick={handleShopNowClick}
                         onMouseEnter={() => setIsPaused(true)}
                         onMouseLeave={() => setIsPaused(false)}
@@ -192,7 +149,7 @@ const Hero: React.FC = () => {
                         {t('hero.shopNow')} <ArrowRight size={18} strokeWidth={2.5} />
                       </button>
                     </div>
-                    
+
                     {/* Right Image Section - Positioned absolutely (refined sizing/placement) */}
                     <div className="absolute right-10 bottom-20 md:bottom-10 lg:bottom-12 w-1/2 md:w-[48%] lg:w-[45%] h-[260px] md:h-[320px] lg:h-[380px] pointer-events-none flex justify-end items-end pr-4">
                       <img
@@ -207,16 +164,15 @@ const Hero: React.FC = () => {
             ))}
           </div>
         </div>
-        
+
         {/* Pagination Dots */}
         <div className="absolute bottom-16 md:bottom-18 lg:bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
           {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => handleDotClick(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                (currentSlide % heroSlides.length) === index ? 'bg-[#00B207] w-6' : 'bg-[#C4C4C4] hover:bg-[#00B207]/50'
-              }`}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${(currentSlide % heroSlides.length) === index ? 'bg-[#00B207] w-6' : 'bg-[#C4C4C4] hover:bg-[#00B207]/50'
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}

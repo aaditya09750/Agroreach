@@ -10,28 +10,6 @@ const TimerBox: React.FC<{ value: string; label: string }> = ({ value, label }) 
   </div>
 );
 
-const FloatingParticle: React.FC<{ 
-  emoji: string; 
-  left?: string; 
-  top?: string; 
-  right?: string; 
-  bottom?: string;
-  size?: string;
-  blur?: string;
-}> = ({ emoji, left, top, right, bottom, size = 'text-4xl', blur = 'blur-sm' }) => (
-  <div 
-    className={`absolute ${size} pointer-events-none opacity-25 ${blur}`}
-    style={{ 
-      left, 
-      top, 
-      right, 
-      bottom
-    }}
-  >
-    {emoji}
-  </div>
-);
-
 interface TimeLeft {
   days: number;
   hours: number;
@@ -116,27 +94,6 @@ const ShopSaleBanner: React.FC = () => {
     <div className="rounded-lg overflow-hidden relative h-[358px] bg-cover bg-center" style={{backgroundImage: `url(${shopBanner})`}}>
       <div className="absolute inset-0 bg-black/50"></div>
       
-      {/* Floating Decorative Particles - Evenly distributed across the banner */}
-      {/* Top Row */}
-      <FloatingParticle emoji="🍃" top="10%" left="6%" size="text-4xl" blur="blur-md" />
-      <FloatingParticle emoji="🍊" top="15%" left="18%" size="text-4xl" blur="blur-sm" />
-      <FloatingParticle emoji="🍃" top="8%" left="50%" size="text-3xl" blur="blur-md" />
-      <FloatingParticle emoji="🍎" top="12%" right="22%" size="text-4xl" blur="blur-sm" />
-      <FloatingParticle emoji="🍃" top="10%" right="8%" size="text-3xl" blur="blur-md" />
-      
-      {/* Middle Row */}
-      <FloatingParticle emoji="🥕" top="40%" left="4%" size="text-4xl" blur="blur-sm" />
-      <FloatingParticle emoji="🍃" top="45%" left="28%" size="text-3xl" blur="blur-md" />
-      <FloatingParticle emoji="🍃" top="42%" right="32%" size="text-3xl" blur="blur-md" />
-      <FloatingParticle emoji="🍋" top="48%" right="10%" size="text-4xl" blur="blur-sm" />
-      
-      {/* Bottom Row */}
-      <FloatingParticle emoji="🍃" bottom="10%" left="10%" size="text-3xl" blur="blur-md" />
-      <FloatingParticle emoji="🍅" bottom="15%" left="24%" size="text-4xl" blur="blur-sm" />
-      <FloatingParticle emoji="🍃" bottom="12%" left="52%" size="text-3xl" blur="blur-md" />
-      <FloatingParticle emoji="🥬" bottom="18%" right="18%" size="text-4xl" blur="blur-sm" />
-      <FloatingParticle emoji="🍃" bottom="8%" right="6%" size="text-3xl" blur="blur-md" />
-      
       <div className="relative z-10 p-16 flex items-center justify-between h-full">
         <div className="text-white">
           <p className="text-sm uppercase font-medium tracking-widest">Best Deals</p>
@@ -161,13 +118,13 @@ const ShopSaleBanner: React.FC = () => {
         >
           <CircularText 
             text="• BEST PRICE • LIMITED OFFER • FRESH DEALS • SAVE NOW " 
-            spinDuration={isHovering ? 5 : 22}
+            spinDuration={isHovering ? 3 : 25}
             onHover="speedUp"
-            className="text-warning pointer-events-none"
+            className="text-warning text-2xl pointer-events-none"
           />
           <div className="w-40 h-40 bg-warning rounded-full flex flex-col items-center justify-center text-white shadow-lg z-10 pointer-events-none">
             <p className="text-5xl font-bold">38%</p>
-            <p className="text-xl font-semibold tracking-wider">OFF</p>
+            <p className="text-xl font-bold tracking-wider">OFF</p>
           </div>
         </div>
       </div>
