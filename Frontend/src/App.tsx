@@ -47,7 +47,6 @@ function App() {
             <UserProvider>
               <OrderProvider>
                 <Router>
-                  <div className="w-full overflow-x-hidden font-poppins">
                     <CartNotification />
                     <UserNotification />
                     <OrderNotification />
@@ -65,7 +64,6 @@ function App() {
                       <Route path="/checkout" element={<CheckoutPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
                     </Routes>
-                  </div>
                 </Router>
               </OrderProvider>
             </UserProvider>
