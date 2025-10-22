@@ -104,7 +104,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
         </button>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[90vh] p-8">
+        <div className="overflow-y-auto max-h-[90vh] scrollbar-hide p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Left Side - Image Gallery */}
             <div className="w-full">

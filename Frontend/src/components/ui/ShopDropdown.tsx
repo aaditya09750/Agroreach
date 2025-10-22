@@ -59,7 +59,7 @@ const ShopDropdown: React.FC<ShopDropdownProps> = ({
           isOpen ? 'opacity-100 translate-y-0 max-h-60' : 'opacity-0 -translate-y-2 max-h-0 pointer-events-none'
         }`}
       >
-        <div className="max-h-60 overflow-y-auto">
+        <div className="max-h-60 overflow-y-auto scrollbar-hide">
           {options.length > 0 ? (
             options.map((option, index) => (
               <button

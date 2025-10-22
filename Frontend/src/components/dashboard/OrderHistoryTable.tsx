@@ -17,7 +17,7 @@ const OrderHistoryTable: React.FC = () => {
         </Link>
       </div>
       {recentOrders.length > 0 ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-hide">
           <table className="w-full text-left">
             <thead className="bg-gray-100">
               <tr>

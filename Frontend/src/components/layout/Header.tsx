@@ -283,7 +283,7 @@ const MidBar: React.FC = () => {
 
         {/* Search Results Dropdown */}
         {showResults && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-md shadow-lg max-h-96 overflow-y-auto z-[100]">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-md shadow-lg max-h-96 overflow-y-auto scrollbar-hide z-[100]">
             {searchResults.length > 0 ? (
               <div className="py-2">
                 <div className="px-4 py-2 text-xs text-gray-500 border-b border-border-color">

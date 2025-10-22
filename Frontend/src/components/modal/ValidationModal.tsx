@@ -46,7 +46,7 @@ const ValidationModal: React.FC<ValidationModalProps> = ({ isOpen, onClose, miss
           <p className="text-sm text-text-muted mb-2">
             Please fill in the required fields:
           </p>
-          <div className="bg-red-50 border border-red-200 rounded-md p-2.5 max-h-[200px] overflow-y-auto">
+          <div className="bg-red-50 border border-red-200 rounded-md p-2.5 max-h-[200px] overflow-y-auto scrollbar-hide">
             <ul className="space-y-1">
               {missingFields.map((field, index) => (
                 <li key={index} className="flex items-start gap-2 text-xs text-red-700">

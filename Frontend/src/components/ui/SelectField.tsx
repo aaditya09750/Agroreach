@@ -73,7 +73,7 @@ const SelectField: React.FC<SelectFieldProps> = ({ label, name, options, placeho
 
         {/* Custom Dropdown Menu */}
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-border-color rounded-md shadow-lg max-h-60 overflow-auto">
+          <div className="absolute z-50 w-full mt-1 bg-white border border-border-color rounded-md shadow-lg max-h-60 overflow-auto scrollbar-hide">
             {options.map((option) => (
               <div
                 key={option}

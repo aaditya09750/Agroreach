@@ -51,7 +51,7 @@ const AboutDetailModal: React.FC<AboutDetailModalProps> = ({ onClose }) => {
         </button>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[90vh] p-6 md:p-8 lg:p-10">
+        <div className="overflow-y-auto max-h-[90vh] scrollbar-hide p-6 md:p-8 lg:p-10">
           {/* Header */}
           <div className="mb-8">
             <h2 id="about-modal-title" className="text-2xl md:text-3xl font-bold text-text-dark">
