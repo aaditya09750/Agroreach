@@ -1,7 +1,10 @@
 import React from 'react';
 import { BarChart3, ChevronDown } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const AdminOverview: React.FC = () => {
+  const { getCurrencySymbol } = useCurrency();
+  
   const stats = [
     {
       label: 'Customers',
@@ -11,7 +14,7 @@ const AdminOverview: React.FC = () => {
     },
     {
       label: 'Income',
-      value: '$39,403,450',
+      value: `${getCurrencySymbol()}39,403,450`,
       change: '8%',
       isPositive: true,
     },
@@ -25,10 +28,10 @@ const AdminOverview: React.FC = () => {
   ];
 
   const popularProducts = [
-    { name: 'Product A', category: 'UI Kit', earnings: '$5461', image: '📦' },
-    { name: 'Product B', category: 'UI Kit', earnings: '$5461', image: '📦' },
-    { name: 'Product C', category: 'UI Kit', earnings: '$5461', image: '📦' },
-    { name: 'Product D', category: 'UI Kit', earnings: '$5461', image: '📦' },
+    { name: 'Product A', category: 'UI Kit', earnings: `${getCurrencySymbol()}5461`, image: '📦' },
+    { name: 'Product B', category: 'UI Kit', earnings: `${getCurrencySymbol()}5461`, image: '📦' },
+    { name: 'Product C', category: 'UI Kit', earnings: `${getCurrencySymbol()}5461`, image: '📦' },
+    { name: 'Product D', category: 'UI Kit', earnings: `${getCurrencySymbol()}5461`, image: '📦' },
   ];
 
   return (

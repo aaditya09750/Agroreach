@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download, Eye } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const AdminOrders: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const { getCurrencySymbol } = useCurrency();
+
+  // Listen for filter events from sidebar
+  useEffect(() => {
+    const handleFilterEvent = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const filter = customEvent.detail.filter;
+      setFilterStatus(filter);
+    };
+
+    window.addEventListener('applyOrderFilter', handleFilterEvent);
+
+    return () => {
+      window.removeEventListener('applyOrderFilter', handleFilterEvent);
+    };
+  }, []);
 
   const orders = [
     {
       id: 'ORD-2024-001',
       customer: 'Johnson D.',
       date: 'Oct 23, 2025',
-      total: '₹1,245.00',
+      total: '1,245.00',
       status: 'completed',
       items: 3,
     },
@@ -18,7 +35,7 @@ const AdminOrders: React.FC = () => {
       id: 'ORD-2024-002',
       customer: 'Didinya J.',
       date: 'Oct 22, 2025',
-      total: '₹890.50',
+      total: '890.50',
       status: 'processing',
       items: 2,
     },
@@ -26,7 +43,7 @@ const AdminOrders: React.FC = () => {
       id: 'ORD-2024-003',
       customer: 'Penny L.',
       date: 'Oct 22, 2025',
-      total: '₹2,150.00',
+      total: '2,150.00',
       status: 'pending',
       items: 5,
     },
@@ -34,7 +51,7 @@ const AdminOrders: React.FC = () => {
       id: 'ORD-2024-004',
       customer: 'Elon M.',
       date: 'Oct 21, 2025',
-      total: '₹675.25',
+      total: '675.25',
       status: 'completed',
       items: 1,
     },
@@ -42,7 +59,7 @@ const AdminOrders: React.FC = () => {
       id: 'ORD-2024-005',
       customer: 'Sarah K.',
       date: 'Oct 21, 2025',
-      total: '₹1,530.00',
+      total: '1,530.00',
       status: 'cancelled',
       items: 4,
     },
@@ -85,7 +102,7 @@ const AdminOrders: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-6">
+      <div id="all-orders-section" className="grid grid-cols-4 gap-6">
         <div className="bg-white p-5 rounded-xl border border-border-color">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs text-text-muted">Total Orders</p>
@@ -99,7 +116,7 @@ const AdminOrders: React.FC = () => {
           <p className="text-xs text-primary mt-1">↑ 12% from last month</p>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-border-color">
+        <div id="pending-orders-section" className="bg-white p-5 rounded-xl border border-border-color">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs text-text-muted">Pending</p>
             <div className="w-9 h-9 bg-warning/10 rounded-lg flex items-center justify-center">
@@ -112,7 +129,7 @@ const AdminOrders: React.FC = () => {
           <p className="text-xs text-text-muted mt-1">Awaiting processing</p>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-border-color">
+        <div id="completed-orders-section" className="bg-white p-5 rounded-xl border border-border-color">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs text-text-muted">Completed</p>
             <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -134,7 +151,7 @@ const AdminOrders: React.FC = () => {
               </svg>
             </div>
           </div>
-          <h3 className="text-xl font-bold text-text-dark">₹1.2M</h3>
+          <h3 className="text-xl font-bold text-text-dark">{getCurrencySymbol()}1.2M</h3>
           <p className="text-xs text-primary mt-1">↑ 15% from last month</p>
         </div>
       </div>
@@ -225,7 +242,7 @@ const AdminOrders: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-text-dark-gray">{order.date}</td>
                   <td className="px-6 py-4 text-sm text-text-dark-gray">{order.items}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-text-dark">{order.total}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-text-dark">{getCurrencySymbol()}{order.total}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
                       {order.status}

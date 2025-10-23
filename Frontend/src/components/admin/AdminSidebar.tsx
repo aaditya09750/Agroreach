@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Home, Package, ShoppingBag, DollarSign, Users, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
+import { Home, Package, ShoppingBag, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
+import HelpModal from '../modal/HelpModal';
 
 interface AdminSidebarProps {
   activeView: 'overview' | 'add-product' | 'orders';
@@ -10,16 +11,16 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, isCollapsed, setIsCollapsed }) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const menuItems = [
     { id: 'overview', label: 'Home', icon: Home, view: 'overview' as const },
-    { id: 'products', label: 'Products', icon: Package, view: 'add-product' as const },
     { 
-      id: 'customers', 
-      label: 'Customers', 
-      icon: Users, 
-      view: 'overview' as const, 
+      id: 'products', 
+      label: 'Products', 
+      icon: Package, 
+      view: 'add-product' as const,
       hasDropdown: true,
-      subItems: ['Customer List', 'Add Customer', 'Customer Groups']
+      subItems: ['Add Product', 'Recent Products']
     },
     { 
       id: 'shop', 
@@ -29,14 +30,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
       hasDropdown: true,
       subItems: ['All Orders', 'Pending', 'Completed']
     },
-    { 
-      id: 'income', 
-      label: 'Income', 
-      icon: DollarSign, 
-      view: 'overview' as const, 
-      hasDropdown: true,
-      subItems: ['Reports', 'Analytics', 'Revenue']
-    },
   ];
 
   const toggleExpand = (itemId: string) => {
@@ -44,8 +37,61 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
     setExpandedItems(prev => 
       prev.includes(itemId) 
         ? prev.filter(id => id !== itemId)
-        : [itemId] // Only keep the newly opened item, closing all others
+        : [itemId]
     );
+  };
+
+  const handleSubMenuClick = (itemId: string, subItem: string) => {
+    // Navigate to products page first
+    if (itemId === 'products') {
+      setActiveView('add-product');
+      
+      // If "Recent Products" is clicked, scroll to that section after a short delay
+      if (subItem === 'Recent Products') {
+        setTimeout(() => {
+          const recentProductsSection = document.getElementById('recent-products-section');
+          if (recentProductsSection) {
+            recentProductsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    }
+    
+    // Navigate to orders page
+    if (itemId === 'shop') {
+      setActiveView('orders');
+      
+      // Determine filter based on submenu selection
+      let filterStatus = 'all';
+      let sectionId = '';
+      
+      if (subItem === 'All Orders') {
+        filterStatus = 'all';
+        sectionId = 'all-orders-section';
+      } else if (subItem === 'Pending') {
+        filterStatus = 'pending';
+        sectionId = 'pending-orders-section';
+      } else if (subItem === 'Completed') {
+        filterStatus = 'completed';
+        sectionId = 'completed-orders-section';
+      }
+      
+      // Dispatch custom event to apply filter
+      setTimeout(() => {
+        const filterEvent = new CustomEvent('applyOrderFilter', {
+          detail: { filter: filterStatus }
+        });
+        window.dispatchEvent(filterEvent);
+        
+        // Scroll to appropriate section
+        if (sectionId) {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }, 100);
+    }
   };
 
   return (
@@ -139,6 +185,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
                           {item.subItems?.map((subItem, index) => (
                             <li key={index}>
                               <button
+                                onClick={() => handleSubMenuClick(item.id, subItem)}
                                 className="w-full text-left px-3 py-2 text-sm text-text-dark-gray hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
                               >
                                 {subItem}
@@ -160,6 +207,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
           <ul className="space-y-1">
             <li>
               <button 
+                onClick={() => setIsHelpModalOpen(true)}
                 className={`w-full flex items-center rounded-lg text-text-dark-gray hover:bg-gray-50 transition-colors relative group ${
                   isCollapsed ? 'p-2.5 justify-center' : 'px-3 py-2.5 gap-2.5'
                 }`}
@@ -169,9 +217,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
                 {!isCollapsed && (
                   <>
                     <span className="text-sm font-medium flex-1 text-left">Help</span>
-                    <span className="bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium flex-shrink-0">
-                      8
-                    </span>
                   </>
                 )}
                 {isCollapsed && (
@@ -207,6 +252,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
           </ul>
         </div>
       </nav>
+
+      {/* Help Modal */}
+      {isHelpModalOpen && <HelpModal onClose={() => setIsHelpModalOpen(false)} />}
     </aside>
   );
 };

@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
+import { shopProducts, Product } from '../../data/products';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const AdminAddProduct: React.FC = () => {
+  const { getCurrencySymbol } = useCurrency();
   const [productName, setProductName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -32,6 +37,23 @@ const AdminAddProduct: React.FC = () => {
       images
     });
     // Handle form submission
+  };
+
+  const handleEditClick = (product: Product) => {
+    setEditingProduct(product);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingProduct(null);
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would normally update the product in your backend/state management
+    console.log('Saving edited product:', editingProduct);
+    handleCloseEditModal();
   };
 
   return (
@@ -130,9 +152,9 @@ const AdminAddProduct: React.FC = () => {
                 Price <span className="text-sale">*</span>
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">₹</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{getCurrencySymbol()}</span>
                 <input
-                  type="number"
+                  type="number" 
                   id="price"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
@@ -221,7 +243,7 @@ const AdminAddProduct: React.FC = () => {
       </form>
 
       {/* Recent Products Table */}
-      <div className="bg-white rounded-xl border border-border-color">
+      <div id="recent-products-section" className="bg-white rounded-xl border border-border-color">
         <div className="p-6 border-b border-border-color">
           <h2 className="text-base font-medium text-text-dark">Recent Products</h2>
         </div>
@@ -250,27 +272,44 @@ const AdminAddProduct: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border-color">
-              {[1, 2, 3].map((item) => (
-                <tr key={item} className="hover:bg-gray-50 transition-colors">
+              {shopProducts.slice(0, 10).map((product) => (
+                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg"></div>
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       <div>
-                        <p className="text-sm font-medium text-text-dark">Fresh Tomatoes</p>
-                        <p className="text-xs text-text-muted">SKU: VEG001</p>
+                        <p className="text-sm font-medium text-text-dark">{product.name}</p>
+                        <p className="text-xs text-text-muted">ID: {product.id}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-text-dark-gray">Vegetables</td>
-                  <td className="px-6 py-4 text-sm font-medium text-text-dark">₹50.00</td>
-                  <td className="px-6 py-4 text-sm text-text-dark-gray">245</td>
+                  <td className="px-6 py-4 text-sm text-text-dark-gray">{product.category}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-text-dark">
+                    {getCurrencySymbol()}{product.price.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-text-dark-gray">
+                    {product.stockStatus === 'In Stock' ? 'Available' : 'Out of Stock'}
+                  </td>
                   <td className="px-6 py-4">
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                      Active
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      product.stockStatus === 'In Stock' 
+                        ? 'bg-primary/10 text-primary' 
+                        : 'bg-sale/10 text-sale'
+                    }`}>
+                      {product.stockStatus === 'In Stock' ? 'Active' : 'Out of Stock'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-primary hover:text-primary/80 text-sm font-medium">
+                    <button 
+                      onClick={() => handleEditClick(product)}
+                      className="text-primary hover:text-primary/80 text-sm font-medium"
+                    >
                       Edit
                     </button>
                   </td>
@@ -280,6 +319,191 @@ const AdminAddProduct: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Product Modal */}
+      {isEditModalOpen && editingProduct && (
+        <div 
+          className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-6 md:p-8"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleCloseEditModal();
+          }}
+        >
+          <div className="bg-white rounded-lg w-full max-w-3xl max-h-[85vh] overflow-hidden relative shadow-2xl">
+            {/* Close Button */}
+            <button 
+              onClick={handleCloseEditModal} 
+              className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+              aria-label="Close modal"
+            >
+              <X size={20} className="text-text-dark" />
+            </button>
+
+            {/* Modal Content */}
+            <div className="overflow-y-auto max-h-[85vh] scrollbar-hide">
+              <form onSubmit={handleSaveEdit}>
+                <div className="p-6 border-b border-border-color">
+                  <h2 className="text-xl font-semibold text-text-dark">Edit Product</h2>
+                  <p className="text-sm text-text-muted mt-1">Update product information</p>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  {/* Product Image Preview */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-dark mb-3">
+                      Product Image
+                    </label>
+                    <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
+                      <img 
+                        src={editingProduct.image} 
+                        alt={editingProduct.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* Product Name */}
+                    <div>
+                      <label htmlFor="editProductName" className="block text-sm font-medium text-text-dark mb-2">
+                        Product Name <span className="text-sale">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="editProductName"
+                        value={editingProduct.name}
+                        onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                        required
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label htmlFor="editCategory" className="block text-sm font-medium text-text-dark mb-2">
+                        Category <span className="text-sale">*</span>
+                      </label>
+                      <select
+                        id="editCategory"
+                        value={editingProduct.category}
+                        onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                        required
+                      >
+                        <option value="">Select category</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Grains & Cereals">Grains & Cereals</option>
+                        <option value="Dairy & Eggs">Dairy & Eggs</option>
+                        <option value="Meat & Fish">Meat & Fish</option>
+                        <option value="Organic Products">Organic Products</option>
+                      </select>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <label htmlFor="editPrice" className="block text-sm font-medium text-text-dark mb-2">
+                        Price <span className="text-sale">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{getCurrencySymbol()}</span>
+                        <input
+                          type="number"
+                          id="editPrice"
+                          value={editingProduct.price}
+                          onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value)})}
+                          className="w-full pl-8 pr-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                          step="0.01"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Stock Status */}
+                    <div>
+                      <label htmlFor="editStockStatus" className="block text-sm font-medium text-text-dark mb-2">
+                        Stock Status <span className="text-sale">*</span>
+                      </label>
+                      <select
+                        id="editStockStatus"
+                        value={editingProduct.stockStatus}
+                        onChange={(e) => setEditingProduct({...editingProduct, stockStatus: e.target.value as 'In Stock' | 'Out of Stock'})}
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                        required
+                      >
+                        <option value="In Stock">In Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label htmlFor="editDescription" className="block text-sm font-medium text-text-dark mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      id="editDescription"
+                      value={editingProduct.description}
+                      onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
+                      rows={4}
+                      className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors resize-none"
+                    />
+                  </div>
+
+                  {/* Rating */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="editRating" className="block text-sm font-medium text-text-dark mb-2">
+                        Rating (1-5)
+                      </label>
+                      <input
+                        type="number"
+                        id="editRating"
+                        value={editingProduct.rating}
+                        onChange={(e) => setEditingProduct({...editingProduct, rating: parseInt(e.target.value)})}
+                        min="1"
+                        max="5"
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="editReviewCount" className="block text-sm font-medium text-text-dark mb-2">
+                        Review Count
+                      </label>
+                      <input
+                        type="number"
+                        id="editReviewCount"
+                        value={editingProduct.reviewCount}
+                        onChange={(e) => setEditingProduct({...editingProduct, reviewCount: parseInt(e.target.value)})}
+                        min="0"
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Actions */}
+                <div className="p-6 border-t border-border-color flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCloseEditModal}
+                    className="px-5 py-2 border border-border-color rounded-lg text-sm text-text-dark hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
