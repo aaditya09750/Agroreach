@@ -256,7 +256,11 @@ const CurrencyDropdown: React.FC = () => {
   );
 };
 
-const AdminHeader: React.FC = () => {
+interface AdminHeaderProps {
+  hideUserGreeting?: boolean;
+}
+
+const AdminHeader: React.FC<AdminHeaderProps> = ({ hideUserGreeting = false }) => {
   return (
     <header className="bg-white border-b border-border-color sticky top-0 z-50">
       <div className="px-6 py-3">
@@ -284,12 +288,14 @@ const AdminHeader: React.FC = () => {
           <div className="flex items-center gap-2">
             <CurrencyDropdown />
             <NotificationDropdown />
-            <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors" title="User Profile">
-              <div className="w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center">
-                <User size={15} className="text-primary" />
-              </div>
-              <span className="text-sm font-medium text-text-dark">Hi Aaditya</span>
-            </button>
+            {!hideUserGreeting && (
+              <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors" title="User Profile">
+                <div className="w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User size={15} className="text-primary" />
+                </div>
+                <span className="text-sm font-medium text-text-dark">Hi Aaditya</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Home, Package, ShoppingBag, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import HelpModal from '../modal/HelpModal';
 
 interface AdminSidebarProps {
@@ -12,6 +13,14 @@ interface AdminSidebarProps {
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, isCollapsed, setIsCollapsed }) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuthenticated');
+    navigate('/');
+    window.scrollTo(0, 0);
+  };
+
   const menuItems = [
     { id: 'overview', label: 'Home', icon: Home, view: 'overview' as const },
     { 
@@ -232,6 +241,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
             </li>
             <li>
               <button 
+                onClick={handleLogout}
                 className={`w-full flex items-center rounded-lg text-text-dark-gray hover:bg-gray-50 transition-colors relative group ${
                   isCollapsed ? 'p-2.5 justify-center' : 'px-3 py-2.5 gap-2.5'
                 }`}

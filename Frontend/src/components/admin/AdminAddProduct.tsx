@@ -329,7 +329,7 @@ const AdminAddProduct: React.FC = () => {
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="w-12 h-12 bg-white rounded-lg overflow-hidden">
                         <img 
                           src={product.image} 
                           alt={product.name}

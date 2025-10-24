@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Filter, Download, Eye, ChevronDown } from 'lucide-react';
+import { Search, Filter, Download, Eye, ChevronDown, MoreVertical } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 
 const AdminOrders: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
+  const actionMenuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { getCurrencySymbol } = useCurrency();
 
   const statusOptions = [
@@ -22,6 +24,14 @@ const AdminOrders: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
         setShowStatusDropdown(false);
+      }
+      
+      // Close action menu if clicked outside
+      const clickedOutsideAllMenus = Object.values(actionMenuRefs.current).every(
+        ref => !ref || !ref.contains(event.target as Node)
+      );
+      if (clickedOutsideAllMenus) {
+        setOpenActionMenu(null);
       }
     };
 
@@ -44,7 +54,7 @@ const AdminOrders: React.FC = () => {
     };
   }, []);
 
-  const orders = [
+  const [ordersData, setOrdersData] = useState([
     {
       id: 'ORD-2024-001',
       customer: 'Johnson D.',
@@ -85,7 +95,18 @@ const AdminOrders: React.FC = () => {
       status: 'cancelled',
       items: 4,
     },
-  ];
+  ]);
+
+  const updateOrderStatus = (orderId: string, newStatus: string) => {
+    setOrdersData(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+    setOpenActionMenu(null);
+  };
+
+  const orders = ordersData;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -287,10 +308,80 @@ const AdminOrders: React.FC = () => {
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View order details">
-                      <Eye size={18} className="text-text-dark-gray" />
-                    </button>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors" 
+                        title="View order details"
+                      >
+                        <Eye size={18} className="text-text-dark-gray" />
+                      </button>
+                      
+                      {/* Action Dropdown Menu */}
+                      <div 
+                        className="relative"
+                        ref={(el) => actionMenuRefs.current[order.id] = el}
+                      >
+                        <button
+                          onClick={() => setOpenActionMenu(openActionMenu === order.id ? null : order.id)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Update status"
+                        >
+                          <MoreVertical size={18} className="text-text-dark-gray" />
+                        </button>
+                        
+                        {openActionMenu === order.id && (
+                          <div className="absolute right-0 mt-2 w-40 bg-white border border-border-color rounded-lg shadow-lg z-20">
+                            <div className="py-1">
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'pending')}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                                  order.status === 'pending' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                Pending
+                              </button>
+                              
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'processing')}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                                  order.status === 'processing' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                Processing
+                              </button>
+                              
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'shipped')}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                                  order.status === 'shipped' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                Shipped
+                              </button>
+                              
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'completed')}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                                  order.status === 'completed' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                Completed
+                              </button>
+                              
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                                  order.status === 'cancelled' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                Cancelled
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ))}

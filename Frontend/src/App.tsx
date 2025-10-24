@@ -14,6 +14,7 @@ import CartPage from './pages/user/CartPage';
 import CheckoutPage from './pages/user/CheckoutPage';
 import SettingsPage from './pages/user/SettingsPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -63,7 +64,8 @@ function App() {
                       <Route path="/cart" element={<CartPage />} />
                       <Route path="/checkout" element={<CheckoutPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
-                      <Route path="/admin" element={<AdminDashboard />} />
+                      <Route path="/admin" element={<AdminLoginPage />} />
+                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
                     </Routes>
                 </Router>
               </OrderProvider>

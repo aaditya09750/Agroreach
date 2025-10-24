@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BarChart3, ChevronDown } from 'lucide-react';
+import { ChevronDown, Package, Truck, AlertTriangle, Star } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { shopProducts, Product } from '../../data/products';
 
@@ -75,19 +75,8 @@ const AdminOverview: React.FC = () => {
   
   const stats = getFilteredStats(overviewFilter);
 
-  const customers = [
-    { name: 'Johnson D.', avatar: '👤' },
-    { name: 'Didinya J.', avatar: '👤' },
-    { name: 'Penny L.', avatar: '👤' },
-    { name: 'Elon M.', avatar: '👤' },
-  ];
-
   // Function to get popular products based on time filter
   const getPopularProducts = (filter: TimeFilter) => {
-    // Simulate different popular products based on time period
-    // In a real app, you would fetch actual sales data from your backend
-    
-    // Get random products from shop but keep them consistent for each filter
     const getProductsByFilter = (): Product[] => {
       switch (filter) {
         case 'today':
@@ -142,6 +131,66 @@ const AdminOverview: React.FC = () => {
   };
 
   const popularProducts = getPopularProducts(incomeFilter);
+
+  // Function to generate chart data based on time filter
+  const getChartData = (filter: TimeFilter) => {
+    switch (filter) {
+      case 'today':
+        return [
+          { label: '12 AM', value: 2500 },
+          { label: '4 AM', value: 1200 },
+          { label: '8 AM', value: 4500 },
+          { label: '12 PM', value: 7800 },
+          { label: '4 PM', value: 9200 },
+          { label: '8 PM', value: 6500 },
+        ];
+      case 'week':
+        return [
+          { label: 'Mon', value: 45000 },
+          { label: 'Tue', value: 52000 },
+          { label: 'Wed', value: 48000 },
+          { label: 'Thu', value: 61000 },
+          { label: 'Fri', value: 55000 },
+          { label: 'Sat', value: 67000 },
+          { label: 'Sun', value: 58000 },
+        ];
+      case 'month':
+        return [
+          { label: 'Week 1', value: 180000 },
+          { label: 'Week 2', value: 220000 },
+          { label: 'Week 3', value: 195000 },
+          { label: 'Week 4', value: 245000 },
+        ];
+      case 'year':
+        return [
+          { label: 'Jan', value: 850000 },
+          { label: 'Feb', value: 920000 },
+          { label: 'Mar', value: 1050000 },
+          { label: 'Apr', value: 980000 },
+          { label: 'May', value: 1120000 },
+          { label: 'Jun', value: 1080000 },
+          { label: 'Jul', value: 1150000 },
+          { label: 'Aug', value: 1200000 },
+          { label: 'Sep', value: 1100000 },
+          { label: 'Oct', value: 1250000 },
+          { label: 'Nov', value: 1180000 },
+          { label: 'Dec', value: 1320000 },
+        ];
+      case 'all-time':
+      default:
+        return [
+          { label: '2020', value: 8500000 },
+          { label: '2021', value: 10200000 },
+          { label: '2022', value: 12800000 },
+          { label: '2023', value: 15500000 },
+          { label: '2024', value: 18900000 },
+          { label: '2025', value: 13200000 },
+        ];
+    }
+  };
+
+  const chartData = getChartData(incomeFilter);
+  const maxValue = Math.max(...chartData.map(d => d.value));
 
   return (
     <div className="space-y-6">
@@ -202,20 +251,63 @@ const AdminOverview: React.FC = () => {
         </div>
       </div>
 
-      {/* Welcome Section */}
+      {/* Quick Stats & Actions */}
       <div className="bg-white p-6 rounded-xl border border-border-color">
-        <h3 className="text-base font-medium text-text-dark mb-6">
-          Welcome to our <span className="font-semibold">new online experience</span>
-        </h3>
-        <div className="flex gap-8">
-          {customers.map((customer, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-2xl mb-2">
-                {customer.avatar}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-text-dark">Welcome back, Admin!</h3>
+            <p className="text-text-muted text-sm mt-1">Here's what's happening with your store today</p>
+          </div>
+          <div className="text-right">
+            <p className="text-text-muted text-xs mb-1">Current Date</p>
+            <p className="text-base font-medium text-text-dark">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Package size={24} className="text-primary" />
               </div>
-              <p className="text-sm text-text-dark-gray">{customer.name}</p>
+              <div>
+                <p className="text-text-muted text-xs mb-1">Pending Orders</p>
+                <p className="text-2xl font-semibold text-text-dark">24</p>
+              </div>
             </div>
-          ))}
+          </div>
+          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Truck size={24} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-text-muted text-xs mb-1">Out for Delivery</p>
+                <p className="text-2xl font-semibold text-text-dark">12</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-warning/5 rounded-lg p-4 border border-warning/20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
+                <AlertTriangle size={24} className="text-warning" />
+              </div>
+              <div>
+                <p className="text-text-muted text-xs mb-1">Low Stock Items</p>
+                <p className="text-2xl font-semibold text-text-dark">8</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Star size={24} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-text-muted text-xs mb-1">New Reviews</p>
+                <p className="text-2xl font-semibold text-text-dark">15</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -252,10 +344,59 @@ const AdminOverview: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="h-64 flex items-center justify-center text-text-muted">
-            <div className="text-center">
-              <BarChart3 size={48} className="mx-auto mb-2 text-primary/30" />
-              <p className="text-sm">Chart visualization here</p>
+          <div className="mt-6 px-4">
+            <div className="flex items-end justify-between gap-3 h-56">
+              {chartData.map((item, index) => {
+                const heightPercentage = (item.value / maxValue) * 100;
+                const heightPx = (heightPercentage / 100) * 200; // Convert to pixels (200px max height)
+                return (
+                  <div key={index} className="flex-1 flex flex-col items-center">
+                    <div className="w-full flex flex-col items-end justify-end h-52">
+                      <div className="relative group w-full">
+                        {/* Tooltip */}
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-text-dark text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                          <div className="text-center">
+                            <div className="font-semibold">{getCurrencySymbol()}{item.value.toLocaleString()}</div>
+                          </div>
+                          {/* Arrow */}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+                            <div className="w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-text-dark"></div>
+                          </div>
+                        </div>
+                        <div
+                          className="w-full bg-gradient-to-t from-primary to-primary/70 rounded-t-md transition-all duration-300 hover:from-primary/90 hover:to-primary/60 cursor-pointer shadow-sm"
+                          style={{ height: `${heightPx}px`, minHeight: '8px' }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="w-full border-t-2 border-border-color mt-1"></div>
+                    <p className="text-xs text-text-dark-gray font-medium mt-2 text-center">{item.label}</p>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Chart Summary Statistics */}
+            <div className="mt-6 pt-4 border-t border-border-color">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <p className="text-xs text-text-muted mb-1">Total Revenue</p>
+                  <p className="text-lg font-semibold text-text-dark">
+                    {getCurrencySymbol()}{chartData.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-text-muted mb-1">Average</p>
+                  <p className="text-lg font-semibold text-text-dark">
+                    {getCurrencySymbol()}{Math.round(chartData.reduce((sum, item) => sum + item.value, 0) / chartData.length).toLocaleString()}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-text-muted mb-1">Peak Period</p>
+                  <p className="text-lg font-semibold text-primary">
+                    {chartData.reduce((max, item) => item.value > max.value ? item : max, chartData[0]).label}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -278,7 +419,7 @@ const AdminOverview: React.FC = () => {
             {popularProducts.map((product) => (
               <div key={product.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                     <img 
                       src={product.image} 
                       alt={product.name}
@@ -298,24 +439,6 @@ const AdminOverview: React.FC = () => {
             <button className="w-full py-2 text-sm text-primary hover:text-primary/80 transition-colors">
               All Products
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Comments Section */}
-      <div className="bg-white p-6 rounded-xl border border-border-color">
-        <h3 className="text-base font-medium text-text-dark mb-4">Comments</h3>
-        <div className="space-y-4">
-          <div className="flex items-start justify-between pb-3 border-b border-border-color">
-            <span className="text-xs font-medium text-text-muted">Comments</span>
-            <span className="text-xs font-medium text-text-muted">Date</span>
-          </div>
-          <div className="flex justify-between">
-            <p className="text-sm text-text-dark-gray max-w-2xl">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-              labore et dolore magna aliqua, sed do eiusmod tempor incididunt
-            </p>
-            <span className="text-sm text-text-muted">Nov 22, 2025</span>
           </div>
         </div>
       </div>
