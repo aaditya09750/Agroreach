@@ -20,9 +20,11 @@ const AdminAddProduct: React.FC = () => {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showEditCategoryDropdown, setShowEditCategoryDropdown] = useState(false);
   const [showEditStockDropdown, setShowEditStockDropdown] = useState(false);
+  const [showEditFeaturesDropdown, setShowEditFeaturesDropdown] = useState(false);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const editCategoryDropdownRef = useRef<HTMLDivElement>(null);
   const editStockDropdownRef = useRef<HTMLDivElement>(null);
+  const editFeaturesDropdownRef = useRef<HTMLDivElement>(null);
 
   const categories = [
     { value: '', label: 'Select category' },
@@ -48,6 +50,9 @@ const AdminAddProduct: React.FC = () => {
       }
       if (editStockDropdownRef.current && !editStockDropdownRef.current.contains(event.target as Node)) {
         setShowEditStockDropdown(false);
+      }
+      if (editFeaturesDropdownRef.current && !editFeaturesDropdownRef.current.contains(event.target as Node)) {
+        setShowEditFeaturesDropdown(false);
       }
     };
 
@@ -457,11 +462,11 @@ const AdminAddProduct: React.FC = () => {
             if (e.target === e.currentTarget) handleCloseEditModal();
           }}
         >
-          <div className="bg-white rounded-lg w-full max-w-3xl max-h-[85vh] overflow-hidden relative shadow-2xl">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[85vh] overflow-hidden relative shadow-2xl">
             {/* Close Button */}
             <button 
               onClick={handleCloseEditModal} 
-              className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+              className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
               aria-label="Close modal"
             >
               <X size={20} className="text-text-dark" />
@@ -667,6 +672,69 @@ const AdminAddProduct: React.FC = () => {
                           <X size={14} />
                         </button>
                       </span>
+                    </div>
+                  </div>
+
+                  {/* Product Features Dropdown */}
+                  <div>
+                    <label htmlFor="editProductFeatures" className="block text-sm font-medium text-text-dark mb-2">
+                      Product Features
+                    </label>
+                    <div className="relative" ref={editFeaturesDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setShowEditFeaturesDropdown(!showEditFeaturesDropdown)}
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
+                      >
+                        <span className="text-text-dark text-sm">
+                          {(() => {
+                            const features = [];
+                            if (editingProduct.isHotDeal) features.push('Hot Deal');
+                            if (editingProduct.isBestSeller) features.push('Best Seller');
+                            if (editingProduct.isTopRated) features.push('Top Rated');
+                            return features.length > 0 ? features.join(', ') : 'Select features';
+                          })()}
+                        </span>
+                        <ChevronDown size={16} className="text-text-muted" />
+                      </button>
+                      {showEditFeaturesDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10">
+                          <div className="p-3 space-y-2">
+                            {/* Hot Deal Option */}
+                            <label className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary/5 cursor-pointer transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.isHotDeal || false}
+                                onChange={(e) => setEditingProduct({...editingProduct, isHotDeal: e.target.checked})}
+                                className="w-4 h-4 border-border-color rounded focus:ring-primary focus:ring-2 cursor-pointer accent-primary checkbox-white-tick"
+                              />
+                              <span className="text-sm text-text-dark">Hot Deal</span>
+                            </label>
+                            
+                            {/* Best Seller Option */}
+                            <label className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary/5 cursor-pointer transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.isBestSeller || false}
+                                onChange={(e) => setEditingProduct({...editingProduct, isBestSeller: e.target.checked})}
+                                className="w-4 h-4 border-border-color rounded focus:ring-primary focus:ring-2 cursor-pointer accent-primary checkbox-white-tick"
+                              />
+                              <span className="text-sm text-text-dark">Best Seller</span>
+                            </label>
+                            
+                            {/* Top Rated Option */}
+                            <label className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary/5 cursor-pointer transition-colors">
+                              <input
+                                type="checkbox"
+                                checked={editingProduct.isTopRated || false}
+                                onChange={(e) => setEditingProduct({...editingProduct, isTopRated: e.target.checked})}
+                                className="w-4 h-4 border-border-color rounded focus:ring-primary focus:ring-2 cursor-pointer accent-primary checkbox-white-tick"
+                              />
+                              <span className="text-sm text-text-dark">Top Rated</span>
+                            </label>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

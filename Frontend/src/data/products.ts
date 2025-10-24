@@ -19,8 +19,8 @@ export interface Product {
     name: string;
     image: string;
     images: string[];
-    price: number; // Changed from string to number
-    oldPrice?: number; // Changed from string to number
+    price: number;
+    oldPrice?: number;
     rating: number;
     reviewCount: number;
     status?: 'sale' | 'out-of-stock' | 'hover';
@@ -33,6 +33,9 @@ export interface Product {
     description: string;
     category: string;
     tags: string[];
+    isHotDeal?: boolean;
+    isBestSeller?: boolean;
+    isTopRated?: boolean;
 }
   
   export const shopProducts: Product[] = [
