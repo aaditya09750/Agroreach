@@ -95,6 +95,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
   };
 
   return (
+    <>
     <aside className={`bg-white border-r border-border-color h-[calc(100vh-61px)] fixed left-0 top-[61px] shadow-sm transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} overflow-hidden`}>
       {/* Toggle Button */}
       <div className={`border-b border-border-color ${isCollapsed ? 'p-2' : 'p-3'}`}>
@@ -221,9 +222,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
                 )}
                 {isCollapsed && (
                   <>
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-medium z-10">
-                      8
-                    </span>
                     <div className="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
                       Help
                       <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900"></div>
@@ -253,9 +251,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
         </div>
       </nav>
 
-      {/* Help Modal */}
-      {isHelpModalOpen && <HelpModal onClose={() => setIsHelpModalOpen(false)} />}
     </aside>
+    {isHelpModalOpen && <HelpModal onClose={() => setIsHelpModalOpen(false)} />}
+    </>
   );
 };
 

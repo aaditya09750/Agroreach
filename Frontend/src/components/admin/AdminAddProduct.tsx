@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Upload, X } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, X, ChevronDown } from 'lucide-react';
 import { shopProducts, Product } from '../../data/products';
 import { useCurrency } from '../../context/CurrencyContext';
 
@@ -13,6 +13,43 @@ const AdminAddProduct: React.FC = () => {
   const [images, setImages] = useState<string[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showEditCategoryDropdown, setShowEditCategoryDropdown] = useState(false);
+  const [showEditStockDropdown, setShowEditStockDropdown] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const editCategoryDropdownRef = useRef<HTMLDivElement>(null);
+  const editStockDropdownRef = useRef<HTMLDivElement>(null);
+
+  const categories = [
+    { value: '', label: 'Select category' },
+    { value: 'vegetables', label: 'Vegetables' },
+    { value: 'fruits', label: 'Fruits' },
+    { value: 'grains', label: 'Grains & Cereals' },
+    { value: 'organic', label: 'Organic Products' },
+  ];
+
+  const stockStatuses = [
+    { value: 'In Stock', label: 'In Stock' },
+    { value: 'Out of Stock', label: 'Out of Stock' },
+  ];
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
+        setShowCategoryDropdown(false);
+      }
+      if (editCategoryDropdownRef.current && !editCategoryDropdownRef.current.contains(event.target as Node)) {
+        setShowEditCategoryDropdown(false);
+      }
+      if (editStockDropdownRef.current && !editStockDropdownRef.current.contains(event.target as Node)) {
+        setShowEditStockDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -129,21 +166,37 @@ const AdminAddProduct: React.FC = () => {
               <label htmlFor="category" className="block text-sm font-medium text-text-dark mb-2">
                 Category <span className="text-sale">*</span>
               </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-                required
-              >
-                <option value="">Select category</option>
-                <option value="vegetables">Vegetables</option>
-                <option value="fruits">Fruits</option>
-                <option value="grains">Grains & Cereals</option>
-                <option value="dairy">Dairy & Eggs</option>
-                <option value="meat">Meat & Fish</option>
-                <option value="organic">Organic Products</option>
-              </select>
+              <div className="relative" ref={categoryDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
+                >
+                  <span className={category ? 'text-text-dark' : 'text-text-muted'}>
+                    {categories.find(c => c.value === category)?.label || 'Select category'}
+                  </span>
+                  <ChevronDown size={16} className="text-text-muted" />
+                </button>
+                {showCategoryDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => {
+                          setCategory(cat.value);
+                          setShowCategoryDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                          category === cat.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                        } ${cat.value === '' ? 'text-text-muted' : ''}`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Price */}
@@ -382,21 +435,37 @@ const AdminAddProduct: React.FC = () => {
                       <label htmlFor="editCategory" className="block text-sm font-medium text-text-dark mb-2">
                         Category <span className="text-sale">*</span>
                       </label>
-                      <select
-                        id="editCategory"
-                        value={editingProduct.category}
-                        onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
-                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-                        required
-                      >
-                        <option value="">Select category</option>
-                        <option value="Vegetables">Vegetables</option>
-                        <option value="Fruits">Fruits</option>
-                        <option value="Grains & Cereals">Grains & Cereals</option>
-                        <option value="Dairy & Eggs">Dairy & Eggs</option>
-                        <option value="Meat & Fish">Meat & Fish</option>
-                        <option value="Organic Products">Organic Products</option>
-                      </select>
+                      <div className="relative" ref={editCategoryDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={() => setShowEditCategoryDropdown(!showEditCategoryDropdown)}
+                          className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
+                        >
+                          <span className="text-text-dark">
+                            {editingProduct.category || 'Select category'}
+                          </span>
+                          <ChevronDown size={16} className="text-text-muted" />
+                        </button>
+                        {showEditCategoryDropdown && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                            {['Vegetables', 'Fruits', 'Grains & Cereals', 'Dairy & Eggs', 'Meat & Fish', 'Organic Products'].map((cat) => (
+                              <button
+                                key={cat}
+                                type="button"
+                                onClick={() => {
+                                  setEditingProduct({...editingProduct, category: cat});
+                                  setShowEditCategoryDropdown(false);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                                  editingProduct.category === cat ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                {cat}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Price */}
@@ -423,16 +492,37 @@ const AdminAddProduct: React.FC = () => {
                       <label htmlFor="editStockStatus" className="block text-sm font-medium text-text-dark mb-2">
                         Stock Status <span className="text-sale">*</span>
                       </label>
-                      <select
-                        id="editStockStatus"
-                        value={editingProduct.stockStatus}
-                        onChange={(e) => setEditingProduct({...editingProduct, stockStatus: e.target.value as 'In Stock' | 'Out of Stock'})}
-                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-                        required
-                      >
-                        <option value="In Stock">In Stock</option>
-                        <option value="Out of Stock">Out of Stock</option>
-                      </select>
+                      <div className="relative" ref={editStockDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={() => setShowEditStockDropdown(!showEditStockDropdown)}
+                          className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
+                        >
+                          <span className="text-text-dark">
+                            {editingProduct.stockStatus}
+                          </span>
+                          <ChevronDown size={16} className="text-text-muted" />
+                        </button>
+                        {showEditStockDropdown && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10">
+                            {stockStatuses.map((status) => (
+                              <button
+                                key={status.value}
+                                type="button"
+                                onClick={() => {
+                                  setEditingProduct({...editingProduct, stockStatus: status.value as 'In Stock' | 'Out of Stock'});
+                                  setShowEditStockDropdown(false);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                                  editingProduct.stockStatus === status.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                {status.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 

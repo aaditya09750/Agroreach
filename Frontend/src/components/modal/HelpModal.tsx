@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { X, Mail, Phone, MessageCircle, FileText, HelpCircle, Video } from 'lucide-react';
+import { X, Mail, Phone, MessageCircle, FileText, HelpCircle, Video, Package, ShoppingBag, Users, DollarSign } from 'lucide-react';
 
 interface HelpModalProps {
   onClose: () => void;
@@ -58,7 +58,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-8 md:p-8"
+      className="fixed inset-0 bg-black/70 z-[99999] flex items-center justify-center p-8 md:p-8"
       onClick={handleOverlayClick}
     >
       <div 
@@ -271,8 +271,5 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
     </div>
   );
 };
-
-// Import icons that are used in the component
-import { Package, ShoppingBag, Users, DollarSign } from 'lucide-react';
 
 export default HelpModal;
