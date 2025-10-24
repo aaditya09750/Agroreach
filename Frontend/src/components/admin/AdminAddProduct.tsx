@@ -8,8 +8,12 @@ const AdminAddProduct: React.FC = () => {
   const [productName, setProductName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
+  const [discount, setDiscount] = useState('');
   const [stock, setStock] = useState('');
   const [description, setDescription] = useState('');
+  const [sellerName, setSellerName] = useState('');
+  const [tags, setTags] = useState<string[]>(['Organic', 'Fresh']);
+  const [newTag, setNewTag] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -63,14 +67,31 @@ const AdminAddProduct: React.FC = () => {
     setImages(images.filter((_, i) => i !== index));
   };
 
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      e.preventDefault();
+      if (!tags.includes(newTag.trim())) {
+        setTags([...tags, newTag.trim()]);
+      }
+      setNewTag('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
       productName,
       category,
       price,
+      discount,
       stock,
       description,
+      sellerName,
+      tags,
       images
     });
     // Handle form submission
@@ -187,7 +208,7 @@ const AdminAddProduct: React.FC = () => {
                           setCategory(cat.value);
                           setShowCategoryDropdown(false);
                         }}
-                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors ${
                           category === cat.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                         } ${cat.value === '' ? 'text-text-muted' : ''}`}
                       >
@@ -198,7 +219,10 @@ const AdminAddProduct: React.FC = () => {
                 )}
               </div>
             </div>
+          </div>
 
+          {/* Price, Discount, and Stock */}
+          <div className="grid grid-cols-3 gap-6">
             {/* Price */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-text-dark mb-2">
@@ -216,6 +240,27 @@ const AdminAddProduct: React.FC = () => {
                   step="0.01"
                   required
                 />
+              </div>
+            </div>
+
+            {/* Discount */}
+            <div>
+              <label htmlFor="discount" className="block text-sm font-medium text-text-dark mb-2">
+                Discount (%)
+              </label>
+              <div className="relative">
+                <input
+                  type="number" 
+                  id="discount"
+                  value={discount}
+                  onChange={(e) => setDiscount(e.target.value)}
+                  placeholder="0"
+                  className="w-full px-4 pr-10 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                  step="1"
+                  min="0"
+                  max="100"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted">%</span>
               </div>
             </div>
 
@@ -251,30 +296,61 @@ const AdminAddProduct: React.FC = () => {
             />
           </div>
 
-          {/* Tags */}
+          {/* Seller Name and Tags Input */}
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="sellerName" className="block text-sm font-medium text-text-dark mb-2">
+                Seller Name
+              </label>
+              <input
+                type="text"
+                id="sellerName"
+                value={sellerName}
+                onChange={(e) => setSellerName(e.target.value)}
+                placeholder="Enter seller name"
+                className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="newTag" className="block text-sm font-medium text-text-dark mb-2">
+                Add Tags
+              </label>
+              <input
+                type="text"
+                id="newTag"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={handleAddTag}
+                placeholder="Type and press Enter to add tags"
+                className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Tags Display */}
           <div>
             <label className="block text-sm font-medium text-text-dark mb-2">
-              Tags
+              Current Tags
             </label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              <span className="px-3 py-1 bg-gray-100 text-text-dark rounded-full text-sm flex items-center gap-2">
-                Organic
-                <button type="button" className="hover:text-sale transition-colors" title="Remove tag">
-                  <X size={14} />
-                </button>
-              </span>
-              <span className="px-3 py-1 bg-gray-100 text-text-dark rounded-full text-sm flex items-center gap-2">
-                Fresh
-                <button type="button" className="hover:text-sale transition-colors" title="Remove tag">
-                  <X size={14} />
-                </button>
-              </span>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
+                <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
+                  {tag}
+                  <button 
+                    type="button" 
+                    onClick={() => removeTag(tag)}
+                    className="hover:text-primary/70 transition-colors" 
+                    title="Remove tag"
+                  >
+                    <X size={14} />
+                  </button>
+                </span>
+              ))}
+              {tags.length === 0 && (
+                <p className="text-sm text-text-muted">No tags added yet. Add tags above.</p>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Add a tag..."
-              className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-            />
           </div>
         </div>
 
@@ -405,7 +481,7 @@ const AdminAddProduct: React.FC = () => {
                     <label className="block text-sm font-medium text-text-dark mb-3">
                       Product Image
                     </label>
-                    <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
+                    <div className="w-24 h-24 bg-white rounded-lg overflow-hidden">
                       <img 
                         src={editingProduct.image} 
                         alt={editingProduct.name}
@@ -456,7 +532,7 @@ const AdminAddProduct: React.FC = () => {
                                   setEditingProduct({...editingProduct, category: cat});
                                   setShowEditCategoryDropdown(false);
                                 }}
-                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors ${
                                   editingProduct.category === cat ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
                               >
@@ -513,7 +589,7 @@ const AdminAddProduct: React.FC = () => {
                                   setEditingProduct({...editingProduct, stockStatus: status.value as 'In Stock' | 'Out of Stock'});
                                   setShowEditStockDropdown(false);
                                 }}
-                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors ${
                                   editingProduct.stockStatus === status.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
                               >
@@ -540,35 +616,57 @@ const AdminAddProduct: React.FC = () => {
                     />
                   </div>
 
-                  {/* Rating */}
+                  {/* Seller Name and Tags */}
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="editRating" className="block text-sm font-medium text-text-dark mb-2">
-                        Rating (1-5)
+                      <label htmlFor="editSellerName" className="block text-sm font-medium text-text-dark mb-2">
+                        Seller Name
                       </label>
                       <input
-                        type="number"
-                        id="editRating"
-                        value={editingProduct.rating}
-                        onChange={(e) => setEditingProduct({...editingProduct, rating: parseInt(e.target.value)})}
-                        min="1"
-                        max="5"
+                        type="text"
+                        id="editSellerName"
+                        placeholder="Enter seller name"
                         className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="editReviewCount" className="block text-sm font-medium text-text-dark mb-2">
-                        Review Count
+                      <label htmlFor="editTags" className="block text-sm font-medium text-text-dark mb-2">
+                        Tags
                       </label>
                       <input
-                        type="number"
-                        id="editReviewCount"
-                        value={editingProduct.reviewCount}
-                        onChange={(e) => setEditingProduct({...editingProduct, reviewCount: parseInt(e.target.value)})}
-                        min="0"
+                        type="text"
+                        id="editTags"
+                        placeholder="e.g., Organic, Fresh, Local"
                         className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
                       />
+                    </div>
+                  </div>
+
+                  {/* Display Tags */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-dark mb-2">
+                      Current Tags
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
+                        Organic
+                        <button type="button" className="hover:text-primary/70 transition-colors" title="Remove tag">
+                          <X size={14} />
+                        </button>
+                      </span>
+                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
+                        Fresh
+                        <button type="button" className="hover:text-primary/70 transition-colors" title="Remove tag">
+                          <X size={14} />
+                        </button>
+                      </span>
+                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
+                        Local
+                        <button type="button" className="hover:text-primary/70 transition-colors" title="Remove tag">
+                          <X size={14} />
+                        </button>
+                      </span>
                     </div>
                   </div>
                 </div>

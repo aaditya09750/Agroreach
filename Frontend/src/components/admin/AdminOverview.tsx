@@ -240,7 +240,7 @@ const AdminOverview: React.FC = () => {
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   stat.isPositive 
-                    ? 'bg-primary/10 text-primary' 
+                    ? ' text-primary' 
                     : 'bg-sale/10 text-sale'
                 }`}>
                   {stat.change}
@@ -264,47 +264,47 @@ const AdminOverview: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+          <div className="bg-primary/5 rounded-lg p-4 ">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Package size={24} className="text-primary" />
+              <div className="w-12 h-12  rounded-lg flex items-center justify-center">
+                <Package size={35} className="text-primary" />
               </div>
               <div>
                 <p className="text-text-muted text-xs mb-1">Pending Orders</p>
-                <p className="text-2xl font-semibold text-text-dark">24</p>
+                <p className="text-xl font-semibold text-text-dark">24</p>
               </div>
             </div>
           </div>
-          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+          <div className="bg-primary/5 rounded-lg p-4 ">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Truck size={24} className="text-primary" />
+              <div className="w-12 h-12  rounded-lg flex items-center justify-center">
+                <Truck size={35} className="text-primary" />
               </div>
               <div>
                 <p className="text-text-muted text-xs mb-1">Out for Delivery</p>
-                <p className="text-2xl font-semibold text-text-dark">12</p>
+                <p className="text-xl font-semibold text-text-dark">12</p>
               </div>
             </div>
           </div>
-          <div className="bg-warning/5 rounded-lg p-4 border border-warning/20">
+          <div className="bg-primary/5 rounded-lg p-4 ">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
-                <AlertTriangle size={24} className="text-warning" />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+                <AlertTriangle size={35} className="text-warning" />
               </div>
               <div>
                 <p className="text-text-muted text-xs mb-1">Low Stock Items</p>
-                <p className="text-2xl font-semibold text-text-dark">8</p>
+                <p className="text-xl font-semibold text-text-dark">8</p>
               </div>
             </div>
           </div>
-          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+          <div className="bg-primary/5 rounded-lg p-4 ">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Star size={24} className="text-primary" />
+              <div className="w-12 h-12  rounded-lg flex items-center justify-center">
+                <Star size={35} className="text-primary" />
               </div>
               <div>
                 <p className="text-text-muted text-xs mb-1">New Reviews</p>
-                <p className="text-2xl font-semibold text-text-dark">15</p>
+                <p className="text-xl font-semibold text-text-dark">15</p>
               </div>
             </div>
           </div>
