@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useOrder } from '../../context/OrderContext';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const OrderHistoryTable: React.FC = () => {
   const { orders } = useOrder();
+  const { convertPrice, getCurrencySymbol } = useCurrency();
+  const currencySymbol = getCurrencySymbol();
   
   // Show only the most recent 5 orders
   const recentOrders = orders.slice(0, 5);
@@ -29,19 +32,29 @@ const OrderHistoryTable: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border-color">
-              {recentOrders.map((order) => (
-                <tr key={order.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">#{order.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.total}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.status}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link to={`/dashboard/order/${order.id}`} className="text-primary hover:text-green-700">
-                      View Details
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {recentOrders.map((order) => {
+                // Extract numeric value from total string (e.g., "$856.68" -> 856.68)
+                const numericTotal = parseFloat(order.total.replace(/[^0-9.-]+/g, ''));
+                const convertedTotal = convertPrice(numericTotal);
+                
+                return (
+                  <tr key={order._id || order.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">
+                      {order.orderId || `#${order._id || order.id}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">
+                      {currencySymbol}{convertedTotal.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.status}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Link to={`/dashboard/order/${order._id || order.id}`} className="text-primary hover:text-green-700">
+                        View Details
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

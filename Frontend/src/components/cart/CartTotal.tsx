@@ -75,7 +75,7 @@ const CartTotal: React.FC = () => {
   // Check if billing address is saved (at least first name and street address required)
   const hasAddress = billingAddress.firstName && billingAddress.streetAddress;
 
-  const handleCheckout = (e: React.MouseEvent) => {
+  const handleCheckout = async (e: React.MouseEvent) => {
     if (cartItems.length === 0) {
       e.preventDefault();
       setShowEmptyCartNotification(true);
@@ -85,41 +85,40 @@ const CartTotal: React.FC = () => {
     if (hasAddress && cartItems.length > 0) {
       e.preventDefault();
       
-      // Create order with cart items
-      const orderItems = cartItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image
-      }));
+      try {
+        // Create order with proper format for backend
+        await addOrder({
+          shippingAddress: {
+            street: billingAddress.streetAddress,
+            city: billingAddress.state,
+            state: billingAddress.state,
+            postalCode: billingAddress.zipCode,
+            country: billingAddress.country
+          },
+          paymentMethod: 'Cash on Delivery',
+          items: cartItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image
+          })),
+          subtotal: convertedSubtotal,
+          shipping,
+          gst
+        });
 
-      addOrder({
-        total: `${currencySymbol}${total.toFixed(2)} (${cartItems.length} Product${cartItems.length > 1 ? 's' : ''})`,
-        items: orderItems,
-        subtotal: convertedSubtotal,
-        shipping,
-        gst,
-        billingAddress: {
-          firstName: billingAddress.firstName,
-          lastName: billingAddress.lastName,
-          email: billingAddress.email,
-          phone: billingAddress.phone,
-          streetAddress: billingAddress.streetAddress,
-          country: billingAddress.country,
-          state: billingAddress.state,
-          zipCode: billingAddress.zipCode,
-          companyName: billingAddress.companyName
-        }
-      });
+        // Clear cart
+        await clearCart();
 
-      // Clear cart
-      clearCart();
-
-      // Navigate to order history after a short delay to show notification
-      setTimeout(() => {
-        navigate('/order-history');
-      }, 500);
+        // Navigate to order history after a short delay to show notification
+        setTimeout(() => {
+          navigate('/order-history');
+        }, 1000);
+      } catch (error) {
+        console.error('Failed to place order:', error);
+        alert('Failed to place order. Please try again.');
+      }
     }
   };
 

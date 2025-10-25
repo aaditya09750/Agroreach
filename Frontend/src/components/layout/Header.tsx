@@ -7,6 +7,7 @@ import ARLogo from '../../assets/AR Logo.png';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useUser } from '../../context/UserContext';
 import { shopProducts, Product } from '../../data/products';
 
 const CurrencyDropdown: React.FC = () => {
@@ -167,6 +168,7 @@ const TopBar: React.FC = () => {
 const MidBar: React.FC = () => {
   const { getCartCount, getCartTotal } = useCart();
   const { convertPrice, getCurrencySymbol } = useCurrency();
+  const { user } = useUser();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -347,7 +349,12 @@ const MidBar: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <Link to="/dashboard" className="relative">
+        <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          {user && (
+            <span className="text-sm font-medium text-text-dark hidden lg:block">
+              Hi {user.name.split(' ')[0]}
+            </span>
+          )}
           <BsPersonCircle size={22} className="text-text-dark" />
         </Link>
         <div className="hidden lg:block border-l border-gray-300 h-5"></div>

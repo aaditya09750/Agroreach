@@ -1,4 +1,7 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { orderService, CreateOrderData } from '../services/orderService';
+import { useUser } from './UserContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 export interface OrderItem {
   id: number;
@@ -9,10 +12,12 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: number;
+  id: number | string;
+  _id?: string;
+  orderId?: string; // Custom order ID like ORD-2024-00001
   date: string;
   total: string;
-  status: 'Order received' | 'Processing' | 'On the way' | 'Delivered';
+  status: 'Order received' | 'Processing' | 'On the way' | 'Delivered' | 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   items: OrderItem[];
   subtotal: number;
   shipping: number;
@@ -32,8 +37,10 @@ export interface Order {
 
 interface OrderContextType {
   orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'date' | 'status'>) => void;
-  getOrderById: (id: number) => Order | undefined;
+  loading: boolean;
+  addOrder: (orderData: CreateOrderData) => Promise<void>;
+  getOrderById: (id: number | string) => Order | undefined;
+  refreshOrders: () => Promise<void>;
   showNotification: boolean;
   notificationMessage: string;
   hideNotification: () => void;
@@ -54,30 +61,197 @@ interface OrderProviderProps {
 }
 
 export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
+  const { user, billingAddress } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
 
-  const addOrder = (orderData: Omit<Order, 'id' | 'date' | 'status'>) => {
-    const newOrder: Order = {
-      ...orderData,
-      id: Math.floor(Math.random() * 9000) + 1000, // Generate random order ID
-      date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }),
-      status: 'Order received'
-    };
-    
-    setOrders(prev => [newOrder, ...prev]);
-    
-    // Show notification
-    setNotificationMessage(`Order #${newOrder.id} placed successfully!`);
-    setShowNotification(true);
-    setTimeout(() => {
-      setShowNotification(false);
-    }, 3000);
+  // Load orders when user logs in
+  useEffect(() => {
+    if (user) {
+      loadOrders();
+    } else {
+      setOrders([]);
+    }
+  }, [user]);
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await orderService.getMyOrders();
+      
+      console.log('Raw orders response:', response);
+      
+      // Backend returns { success: true, data: [...], pagination: {...} }
+      const ordersData = response.data || response;
+      
+      console.log('Orders data:', ordersData);
+      
+      const mappedOrders = ordersData.map((order: {
+        _id: string;
+        orderId?: string;
+        createdAt: string;
+        total: number;
+        status: string;
+        shipping?: number;
+        tax?: number;
+        subtotal?: number;
+        items?: Array<{
+          product: string | { _id: string; name?: string; images?: string[] };
+          name?: string;
+          price: number;
+          quantity: number;
+          image?: string;
+        }>;
+        billingAddress?: {
+          firstName?: string;
+          lastName?: string;
+          email?: string;
+          phone?: string;
+          streetAddress?: string;
+          street?: string;
+          city?: string;
+          state?: string;
+          postalCode?: string;
+          zipCode?: string;
+          country?: string;
+          companyName?: string;
+        };
+        user?: {
+          email?: string;
+          phone?: string;
+        };
+      }) => ({
+        id: order._id,
+        _id: order._id,
+        orderId: order.orderId, // Add custom orderId
+        date: new Date(order.createdAt).toLocaleDateString('en-US', { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        }),
+        total: `$${order.total.toFixed(2)}`,
+        status: mapOrderStatus(order.status),
+        items: order.items?.map((item) => {
+          // Extract product info properly
+          let productId: string;
+          let productName: string;
+          let productImage: string;
+
+          if (typeof item.product === 'string') {
+            // Product is just an ID
+            productId = item.product;
+            productName = item.name || 'Product';
+            productImage = getImageUrl(item.image);
+          } else {
+            // Product is populated object
+            productId = item.product._id;
+            productName = item.product.name || item.name || 'Product';
+            productImage = getImageUrl(item.product.images?.[0] || item.image);
+          }
+
+          return {
+            id: productId,
+            name: productName,
+            price: item.price,
+            quantity: item.quantity,
+            image: productImage,
+          };
+        }) || [],
+        subtotal: order.subtotal || 0,
+        shipping: order.shipping || 0,
+        gst: order.tax || 0,
+        billingAddress: {
+          firstName: order.billingAddress?.firstName || '',
+          lastName: order.billingAddress?.lastName || '',
+          email: order.billingAddress?.email || order.user?.email || '',
+          phone: order.billingAddress?.phone || order.user?.phone || '',
+          streetAddress: order.billingAddress?.streetAddress || order.billingAddress?.street || '',
+          country: order.billingAddress?.country || '',
+          state: order.billingAddress?.state || '',
+          zipCode: order.billingAddress?.zipCode || order.billingAddress?.postalCode || '',
+          companyName: order.billingAddress?.companyName || '',
+        },
+      }));
+      setOrders(mappedOrders);
+    } catch (error) {
+      console.error('Failed to load orders', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const getOrderById = (id: number): Order | undefined => {
-    return orders.find(order => order.id === id);
+  const mapOrderStatus = (status: string) => {
+    const statusMap: Record<string, Order['status']> = {
+      'pending': 'Order received',
+      'confirmed': 'Processing',
+      'shipped': 'On the way',
+      'delivered': 'Delivered',
+      'cancelled': 'cancelled',
+    };
+    return statusMap[status] || 'Order received';
+  };
+
+  const refreshOrders = async () => {
+    if (user) {
+      await loadOrders();
+    }
+  };
+
+  const addOrder = async (orderData: CreateOrderData) => {
+    if (!user) {
+      alert('Please login to place an order');
+      return;
+    }
+
+    try {
+      console.log('Creating order with data:', orderData);
+      console.log('User billing address:', billingAddress);
+      
+      // Validate shipping address exists
+      if (!orderData.shippingAddress) {
+        throw new Error('Shipping address is required');
+      }
+      
+      // Merge billing address into order data with proper field mapping
+      const completeOrderData = {
+        ...orderData,
+        billingAddress: {
+          firstName: billingAddress.firstName,
+          lastName: billingAddress.lastName,
+          email: billingAddress.email,
+          phone: billingAddress.phone,
+          streetAddress: orderData.shippingAddress.street,
+          country: orderData.shippingAddress.country,
+          state: orderData.shippingAddress.state,
+          zipCode: orderData.shippingAddress.postalCode,
+          companyName: billingAddress.companyName || ''
+        }
+      };
+
+      console.log('Complete order data:', completeOrderData);
+      
+      await orderService.createOrder(completeOrderData);
+      await loadOrders();
+      
+      // Show notification
+      setNotificationMessage(`Order placed successfully!`);
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 3000);
+    } catch (error: unknown) {
+      console.error('Failed to create order', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        console.error('Error response:', (error as { response?: { data?: unknown } }).response?.data);
+      }
+      throw error;
+    }
+  };
+
+  const getOrderById = (id: number | string): Order | undefined => {
+    return orders.find(order => String(order.id) === String(id));
   };
 
   const hideNotification = () => {
@@ -88,8 +262,10 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     <OrderContext.Provider
       value={{
         orders,
+        loading,
         addOrder,
         getOrderById,
+        refreshOrders,
         showNotification,
         notificationMessage,
         hideNotification

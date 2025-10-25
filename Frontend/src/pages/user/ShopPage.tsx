@@ -8,10 +8,9 @@ import ProductGrid from '../../components/sections/ProductGrid';
 import Pagination from '../../components/ui/Pagination';
 import ProductDetailModal from '../../components/modal/ProductDetailModal';
 import { useProduct } from '../../context/ProductContext';
-import { shopProducts } from '../../data/products';
 
 const ShopPage: React.FC = () => {
-  const { isModalOpen, selectedProduct, closeModal, openModal } = useProduct();
+  const { isModalOpen, selectedProduct, closeModal, openModal, products } = useProduct();
   const location = useLocation();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -25,7 +24,7 @@ const ShopPage: React.FC = () => {
   // Handle navigation state (from search)
   useEffect(() => {
     if (location.state && !hasProcessedState.current) {
-      const state = location.state as { searchQuery?: string; productId?: number };
+      const state = location.state as { searchQuery?: string; productId?: string };
       
       if (state.searchQuery) {
         setSearchQuery(state.searchQuery);
@@ -36,7 +35,7 @@ const ShopPage: React.FC = () => {
       }
       
       if (state.productId) {
-        const product = shopProducts.find(p => p.id === state.productId);
+        const product = products.find(p => p.id === state.productId);
         if (product) {
           openModal(product);
         }
@@ -48,7 +47,7 @@ const ShopPage: React.FC = () => {
       // Clear the navigation state to prevent reopening modal
       navigate(location.pathname, { replace: true });
     }
-  }, [location.state, location.pathname, openModal, navigate]);
+  }, [location.state, location.pathname, openModal, navigate, products]);
 
   // Reset the ref when modal closes
   useEffect(() => {
@@ -59,14 +58,14 @@ const ShopPage: React.FC = () => {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let filtered = [...shopProducts];
+    let filtered = [...products];
 
     // Filter by search query first
     if (searchQuery.trim()) {
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+        product.tags?.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -129,7 +128,7 @@ const ShopPage: React.FC = () => {
     }
 
     return filtered;
-  }, [selectedCategory, selectedPrice, selectedSort, searchQuery]);
+  }, [products, selectedCategory, selectedPrice, selectedSort, searchQuery]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);

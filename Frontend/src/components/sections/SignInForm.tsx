@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Eye } from 'lucide-react';
 import Checkbox from '../ui/Checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 const SignInForm: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useUser();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     email: '',
     password: '',
@@ -19,15 +25,37 @@ const SignInForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formState);
-    // Handle login logic here
+    setError('');
+    setLoading(true);
+
+    try {
+      await login(formState.email, formState.password);
+      // Redirect to the page they tried to visit or home page
+      const locationState = location.state as { from?: { pathname?: string } } | null;
+      const from = locationState?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Login failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 w-full max-w-[520px]">
       <h2 className="text-3xl font-semibold text-text-dark text-center">Sign In</h2>
+      
+      {error && (
+        <div className="mt-5 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          {error}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="mt-5 space-y-5">
         <div>
           <input
@@ -54,6 +82,7 @@ const SignInForm: React.FC = () => {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-muted"
+            aria-label="Toggle password visibility"
           >
             <Eye size={20} />
           </button>
@@ -67,8 +96,12 @@ const SignInForm: React.FC = () => {
           />
           <Link to="/signin" className="text-text-dark-gray hover:text-primary">Forget Password</Link>
         </div>
-        <button type="submit" className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors">
-          Login
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
       <div className="mt-5 text-center text-sm">

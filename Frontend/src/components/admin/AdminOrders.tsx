@@ -1,23 +1,72 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Filter, Download, Eye, ChevronDown, MoreVertical, X, Package, User, Mail, Phone, MapPin, Calendar, CreditCard } from 'lucide-react';
+import { Search, Filter, Download, Eye, ChevronDown, MoreVertical, X, Package, User, Mail, Phone, MapPin, Calendar, CreditCard, Trash2 } from 'lucide-react';
 import { BsBag, BsClock, BsCheckCircle, BsCurrencyDollar, BsCurrencyRupee } from 'react-icons/bs';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useNotifications } from '../../context/NotificationContext';
+import { adminService } from '../../services/adminService';
+import { getImageUrl } from '../../utils/imageUtils';
+
+interface OrderProduct {
+  name: string;
+  quantity: number;
+  price: string;
+  image: string;
+}
+
+interface OrderData {
+  id: string;
+  _id: string;
+  orderId: string;
+  customer: string;
+  email: string;
+  phone: string;
+  date: string;
+  total: string;
+  status: string;
+  items: number;
+  shippingAddress: {
+    street: string;
+    city?: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
+  paymentMethod: string;
+  products: OrderProduct[];
+}
 
 const AdminOrders: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [ordersData, setOrdersData] = useState<OrderData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [ordersPerPage] = useState(10);
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    pendingOrders: 0,
+    completedOrders: 0,
+    totalRevenue: 0,
+    totalOrdersGrowth: 0,
+    completedOrdersGrowth: 0,
+    revenueGrowth: 0
+  });
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const actionMenuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { getCurrencySymbol, currency } = useCurrency();
+  const { refreshNotifications, addNotification } = useNotifications();
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'pending', label: 'Pending' },
     { value: 'processing', label: 'Processing' },
+    { value: 'shipped', label: 'Shipped' },
     { value: 'completed', label: 'Completed' },
     { value: 'cancelled', label: 'Cancelled' },
   ];
@@ -42,6 +91,181 @@ const AdminOrders: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, searchQuery]);
+
+  // Fetch orders from API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const params: { status?: string; search?: string; page?: number; limit?: number } = {
+          page: currentPage,
+          limit: ordersPerPage
+        };
+        
+        if (filterStatus !== 'all') {
+          // Map frontend filter status to backend status
+          const backendStatusMap: { [key: string]: string } = {
+            'pending': 'pending',
+            'processing': 'processing',
+            'shipped': 'shipped',
+            'completed': 'delivered', // Frontend "completed" = Backend "delivered"
+            'cancelled': 'cancelled'
+          };
+          params.status = backendStatusMap[filterStatus] || filterStatus;
+        }
+        
+        if (searchQuery) {
+          params.search = searchQuery;
+        }
+
+        const response = await adminService.getAllOrders(params);
+        
+        console.log('Admin orders response:', response);
+        
+        if (response.success && response.data) {
+          // Map backend status to frontend status
+          const mapBackendStatusToFrontend = (backendStatus: string): string => {
+            const statusMap: { [key: string]: string } = {
+              'pending': 'pending',
+              'processing': 'processing',
+              'shipped': 'shipped',
+              'delivered': 'completed', // Backend "delivered" shows as "completed" in frontend
+              'cancelled': 'cancelled'
+            };
+            return statusMap[backendStatus] || backendStatus;
+          };
+
+          // Transform backend data to match frontend format
+          const transformedOrders: OrderData[] = response.data.map((order: {
+            _id: string;
+            orderId: string;
+            user: { firstName: string; lastName: string; email: string };
+            billingAddress: {
+              firstName: string;
+              lastName: string;
+              email: string;
+              phone: string;
+              streetAddress: string;
+              city?: string;
+              state: string;
+              zipCode: string;
+              country: string;
+            };
+            createdAt: string;
+            total: number;
+            status: string;
+            items: Array<{
+              product: { _id: string; name: string; images?: string[] };
+              name: string;
+              price: number;
+              quantity: number;
+              image?: string;
+            }>;
+            paymentMethod: string;
+          }) => ({
+            id: order._id,
+            _id: order._id,
+            orderId: order.orderId,
+            customer: `${order.billingAddress.firstName} ${order.billingAddress.lastName}`,
+            email: order.billingAddress.email || order.user?.email || '',
+            phone: order.billingAddress.phone || '',
+            date: new Date(order.createdAt).toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            }),
+            total: order.total.toFixed(2),
+            status: mapBackendStatusToFrontend(order.status), // Map backend status to frontend
+            items: order.items.length,
+            shippingAddress: {
+              street: order.billingAddress.streetAddress,
+              city: order.billingAddress.city,
+              state: order.billingAddress.state,
+              zip: order.billingAddress.zipCode,
+              country: order.billingAddress.country,
+            },
+            paymentMethod: order.paymentMethod,
+            products: order.items.map(item => ({
+              name: item.product?.name || item.name,
+              quantity: item.quantity,
+              price: item.price.toFixed(2),
+              image: getImageUrl(item.product?.images?.[0] || item.image),
+            })),
+          }));
+          
+          setOrdersData(transformedOrders);
+          
+          // Set pagination data
+          if (response.pagination) {
+            setTotalOrders(response.pagination.total);
+            setTotalPages(response.pagination.totalPages);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [filterStatus, searchQuery, currentPage, ordersPerPage]);
+
+  // Fetch order statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch all orders to calculate stats (without pagination for stats)
+        const allOrdersResponse = await adminService.getAllOrders({ limit: 10000 });
+        
+        if (allOrdersResponse.success && allOrdersResponse.data) {
+          const orders = allOrdersResponse.data;
+          
+          // Calculate total orders
+          const total = orders.length;
+          
+          // Calculate pending orders (status: pending)
+          const pending = orders.filter((order: { status: string }) => order.status === 'pending').length;
+          
+          // Calculate completed orders (status: delivered in backend)
+          const completed = orders.filter((order: { status: string }) => order.status === 'delivered').length;
+          
+          // Calculate total revenue
+          const revenue = orders.reduce((sum: number, order: { total: number }) => sum + order.total, 0);
+          
+          // Calculate growth percentages (mock data for now - would need historical data)
+          // In a real app, you'd compare with last month's data from the backend
+          const totalGrowth = Math.floor(Math.random() * 20); // Mock: 0-20%
+          const completedGrowth = Math.floor(Math.random() * 15); // Mock: 0-15%
+          const revenueGrowth = Math.floor(Math.random() * 25); // Mock: 0-25%
+          
+          setStats({
+            totalOrders: total,
+            pendingOrders: pending,
+            completedOrders: completed,
+            totalRevenue: revenue,
+            totalOrdersGrowth: totalGrowth,
+            completedOrdersGrowth: completedGrowth,
+            revenueGrowth: revenueGrowth
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch order stats:', error);
+      }
+    };
+
+    fetchStats();
+    
+    // Refresh stats every minute
+    const interval = setInterval(fetchStats, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // Listen for filter events from sidebar
   useEffect(() => {
     const handleFilterEvent = (event: Event) => {
@@ -57,134 +281,157 @@ const AdminOrders: React.FC = () => {
     };
   }, []);
 
-  const [ordersData, setOrdersData] = useState([
-    {
-      id: 'ORD-2024-001',
-      customer: 'Johnson D.',
-      email: 'johnson.d@email.com',
-      phone: '+1 234-567-8900',
-      date: 'Oct 23, 2025',
-      total: '1,245.00',
-      status: 'completed',
-      items: 3,
-      shippingAddress: {
-        street: '123 Main Street',
-        city: 'New York',
-        state: 'NY',
-        zip: '10001',
-        country: 'USA'
-      },
-      paymentMethod: 'Credit Card',
-      products: [
-        { name: 'Organic Tomatoes', quantity: 2, price: '125.00', image: '/path/to/image1.jpg' },
-        { name: 'Fresh Lettuce', quantity: 5, price: '450.00', image: '/path/to/image2.jpg' },
-        { name: 'Green Peppers', quantity: 3, price: '670.00', image: '/path/to/image3.jpg' }
-      ]
-    },
-    {
-      id: 'ORD-2024-002',
-      customer: 'Didinya J.',
-      email: 'didinya.j@email.com',
-      phone: '+1 234-567-8901',
-      date: 'Oct 22, 2025',
-      total: '890.50',
-      status: 'processing',
-      items: 2,
-      shippingAddress: {
-        street: '456 Oak Avenue',
-        city: 'Los Angeles',
-        state: 'CA',
-        zip: '90001',
-        country: 'USA'
-      },
-      paymentMethod: 'PayPal',
-      products: [
-        { name: 'Organic Carrots', quantity: 4, price: '340.50', image: '/path/to/image4.jpg' },
-        { name: 'Fresh Spinach', quantity: 3, price: '550.00', image: '/path/to/image5.jpg' }
-      ]
-    },
-    {
-      id: 'ORD-2024-003',
-      customer: 'Penny L.',
-      email: 'penny.l@email.com',
-      phone: '+1 234-567-8902',
-      date: 'Oct 22, 2025',
-      total: '2,150.00',
-      status: 'pending',
-      items: 5,
-      shippingAddress: {
-        street: '789 Pine Road',
-        city: 'Chicago',
-        state: 'IL',
-        zip: '60601',
-        country: 'USA'
-      },
-      paymentMethod: 'Debit Card',
-      products: [
-        { name: 'Organic Apples', quantity: 10, price: '500.00', image: '/path/to/image6.jpg' },
-        { name: 'Fresh Oranges', quantity: 8, price: '650.00', image: '/path/to/image7.jpg' },
-        { name: 'Bananas', quantity: 5, price: '250.00', image: '/path/to/image8.jpg' },
-        { name: 'Strawberries', quantity: 3, price: '450.00', image: '/path/to/image9.jpg' },
-        { name: 'Blueberries', quantity: 2, price: '300.00', image: '/path/to/image10.jpg' }
-      ]
-    },
-    {
-      id: 'ORD-2024-004',
-      customer: 'Elon M.',
-      email: 'elon.m@email.com',
-      phone: '+1 234-567-8903',
-      date: 'Oct 21, 2025',
-      total: '675.25',
-      status: 'completed',
-      items: 1,
-      shippingAddress: {
-        street: '321 Elm Street',
-        city: 'Austin',
-        state: 'TX',
-        zip: '73301',
-        country: 'USA'
-      },
-      paymentMethod: 'Credit Card',
-      products: [
-        { name: 'Organic Cucumbers', quantity: 6, price: '675.25', image: '/path/to/image11.jpg' }
-      ]
-    },
-    {
-      id: 'ORD-2024-005',
-      customer: 'Sarah K.',
-      email: 'sarah.k@email.com',
-      phone: '+1 234-567-8904',
-      date: 'Oct 21, 2025',
-      total: '1,530.00',
-      status: 'cancelled',
-      items: 4,
-      shippingAddress: {
-        street: '654 Maple Drive',
-        city: 'Miami',
-        state: 'FL',
-        zip: '33101',
-        country: 'USA'
-      },
-      paymentMethod: 'Cash on Delivery',
-      products: [
-        { name: 'Fresh Broccoli', quantity: 3, price: '380.00', image: '/path/to/image12.jpg' },
-        { name: 'Organic Potatoes', quantity: 5, price: '450.00', image: '/path/to/image13.jpg' },
-        { name: 'Sweet Corn', quantity: 4, price: '400.00', image: '/path/to/image14.jpg' },
-        { name: 'Green Beans', quantity: 2, price: '300.00', image: '/path/to/image15.jpg' }
-      ]
-    },
-  ]);
-
-  const updateOrderStatus = (orderId: string, newStatus: string) => {
-    setOrdersData(prevOrders =>
-      prevOrders.map(order =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
-    setOpenActionMenu(null);
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      // Map frontend status to backend status
+      const backendStatus = newStatus === 'completed' ? 'delivered' : newStatus;
+      
+      console.log('Updating order status:', { orderId, newStatus, backendStatus });
+      
+      const response = await adminService.updateOrderStatus(orderId, backendStatus);
+      
+      console.log('Status update response:', response);
+      
+      // Update local state with the frontend status
+      setOrdersData(prevOrders =>
+        prevOrders.map(order =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+      setOpenActionMenu(null);
+      
+      // Add notification for status update
+      addNotification({
+        type: 'order',
+        title: 'Order Status Updated',
+        message: `Order #${orderId.slice(-8)} status changed to ${newStatus}`,
+        read: false,
+        icon: 'success'
+      });
+      
+      // Refresh notifications to get latest orders
+      refreshNotifications();
+      
+      // Update stats based on status change
+      setStats(prevStats => {
+        let pendingDelta = 0;
+        let completedDelta = 0;
+        
+        // Calculate the change in pending orders
+        const oldStatus = ordersData.find(o => o._id === orderId)?.status;
+        if (oldStatus === 'pending' && newStatus !== 'pending') {
+          pendingDelta = -1;
+        } else if (oldStatus !== 'pending' && newStatus === 'pending') {
+          pendingDelta = 1;
+        }
+        
+        // Calculate the change in completed orders
+        if (oldStatus === 'completed' && newStatus !== 'completed') {
+          completedDelta = -1;
+        } else if (oldStatus !== 'completed' && newStatus === 'completed') {
+          completedDelta = 1;
+        }
+        
+        return {
+          ...prevStats,
+          pendingOrders: prevStats.pendingOrders + pendingDelta,
+          completedOrders: prevStats.completedOrders + completedDelta
+        };
+      });
+      
+      // Show success message
+      alert('Order status updated successfully!');
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      
+      // Add error notification
+      addNotification({
+        type: 'system',
+        title: 'Order Update Failed',
+        message: 'Failed to update order status. Please try again.',
+        read: false,
+        icon: 'error'
+      });
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        alert(axiosError.response?.data?.message || 'Failed to update order status. Please try again.');
+      } else {
+        alert('Failed to update order status. Please try again.');
+      }
+    }
   };
 
-  const handleViewOrder = (order: typeof ordersData[0]) => {
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await adminService.deleteOrder(orderId);
+      
+      // Remove order from local state
+      const deletedOrder = ordersData.find(o => o._id === orderId);
+      setOrdersData(prevOrders => prevOrders.filter(order => order._id !== orderId));
+      setOpenActionMenu(null);
+      
+      // Update stats
+      setStats(prevStats => {
+        const updates: Partial<typeof prevStats> = {
+          totalOrders: prevStats.totalOrders - 1
+        };
+        
+        if (deletedOrder?.status === 'pending') {
+          updates.pendingOrders = prevStats.pendingOrders - 1;
+        } else if (deletedOrder?.status === 'completed') {
+          updates.completedOrders = prevStats.completedOrders - 1;
+        }
+        
+        if (deletedOrder?.total) {
+          updates.totalRevenue = prevStats.totalRevenue - parseFloat(deletedOrder.total);
+        }
+        
+        return { ...prevStats, ...updates };
+      });
+      
+      // Update total orders count
+      setTotalOrders(prev => prev - 1);
+      
+      // Add success notification
+      addNotification({
+        type: 'order',
+        title: 'Order Deleted',
+        message: `Order #${orderId.slice(-8)} has been deleted successfully`,
+        read: false,
+        icon: 'success'
+      });
+      
+      // Refresh notifications
+      refreshNotifications();
+      
+      alert('Order deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete order:', error);
+      
+      // Add error notification
+      addNotification({
+        type: 'system',
+        title: 'Delete Failed',
+        message: 'Failed to delete order. Please try again.',
+        read: false,
+        icon: 'error'
+      });
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        alert(axiosError.response?.data?.message || 'Failed to delete order. Please try again.');
+      } else {
+        alert('Failed to delete order. Please try again.');
+      }
+    }
+  };
+
+  const handleViewOrder = (order: OrderData) => {
     setSelectedOrder(order);
     setShowOrderModal(true);
   };
@@ -197,24 +444,29 @@ const AdminOrders: React.FC = () => {
   const orders = ordersData;
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'completed':
+      case 'delivered':
         return 'bg-primary/10 text-primary';
       case 'processing':
+      case 'confirmed':
         return 'bg-warning/10 text-warning';
       case 'pending':
         return 'bg-gray-200 text-text-dark-gray';
       case 'cancelled':
         return 'bg-sale/10 text-sale';
+      case 'shipped':
+        return 'bg-blue-100 text-blue-600';
       default:
         return 'bg-gray-200 text-text-dark-gray';
     }
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         order.customer.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
+    const matchesSearch = order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         order.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || order.status.toLowerCase() === filterStatus.toLowerCase();
     return matchesSearch && matchesStatus;
   });
 
@@ -241,8 +493,8 @@ const AdminOrders: React.FC = () => {
               <BsBag className="w-6 h-6 text-primary" strokeWidth={0.5} />
             </div>
           </div>
-          <h3 className="text-xl font-bold text-text-dark">1,234</h3>
-          <p className="text-xs text-primary mt-1">↑ 12% from last month</p>
+          <h3 className="text-xl font-bold text-text-dark">{stats.totalOrders.toLocaleString()}</h3>
+          <p className="text-xs text-primary mt-1">↑ {stats.totalOrdersGrowth}% from last month</p>
         </div>
 
         <div id="pending-orders-section" className="bg-white p-5 rounded-xl border border-border-color">
@@ -252,7 +504,7 @@ const AdminOrders: React.FC = () => {
               <BsClock className="w-6 h-6 text-warning" strokeWidth={0.5} />
             </div>
           </div>
-          <h3 className="text-xl font-bold text-text-dark">45</h3>
+          <h3 className="text-xl font-bold text-text-dark">{stats.pendingOrders}</h3>
           <p className="text-xs text-text-muted mt-1">Awaiting processing</p>
         </div>
 
@@ -263,8 +515,8 @@ const AdminOrders: React.FC = () => {
               <BsCheckCircle className="w-6 h-6 text-primary" strokeWidth={0.5} />
             </div>
           </div>
-          <h3 className="text-xl font-bold text-text-dark">1,087</h3>
-          <p className="text-xs text-primary mt-1">↑ 8% from last month</p>
+          <h3 className="text-xl font-bold text-text-dark">{stats.completedOrders.toLocaleString()}</h3>
+          <p className="text-xs text-primary mt-1">↑ {stats.completedOrdersGrowth}% from last month</p>
         </div>
 
         <div className="bg-white p-5 rounded-xl border border-border-color">
@@ -278,8 +530,10 @@ const AdminOrders: React.FC = () => {
               )}
             </div>
           </div>
-          <h3 className="text-xl font-bold text-text-dark">{getCurrencySymbol()}1.2M</h3>
-          <p className="text-xs text-primary mt-1">↑ 15% from last month</p>
+          <h3 className="text-xl font-bold text-text-dark">
+            {getCurrencySymbol()}{(stats.totalRevenue / 1000).toFixed(1)}K
+          </h3>
+          <p className="text-xs text-primary mt-1">↑ {stats.revenueGrowth}% from last month</p>
         </div>
       </div>
 
@@ -341,7 +595,27 @@ const AdminOrders: React.FC = () => {
         </div>
 
         {/* Table Content */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-visible">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <p className="text-sm text-text-muted mt-4">Loading orders...</p>
+              </div>
+            </div>
+          ) : ordersData.length === 0 ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <Package size={48} className="mx-auto text-text-muted mb-4" />
+                <p className="text-lg font-medium text-text-dark">No orders found</p>
+                <p className="text-sm text-text-muted mt-2">
+                  {searchQuery || filterStatus !== 'all' 
+                    ? 'Try adjusting your filters' 
+                    : 'No orders have been placed yet'}
+                </p>
+              </div>
+            </div>
+          ) : (
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-border-color">
               <tr>
@@ -371,12 +645,12 @@ const AdminOrders: React.FC = () => {
             <tbody className="divide-y divide-border-color">
               {filteredOrders.map((order) => (
                 <tr 
-                  key={order.id} 
+                  key={order._id} 
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() => handleViewOrder(order)}
                 >
                   <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-primary">{order.id}</span>
+                    <span className="text-sm font-medium text-primary">{order.orderId}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -423,11 +697,11 @@ const AdminOrders: React.FC = () => {
                           <MoreVertical size={18} className="text-text-dark-gray" />
                         </button>
                         
-                        {openActionMenu === order.id && (
-                          <div className="absolute right-0 mt-2 w-40 bg-white border border-border-color rounded-lg shadow-lg z-20">
+                        {openActionMenu === order._id && (
+                          <div className="absolute right-0 mt-2 w-40 bg-white border border-border-color rounded-lg shadow-lg z-[9999]">
                             <div className="py-1">
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'pending')}
+                                onClick={() => updateOrderStatus(order._id, 'pending')}
                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
                                   order.status === 'pending' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
@@ -436,7 +710,7 @@ const AdminOrders: React.FC = () => {
                               </button>
                               
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'processing')}
+                                onClick={() => updateOrderStatus(order._id, 'processing')}
                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
                                   order.status === 'processing' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
@@ -445,7 +719,7 @@ const AdminOrders: React.FC = () => {
                               </button>
                               
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'shipped')}
+                                onClick={() => updateOrderStatus(order._id, 'shipped')}
                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
                                   order.status === 'shipped' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
@@ -454,7 +728,7 @@ const AdminOrders: React.FC = () => {
                               </button>
                               
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'completed')}
+                                onClick={() => updateOrderStatus(order._id, 'completed')}
                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
                                   order.status === 'completed' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
@@ -463,12 +737,22 @@ const AdminOrders: React.FC = () => {
                               </button>
                               
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                                onClick={() => updateOrderStatus(order._id, 'cancelled')}
                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
                                   order.status === 'cancelled' ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
                                 }`}
                               >
                                 Cancelled
+                              </button>
+                              
+                              <div className="border-t border-border-color my-1"></div>
+                              
+                              <button
+                                onClick={() => handleDeleteOrder(order._id)}
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 transition-colors text-red-600 flex items-center gap-2"
+                              >
+                                <Trash2 size={14} />
+                                Delete Order
                               </button>
                             </div>
                           </div>
@@ -480,28 +764,67 @@ const AdminOrders: React.FC = () => {
               ))}
             </tbody>
           </table>
+          )}
         </div>
 
         {/* Pagination */}
         <div className="p-6 border-t border-border-color flex items-center justify-between">
           <p className="text-sm text-text-muted">
-            Showing <span className="font-medium text-text-dark">1-5</span> of{' '}
-            <span className="font-medium text-text-dark">1,234</span> orders
+            Showing <span className="font-medium text-text-dark">
+              {ordersData.length === 0 ? 0 : (currentPage - 1) * ordersPerPage + 1}-{Math.min(currentPage * ordersPerPage, totalOrders)}
+            </span> of{' '}
+            <span className="font-medium text-text-dark">{totalOrders}</span> orders
           </p>
           <div className="flex items-center gap-2">
-            <button className="px-4 py-2 border border-border-color rounded-lg text-sm text-text-dark-gray hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 border border-border-color rounded-lg text-sm transition-colors ${
+                currentPage === 1 
+                  ? 'text-text-muted cursor-not-allowed bg-gray-50' 
+                  : 'text-text-dark-gray hover:bg-gray-50'
+              }`}
+            >
               Previous
             </button>
-            <button className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium">
-              1
-            </button>
-            <button className="px-4 py-2 border border-border-color rounded-lg text-sm text-text-dark-gray hover:bg-gray-50 transition-colors">
-              2
-            </button>
-            <button className="px-4 py-2 border border-border-color rounded-lg text-sm text-text-dark-gray hover:bg-gray-50 transition-colors">
-              3
-            </button>
-            <button className="px-4 py-2 border border-border-color rounded-lg text-sm text-text-dark-gray hover:bg-gray-50 transition-colors">
+            
+            {/* Page numbers */}
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === pageNum
+                      ? 'bg-primary text-white'
+                      : 'border border-border-color text-text-dark-gray hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 border border-border-color rounded-lg text-sm transition-colors ${
+                currentPage === totalPages 
+                  ? 'text-text-muted cursor-not-allowed bg-gray-50' 
+                  : 'text-text-dark-gray hover:bg-gray-50'
+              }`}
+            >
               Next
             </button>
           </div>
@@ -606,11 +929,15 @@ const AdminOrders: React.FC = () => {
                   Order Items ({selectedOrder.items})
                 </h3>
                 <div className="space-y-3">
-                  {selectedOrder.products.map((product: any, index: number) => (
+                  {selectedOrder.products.map((product: OrderProduct, index: number) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                          <Package size={24} className="text-text-muted" />
+                        <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Package size={24} className="text-text-muted" />
+                          )}
                         </div>
                         <div>
                           <p className="font-medium text-text-dark">{product.name}</p>
@@ -651,7 +978,7 @@ const AdminOrders: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                   <button
                     onClick={() => {
-                      updateOrderStatus(selectedOrder.id, 'pending');
+                      updateOrderStatus(selectedOrder._id, 'pending');
                       setSelectedOrder({ ...selectedOrder, status: 'pending' });
                     }}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
@@ -665,7 +992,7 @@ const AdminOrders: React.FC = () => {
                   
                   <button
                     onClick={() => {
-                      updateOrderStatus(selectedOrder.id, 'processing');
+                      updateOrderStatus(selectedOrder._id, 'processing');
                       setSelectedOrder({ ...selectedOrder, status: 'processing' });
                     }}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
@@ -679,7 +1006,7 @@ const AdminOrders: React.FC = () => {
                   
                   <button
                     onClick={() => {
-                      updateOrderStatus(selectedOrder.id, 'shipped');
+                      updateOrderStatus(selectedOrder._id, 'shipped');
                       setSelectedOrder({ ...selectedOrder, status: 'shipped' });
                     }}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
@@ -693,7 +1020,7 @@ const AdminOrders: React.FC = () => {
                   
                   <button
                     onClick={() => {
-                      updateOrderStatus(selectedOrder.id, 'completed');
+                      updateOrderStatus(selectedOrder._id, 'completed');
                       setSelectedOrder({ ...selectedOrder, status: 'completed' });
                     }}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
@@ -707,7 +1034,7 @@ const AdminOrders: React.FC = () => {
                   
                   <button
                     onClick={() => {
-                      updateOrderStatus(selectedOrder.id, 'cancelled');
+                      updateOrderStatus(selectedOrder._id, 'cancelled');
                       setSelectedOrder({ ...selectedOrder, status: 'cancelled' });
                     }}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${

@@ -15,6 +15,9 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   const convertedPrice = convertPrice(item.price);
   const subtotal = convertedPrice * item.quantity;
   const currencySymbol = getCurrencySymbol();
+  
+  // Handle both image (string) and images (array) formats
+  const imageUrl = item.image || (item.images && item.images[0]) || '/placeholder.jpg';
 
   const handleDecrease = () => {
     if (item.quantity > 1) {
@@ -34,7 +37,14 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
     <tr>
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
-          <img src={item.image} alt={item.name} className="w-24 h-24 object-contain rounded-md" />
+          <img 
+            src={imageUrl} 
+            alt={item.name} 
+            className="w-24 h-24 object-contain rounded-md bg-gray-50"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.jpg';
+            }}
+          />
           <span className="text-sm font-medium text-text-dark">{item.name}</span>
         </div>
       </td>

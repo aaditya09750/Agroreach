@@ -9,6 +9,9 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images }) => 
   // Use the first image or fallback to empty string
   const displayImages = images.length > 0 ? images : [];
   const [mainImage, setMainImage] = useState(displayImages[0] || '');
+  
+  // Thumbnail images are all images except the first one (which is the main image)
+  const thumbnailImages = displayImages.slice(1);
 
   // If no images available, show a placeholder
   if (displayImages.length === 0) {
@@ -21,41 +24,43 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images }) => 
 
   return (
     <div className="flex gap-4 h-full items-center">
-      {/* Thumbnail Column - Always show */}
-      <div className="flex flex-col items-center gap-2 h-full justify-center">
-        <button 
-          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
-          aria-label="Scroll up"
-        >
-          <ChevronUp size={18} className="text-gray-600"/>
-        </button>
-        <div className="flex flex-col gap-3">
-          {displayImages.map((img, index) => (
-            <button 
-              key={index}
-              className={`w-20 h-20 rounded-lg border-2 overflow-hidden transition-all ${
-                mainImage === img 
-                  ? 'border-primary' 
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => setMainImage(img)}
-              aria-label={`View image ${index + 1}`}
-            >
-              <img 
-                src={img} 
-                alt={`Thumbnail ${index + 1}`} 
-                className="w-full h-full object-cover" 
-              />
-            </button>
-          ))}
+      {/* Thumbnail Column - Show only if there are additional images */}
+      {thumbnailImages.length > 0 && (
+        <div className="flex flex-col items-center gap-2 h-full justify-center">
+          <button 
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
+            aria-label="Scroll up"
+          >
+            <ChevronUp size={18} className="text-gray-600"/>
+          </button>
+          <div className="flex flex-col gap-3">
+            {thumbnailImages.map((img, index) => (
+              <button 
+                key={index}
+                className={`w-20 h-20 rounded-lg border-2 overflow-hidden transition-all ${
+                  mainImage === img 
+                    ? 'border-primary' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setMainImage(img)}
+                aria-label={`View image ${index + 2}`}
+              >
+                <img 
+                  src={img} 
+                  alt={`Thumbnail ${index + 2}`} 
+                  className="w-full h-full object-cover" 
+                />
+              </button>
+            ))}
+          </div>
+          <button 
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
+            aria-label="Scroll down"
+          >
+            <ChevronDown size={18} className="text-gray-600"/>
+          </button>
         </div>
-        <button 
-          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
-          aria-label="Scroll down"
-        >
-          <ChevronDown size={18} className="text-gray-600"/>
-        </button>
-      </div>
+      )}
       
       {/* Main Image */}
       <div className="flex-1 bg-white rounded-lg overflow-hidden flex items-center justify-center h-[500px]">

@@ -4,7 +4,9 @@ import { X, Star, ShoppingCart } from 'lucide-react';
 import ProductImageGallery from './ProductImageGallery';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
-import { useProduct } from '../../context/ProductContext';
+import { useUser } from '../../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+import { productService } from '../../services/productService';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -21,21 +23,59 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const hasIncrementedRef = useRef(false); // Track if we've already incremented
+  const currentProductIdRef = useRef<string | number | null>(null); // Track current product
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+  const [reviewCount, setReviewCount] = useState(product.reviewCount || 0);
   const { addToCart } = useCart();
   const { convertPrice, getCurrencySymbol } = useCurrency();
-  const { getProductViewCount } = useProduct();
-  const viewCount = getProductViewCount(product.id);
+  const { user } = useUser();
+  const navigate = useNavigate();
   const convertedPrice = convertPrice(product.price);
   const currencySymbol = getCurrencySymbol();
-  
-  let convertedOldPrice = null;
-  if (product.oldPrice) {
-    convertedOldPrice = convertPrice(product.oldPrice);
-  }
 
   useEffect(() => {
+    // Increment review count when modal opens (counts as a view)
+    const productId = product._id || product.id;
+    
+    // Reset the flag if we're viewing a different product
+    if (currentProductIdRef.current !== productId) {
+      hasIncrementedRef.current = false;
+      currentProductIdRef.current = productId;
+    }
+    
+    // Use ref to prevent double-increment in React Strict Mode
+    if (hasIncrementedRef.current) {
+      console.log('Already incremented for this product, skipping...');
+      return;
+    }
+    
+    const incrementView = async () => {
+      try {
+        if (productId) {
+          console.log('Incrementing review count for product:', productId);
+          hasIncrementedRef.current = true;
+          
+          const response = await productService.incrementViewCount(String(productId));
+          console.log('Review count response:', response);
+          
+          if (response.success && response.data?.reviewCount !== undefined) {
+            setReviewCount(response.data.reviewCount);
+            console.log('Updated review count to:', response.data.reviewCount);
+          }
+        } else {
+          console.warn('No product ID found:', product);
+        }
+      } catch (error) {
+        console.error('Error incrementing review count:', error);
+        hasIncrementedRef.current = false; // Reset on error so it can retry
+      }
+    };
+
+    incrementView();
+
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -48,7 +88,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
       document.removeEventListener('keydown', handleKeydown);
       document.body.style.overflow = 'auto';
     };
-  }, [onClose]);
+  }, [product._id, product.id, onClose, product]);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -66,7 +106,14 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
     setQuantity(quantity + 1);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    // Check if user is authenticated
+    if (!user) {
+      // Show auth prompt modal
+      setShowAuthPrompt(true);
+      return;
+    }
+
     if (product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock') {
       alert('This product is out of stock and cannot be added to cart.');
       return;
@@ -75,12 +122,21 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
     setIsAddingToCart(true);
     
     // Add to cart using context
-    addToCart(product, quantity);
+    const success = await addToCart(product, quantity);
     
-    setTimeout(() => {
+    if (success) {
+      setTimeout(() => {
+        setIsAddingToCart(false);
+        setQuantity(1); // Reset quantity after adding
+      }, 500);
+    } else {
       setIsAddingToCart(false);
-      setQuantity(1); // Reset quantity after adding
-    }, 500);
+    }
+  };
+
+  const handleSignInRedirect = () => {
+    onClose(); // Close the product modal
+    navigate('/signin');
   };
 
   return (
@@ -129,21 +185,21 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 </span>
               </div>
 
-              {/* Rating and SKU */}
+              {/* Rating and Reviews */}
               <div className="flex items-center gap-3 mb-4">
                 <StarRating rating={product.rating} />
-                <span className="text-sm text-text-dark">{viewCount} Review</span>
+                <span className="text-sm text-text-dark">{reviewCount} Review{reviewCount !== 1 ? 's' : ''}</span>
               </div>
 
               {/* Price */}
               <div className="flex items-center gap-3 mb-5">
-                {convertedOldPrice && (
-                  <span className="text-xl text-gray-400 line-through">{currencySymbol}{convertedOldPrice.toFixed(2)}</span>
+                {product.oldPrice && Number(product.discount || 0) > 0 && (
+                  <span className="text-lg text-gray-300 line-through opacity-60">{currencySymbol}{convertPrice(product.oldPrice).toFixed(2)}</span>
                 )}
                 <span className="text-3xl font-semibold text-primary">{currencySymbol}{convertedPrice.toFixed(2)}</span>
-                {product.discount && (
+                {product.discount !== undefined && product.discount !== null && Number(product.discount) > 0 && (
                   <span className="bg-sale/10 text-sale text-sm font-medium px-2.5 py-1 rounded">
-                    {product.discount}
+                    {product.discount}% off
                   </span>
                 )}
               </div>
@@ -225,6 +281,32 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
           </div>
         </div>
       </div>
+
+      {/* Authentication Prompt Modal */}
+      {showAuthPrompt && (
+        <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Sign In Required</h3>
+            <p className="text-gray-600 mb-6">
+              Please sign in to add products to your cart and enjoy a seamless shopping experience.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowAuthPrompt(false)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSignInRedirect}
+                className="flex-1 px-4 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

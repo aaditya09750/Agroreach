@@ -1,10 +1,36 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, X, ChevronDown } from 'lucide-react';
-import { shopProducts, Product } from '../../data/products';
+import { Upload, X, ChevronDown, Trash2, Package } from 'lucide-react';
+import { Product } from '../../data/products';
 import { useCurrency } from '../../context/CurrencyContext';
+import { adminService } from '../../services/adminService';
+import { useProduct } from '../../context/ProductContext';
+import { getImageUrls } from '../../utils/imageUtils';
+
+interface BackendProduct {
+  _id: string;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  description: string;
+  category: string;
+  tags: string[];
+  images: string[];
+  rating: number;
+  reviewCount: number;
+  stockStatus: 'In Stock' | 'Out of Stock';
+  stockQuantity: number;
+  discount: number;
+  isHotDeal: boolean;
+  isBestSeller: boolean;
+  isTopRated: boolean;
+  status?: 'sale' | 'new' | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const AdminAddProduct: React.FC = () => {
   const { getCurrencySymbol } = useCurrency();
+  const { refreshProducts } = useProduct();
   const [productName, setProductName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
@@ -12,15 +38,22 @@ const AdminAddProduct: React.FC = () => {
   const [stock, setStock] = useState('');
   const [description, setDescription] = useState('');
   const [sellerName, setSellerName] = useState('');
-  const [tags, setTags] = useState<string[]>(['Organic', 'Fresh']);
+  const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [images, setImages] = useState<string[]>([]);
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [editNewTag, setEditNewTag] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showEditCategoryDropdown, setShowEditCategoryDropdown] = useState(false);
   const [showEditStockDropdown, setShowEditStockDropdown] = useState(false);
   const [showEditFeaturesDropdown, setShowEditFeaturesDropdown] = useState(false);
+  const [recentProducts, setRecentProducts] = useState<BackendProduct[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const editCategoryDropdownRef = useRef<HTMLDivElement>(null);
   const editStockDropdownRef = useRef<HTMLDivElement>(null);
@@ -28,16 +61,32 @@ const AdminAddProduct: React.FC = () => {
 
   const categories = [
     { value: '', label: 'Select category' },
-    { value: 'vegetables', label: 'Vegetables' },
-    { value: 'fruits', label: 'Fruits' },
-    { value: 'grains', label: 'Grains & Cereals' },
-    { value: 'organic', label: 'Organic Products' },
+    { value: 'Fresh Fruit', label: 'Fresh Fruit' },
+    { value: 'Vegetables', label: 'Vegetables' },
+    { value: 'Meat & Fish', label: 'Meat & Fish' },
+    { value: 'Dairy & Eggs', label: 'Dairy & Eggs' },
   ];
 
   const stockStatuses = [
     { value: 'In Stock', label: 'In Stock' },
     { value: 'Out of Stock', label: 'Out of Stock' },
   ];
+
+  // Load recent products on mount
+  useEffect(() => {
+    loadRecentProducts();
+  }, []);
+
+  const loadRecentProducts = async () => {
+    try {
+      const response = await adminService.getRecentProducts();
+      if (response.success) {
+        setRecentProducts(response.data.products);
+      }
+    } catch (error) {
+      console.error('Error loading recent products:', error);
+    }
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -63,13 +112,20 @@ const AdminAddProduct: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-      setImages([...images, ...newImages]);
+      const newFiles = Array.from(files);
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      
+      setImageFiles([...imageFiles, ...newFiles]);
+      setImagePreviews([...imagePreviews, ...newPreviews]);
     }
   };
 
   const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+    // Revoke the object URL to free up memory
+    URL.revokeObjectURL(imagePreviews[index]);
+    
+    setImageFiles(imageFiles.filter((_, i) => i !== index));
+    setImagePreviews(imagePreviews.filter((_, i) => i !== index));
   };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -86,37 +142,193 @@ const AdminAddProduct: React.FC = () => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({
-      productName,
-      category,
-      price,
-      discount,
-      stock,
-      description,
-      sellerName,
-      tags,
-      images
-    });
-    // Handle form submission
+  const handleAddEditTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && editNewTag.trim()) {
+      e.preventDefault();
+      if (!editTags.includes(editNewTag.trim())) {
+        setEditTags([...editTags, editNewTag.trim()]);
+      }
+      setEditNewTag('');
+    }
   };
 
-  const handleEditClick = (product: Product) => {
-    setEditingProduct(product);
+  const removeEditTag = (tagToRemove: string) => {
+    setEditTags(editTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('name', productName);
+      formData.append('category', category);
+      formData.append('price', price);
+      formData.append('discount', discount || '0');
+      formData.append('stockQuantity', stock || '0');
+      formData.append('description', description || '');
+      // Don't send stockStatus - let backend calculate it based on stockQuantity
+      
+      // Add tags as JSON array
+      if (tags.length > 0) {
+        tags.forEach(tag => {
+          formData.append('tags', tag);
+        });
+      }
+
+      // Add images
+      imageFiles.forEach(file => {
+        formData.append('images', file);
+      });
+
+      const response = await adminService.createProduct(formData);
+      
+      if (response.success) {
+        setSubmitMessage({ type: 'success', text: 'Product added successfully!' });
+        
+        // Reset form
+        setProductName('');
+        setCategory('');
+        setPrice('');
+        setDiscount('');
+        setStock('');
+        setDescription('');
+        setSellerName('');
+        setTags([]);
+        setImageFiles([]);
+        setImagePreviews([]);
+
+        // Refresh products list
+        await loadRecentProducts();
+        await refreshProducts();
+
+        // Clear message after 3 seconds
+        setTimeout(() => setSubmitMessage(null), 3000);
+      }
+    } catch (error: unknown) {
+      console.error('Error creating product:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add product';
+      setSubmitMessage({ type: 'error', text: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditClick = (product: BackendProduct) => {
+    // Convert backend product to frontend Product type for editing
+    const imageUrls = getImageUrls(product.images);
+    
+    const productForEdit: Product = {
+      id: product._id,
+      name: product.name,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      description: product.description || '',
+      category: product.category,
+      tags: product.tags,
+      image: imageUrls[0], // First image as thumbnail
+      images: imageUrls,
+      rating: product.rating,
+      reviewCount: product.reviewCount,
+      stock: product.stockQuantity || 0,
+      stockStatus: product.stockStatus,
+      discount: product.discount !== undefined && product.discount !== null ? product.discount : 0,
+      isHotDeal: product.isHotDeal,
+      isBestSeller: product.isBestSeller,
+      isTopRated: product.isTopRated,
+      status: product.status || undefined,
+    };
+    
+    setEditingProduct(productForEdit);
+    setEditingProductId(product._id);
+    setEditTags(product.tags || []);
     setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setEditingProduct(null);
+    setEditingProductId(null);
+    setEditTags([]);
+    setEditNewTag('');
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleDeleteProduct = async (productId: string, productName: string) => {
+    // Confirm deletion
+    const confirmed = window.confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`);
+    
+    if (!confirmed) return;
+
+    try {
+      const response = await adminService.deleteProduct(productId);
+      
+      if (response.success) {
+        setSubmitMessage({ type: 'success', text: 'Product deleted successfully!' });
+        
+        // Refresh products list
+        await loadRecentProducts();
+        await refreshProducts();
+
+        // Clear message after 3 seconds
+        setTimeout(() => setSubmitMessage(null), 3000);
+      }
+    } catch (error: unknown) {
+      console.error('Error deleting product:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete product';
+      setSubmitMessage({ type: 'error', text: errorMessage });
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => setSubmitMessage(null), 5000);
+    }
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would normally update the product in your backend/state management
-    console.log('Saving edited product:', editingProduct);
-    handleCloseEditModal();
+    
+    if (!editingProduct || !editingProductId) return;
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const updateData = {
+        name: editingProduct.name,
+        price: editingProduct.price,
+        oldPrice: editingProduct.oldPrice || null,
+        description: editingProduct.description,
+        category: editingProduct.category,
+        stockQuantity: editingProduct.stock || 0,
+        discount: (editingProduct.discount && Number(editingProduct.discount) > 0) ? Number(editingProduct.discount) : 0,
+        tags: editTags,
+        isHotDeal: editingProduct.isHotDeal || false,
+        isBestSeller: editingProduct.isBestSeller || false,
+        isTopRated: editingProduct.isTopRated || false,
+      };
+
+      const response = await adminService.updateProduct(editingProductId, updateData);
+      
+      if (response.success) {
+        setSubmitMessage({ type: 'success', text: 'Product updated successfully!' });
+        
+        // Refresh products list
+        await loadRecentProducts();
+        await refreshProducts();
+        
+        // Close modal
+        handleCloseEditModal();
+
+        // Clear message after 3 seconds
+        setTimeout(() => setSubmitMessage(null), 3000);
+      }
+    } catch (error: unknown) {
+      console.error('Error updating product:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update product';
+      setSubmitMessage({ type: 'error', text: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -126,6 +338,17 @@ const AdminAddProduct: React.FC = () => {
         <h1 className="text-2xl font-semibold text-text-dark">Products</h1>
         <p className="text-sm text-text-muted mt-1">Add new products to your store</p>
       </div>
+
+      {/* Success/Error Message */}
+      {submitMessage && (
+        <div className={`p-4 rounded-lg ${
+          submitMessage.type === 'success' 
+            ? 'bg-green-50 text-green-800 border border-green-200' 
+            : 'bg-red-50 text-red-800 border border-red-200'
+        }`}>
+          {submitMessage.text}
+        </div>
+      )}
 
       {/* Add Product Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-border-color">
@@ -140,7 +363,7 @@ const AdminAddProduct: React.FC = () => {
               Product Images
             </label>
             <div className="grid grid-cols-5 gap-4">
-              {images.map((image, index) => (
+              {imagePreviews.map((image, index) => (
                 <div key={index} className="relative aspect-square rounded-lg border-2 border-border-color overflow-hidden group">
                   <img src={image} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
                   <button
@@ -153,7 +376,7 @@ const AdminAddProduct: React.FC = () => {
                   </button>
                 </div>
               ))}
-              {images.length < 5 && (
+              {imagePreviews.length < 5 && (
                 <label className="aspect-square rounded-lg border-2 border-dashed border-border-color hover:border-primary transition-colors cursor-pointer flex flex-col items-center justify-center gap-2 group">
                   <Upload size={24} className="text-text-muted group-hover:text-primary transition-colors" />
                   <span className="text-xs text-text-muted group-hover:text-primary transition-colors">Upload</span>
@@ -272,7 +495,7 @@ const AdminAddProduct: React.FC = () => {
             {/* Stock */}
             <div>
               <label htmlFor="stock" className="block text-sm font-medium text-text-dark mb-2">
-                Stock Quantity <span className="text-sale">*</span>
+                Stock Quantity
               </label>
               <input
                 type="number"
@@ -280,9 +503,10 @@ const AdminAddProduct: React.FC = () => {
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
                 placeholder="0"
+                min="0"
                 className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-                required
               />
+              <p className="text-xs text-text-muted mt-1">Leave empty or 0 for out of stock</p>
             </div>
           </div>
 
@@ -364,14 +588,28 @@ const AdminAddProduct: React.FC = () => {
           <button
             type="button"
             className="px-5 py-2 border border-border-color rounded-lg text-sm text-text-dark hover:bg-gray-50 transition-colors font-medium"
+            onClick={() => {
+              setProductName('');
+              setCategory('');
+              setPrice('');
+              setDiscount('');
+              setStock('');
+              setDescription('');
+              setSellerName('');
+              setTags([]);
+              setNewTag('');
+              setImageFiles([]);
+              setImagePreviews([]);
+            }}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+            disabled={isSubmitting}
+            className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Product
+            {isSubmitting ? 'Adding...' : 'Add Product'}
           </button>
         </div>
       </form>
@@ -379,76 +617,102 @@ const AdminAddProduct: React.FC = () => {
       {/* Recent Products Table */}
       <div id="recent-products-section" className="bg-white rounded-xl border border-border-color">
         <div className="p-6 border-b border-border-color">
-          <h2 className="text-base font-medium text-text-dark">Recent Products</h2>
+          <h2 className="text-lg font-semibold text-text-dark">Recent Products</h2>
+          <p className="text-sm text-text-muted mt-1">Manage your product inventory</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-border-color">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                   Stock
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-text-muted uppercase tracking-wider">
+                <th className="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-color">
-              {shopProducts.slice(0, 10).map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white rounded-lg overflow-hidden">
-                        <img 
-                          src={product.image} 
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
+            <tbody className="bg-white divide-y divide-border-color">
+              {recentProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                        <Package size={32} className="text-text-muted" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-text-dark">{product.name}</p>
-                        <p className="text-xs text-text-muted">ID: {product.id}</p>
-                      </div>
+                      <p className="text-sm font-medium text-text-dark">No products added yet</p>
+                      <p className="text-xs text-text-muted mt-1">Add your first product above</p>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-text-dark-gray">{product.category}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-text-dark">
-                    {getCurrencySymbol()}{product.price.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-text-dark-gray">
-                    {product.stockStatus === 'In Stock' ? 'Available' : 'Out of Stock'}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      product.stockStatus === 'In Stock' 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'bg-sale/10 text-sale'
-                    }`}>
-                      {product.stockStatus === 'In Stock' ? 'Active' : 'Out of Stock'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button 
-                      onClick={() => handleEditClick(product)}
-                      className="text-primary hover:text-primary/80 text-sm font-medium"
-                    >
-                      Edit
-                    </button>
-                  </td>
                 </tr>
-              ))}
+              ) : (
+                recentProducts.map((product) => (
+                  <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-border-color">
+                          <img 
+                            src={getImageUrls(product.images)[0]} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-text-dark truncate">{product.name}</p>
+                          <p className="text-xs text-text-muted mt-0.5">ID: {product._id.slice(-8)}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-sm text-text-dark-gray">{product.category}</td>
+                    <td className="px-6 py-5 text-sm font-medium text-text-dark">
+                      {getCurrencySymbol()}{product.price.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-5 text-sm text-text-dark-gray text-center">
+                      {product.stockQuantity}
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`inline-flex px-3 py-1.5 rounded-full text-xs font-medium ${
+                        product.stockStatus === 'In Stock' 
+                          ? 'bg-primary/10 text-primary' 
+                          : 'bg-sale/10 text-sale'
+                      }`}>
+                        {product.stockStatus}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-end gap-3">
+                        <button 
+                          type="button"
+                          onClick={() => handleEditClick(product)}
+                          className="text-primary hover:text-primary/80 text-sm font-medium transition-colors px-2 py-1"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => handleDeleteProduct(product._id, product.name)}
+                          className="text-sale hover:text-sale/80 transition-colors p-2 hover:bg-sale/10 rounded-lg"
+                          title="Delete product"
+                        >
+                          <Trash2 size={18} strokeWidth={2} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -529,7 +793,7 @@ const AdminAddProduct: React.FC = () => {
                         </button>
                         {showEditCategoryDropdown && (
                           <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-                            {['Vegetables', 'Fruits', 'Grains & Cereals', 'Dairy & Eggs', 'Meat & Fish', 'Organic Products'].map((cat) => (
+                            {['Fresh Fruit', 'Vegetables', 'Meat & Fish', 'Dairy & Eggs'].map((cat) => (
                               <button
                                 key={cat}
                                 type="button"
@@ -568,41 +832,56 @@ const AdminAddProduct: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Stock Status */}
+                    {/* Stock Quantity */}
                     <div>
-                      <label htmlFor="editStockStatus" className="block text-sm font-medium text-text-dark mb-2">
-                        Stock Status <span className="text-sale">*</span>
+                      <label htmlFor="editStock" className="block text-sm font-medium text-text-dark mb-2">
+                        Stock Quantity
                       </label>
-                      <div className="relative" ref={editStockDropdownRef}>
-                        <button
-                          type="button"
-                          onClick={() => setShowEditStockDropdown(!showEditStockDropdown)}
-                          className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
-                        >
-                          <span className="text-text-dark">
-                            {editingProduct.stockStatus}
-                          </span>
-                          <ChevronDown size={16} className="text-text-muted" />
-                        </button>
-                        {showEditStockDropdown && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10">
-                            {stockStatuses.map((status) => (
-                              <button
-                                key={status.value}
-                                type="button"
-                                onClick={() => {
-                                  setEditingProduct({...editingProduct, stockStatus: status.value as 'In Stock' | 'Out of Stock'});
-                                  setShowEditStockDropdown(false);
-                                }}
-                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors ${
-                                  editingProduct.stockStatus === status.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
-                                }`}
-                              >
-                                {status.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                      <input
+                        type="number"
+                        id="editStock"
+                        value={editingProduct.stock || 0}
+                        onChange={(e) => setEditingProduct({...editingProduct, stock: parseInt(e.target.value) || 0})}
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                        min="0"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    {/* Discount */}
+                    <div>
+                      <label htmlFor="editDiscount" className="block text-sm font-medium text-text-dark mb-2">
+                        Discount (%)
+                      </label>
+                      <input
+                        type="number"
+                        id="editDiscount"
+                        value={editingProduct.discount && Number(editingProduct.discount) > 0 ? editingProduct.discount : ''}
+                        onChange={(e) => setEditingProduct({...editingProduct, discount: e.target.value ? parseFloat(e.target.value) : 0})}
+                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        placeholder="Enter discount percentage (optional)"
+                      />
+                    </div>
+
+                    {/* Old Price */}
+                    <div>
+                      <label htmlFor="editOldPrice" className="block text-sm font-medium text-text-dark mb-2">
+                        Old Price (Optional)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">{getCurrencySymbol()}</span>
+                        <input
+                          type="number"
+                          id="editOldPrice"
+                          value={editingProduct.oldPrice || ''}
+                          onChange={(e) => setEditingProduct({...editingProduct, oldPrice: e.target.value ? parseFloat(e.target.value) : undefined})}
+                          className="w-full pl-8 pr-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                          step="0.01"
+                          placeholder="Original price before discount"
+                        />
                       </div>
                     </div>
                   </div>
@@ -614,38 +893,28 @@ const AdminAddProduct: React.FC = () => {
                     </label>
                     <textarea
                       id="editDescription"
-                      value={editingProduct.description}
+                      value={editingProduct.description || ''}
                       onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
                       rows={4}
+                      placeholder="Enter product description (optional)"
                       className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors resize-none"
                     />
                   </div>
 
-                  {/* Seller Name and Tags */}
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="editSellerName" className="block text-sm font-medium text-text-dark mb-2">
-                        Seller Name
-                      </label>
-                      <input
-                        type="text"
-                        id="editSellerName"
-                        placeholder="Enter seller name"
-                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="editTags" className="block text-sm font-medium text-text-dark mb-2">
-                        Tags
-                      </label>
-                      <input
-                        type="text"
-                        id="editTags"
-                        placeholder="e.g., Organic, Fresh, Local"
-                        className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
-                      />
-                    </div>
+                  {/* Tags Input */}
+                  <div>
+                    <label htmlFor="editNewTag" className="block text-sm font-medium text-text-dark mb-2">
+                      Add Tags
+                    </label>
+                    <input
+                      type="text"
+                      id="editNewTag"
+                      value={editNewTag}
+                      onChange={(e) => setEditNewTag(e.target.value)}
+                      onKeyDown={handleAddEditTag}
+                      placeholder="Type tag and press Enter (e.g., Organic, Fresh, Local)"
+                      className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors"
+                    />
                   </div>
 
                   {/* Display Tags */}
@@ -654,24 +923,23 @@ const AdminAddProduct: React.FC = () => {
                       Current Tags
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
-                        Organic
-                        <button type="button" className="hover:text-primary/70 transition-colors" title="Remove tag">
-                          <X size={14} />
-                        </button>
-                      </span>
-                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
-                        Fresh
-                        <button type="button" className="hover:text-primary/70 transition-colors" title="Remove tag">
-                          <X size={14} />
-                        </button>
-                      </span>
-                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
-                        Local
-                        <button type="button" className="hover:text-primary/70 transition-colors" title="Remove tag">
-                          <X size={14} />
-                        </button>
-                      </span>
+                      {editTags.length > 0 ? (
+                        editTags.map((tag, index) => (
+                          <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm flex items-center gap-2">
+                            {tag}
+                            <button 
+                              type="button" 
+                              onClick={() => removeEditTag(tag)}
+                              className="hover:text-primary/70 transition-colors" 
+                              title="Remove tag"
+                            >
+                              <X size={14} />
+                            </button>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-text-muted">No tags added</span>
+                      )}
                     </div>
                   </div>
 
@@ -750,9 +1018,10 @@ const AdminAddProduct: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                    disabled={isSubmitting}
+                    className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Save Changes
+                    {isSubmitting ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </form>

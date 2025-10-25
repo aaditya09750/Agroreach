@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import InputField from '../ui/InputField';
 import { useUser } from '../../context/UserContext';
 import { Edit2, User } from 'lucide-react';
@@ -7,6 +7,11 @@ const AccountSettingsForm: React.FC = () => {
   const { profile, updateProfile } = useUser();
   const [formData, setFormData] = useState(profile);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update formData when profile changes
+  useEffect(() => {
+    setFormData(profile);
+  }, [profile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -23,22 +28,22 @@ const AccountSettingsForm: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Create a preview URL for immediate display
       const reader = new FileReader();
       reader.onloadend = () => {
-        const newFormData = {
-          ...formData,
-          image: reader.result as string
-        };
-        setFormData(newFormData);
-        updateProfile(newFormData);
+        setFormData(prev => ({
+          ...prev,
+          image: reader.result as string,  // Preview URL
+          imageFile: file,  // Actual file to upload
+        }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile(formData);
+    await updateProfile(formData);
     // Notification will be shown automatically by UserContext
   };
 

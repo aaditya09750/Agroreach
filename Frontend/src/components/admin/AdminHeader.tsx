@@ -2,78 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, Bell, User, ChevronDown, Package, ShoppingBag, DollarSign, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import ARLogo from '../../assets/AR Logo.png';
 import { useCurrency } from '../../context/CurrencyContext';
-
-interface Notification {
-  id: number;
-  type: 'order' | 'product' | 'payment' | 'system';
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-  icon: 'success' | 'error' | 'warning' | 'info';
-}
+import { useNotifications } from '../../context/NotificationContext';
 
 const NotificationDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      type: 'order',
-      title: 'New Order Received',
-      message: 'Order #ORD-2024-156 from John Doe',
-      time: '2 minutes ago',
-      read: false,
-      icon: 'info'
-    },
-    {
-      id: 2,
-      type: 'product',
-      title: 'Low Stock Alert',
-      message: 'Fresh Tomatoes stock is running low (5 units left)',
-      time: '15 minutes ago',
-      read: false,
-      icon: 'warning'
-    },
-    {
-      id: 3,
-      type: 'payment',
-      title: 'Payment Received',
-      message: 'Payment of $450.00 received for Order #ORD-2024-155',
-      time: '1 hour ago',
-      read: false,
-      icon: 'success'
-    },
-    {
-      id: 4,
-      type: 'order',
-      title: 'Order Shipped',
-      message: 'Order #ORD-2024-154 has been shipped successfully',
-      time: '2 hours ago',
-      read: true,
-      icon: 'success'
-    },
-    {
-      id: 5,
-      type: 'system',
-      title: 'System Update',
-      message: 'New features added to the admin panel',
-      time: '3 hours ago',
-      read: true,
-      icon: 'info'
-    },
-    {
-      id: 6,
-      type: 'order',
-      title: 'Order Cancelled',
-      message: 'Order #ORD-2024-153 has been cancelled by customer',
-      time: '5 hours ago',
-      read: true,
-      icon: 'error'
-    }
-  ]);
-  
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -85,16 +19,6 @@ const NotificationDropdown: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const markAsRead = (id: number) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-  };
 
   const getNotificationIcon = (type: string, iconType: string) => {
     if (iconType === 'success') {

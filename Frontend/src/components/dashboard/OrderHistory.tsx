@@ -36,13 +36,15 @@ const OrderHistory: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-border-color">
                 {currentOrders.map((order) => (
-                  <tr key={order.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">#{order.id}</td>
+                  <tr key={order._id || order.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">
+                      {order.orderId || `#${order._id || order.id}`}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.total}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.status}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link to={`/dashboard/order/${order.id}`} className="text-primary font-medium hover:underline">
+                      <Link to={`/dashboard/order/${order._id || order.id}`} className="text-primary font-medium hover:underline">
                         View Details
                       </Link>
                     </td>

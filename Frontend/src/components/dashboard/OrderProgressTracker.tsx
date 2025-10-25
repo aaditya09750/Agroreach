@@ -32,7 +32,7 @@ const ProgressStep: React.FC<ProgressStepProps> = ({ stepNumber, label, status }
 };
 
 interface OrderProgressTrackerProps {
-  currentStatus: 'Order received' | 'Processing' | 'On the way' | 'Delivered';
+  currentStatus: 'Order received' | 'Processing' | 'On the way' | 'Delivered' | 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 }
 
 const OrderProgressTracker: React.FC<OrderProgressTrackerProps> = ({ currentStatus }) => {

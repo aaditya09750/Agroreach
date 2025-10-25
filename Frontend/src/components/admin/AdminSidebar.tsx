@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Home, Package, ShoppingBag, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 import HelpModal from '../modal/HelpModal';
 
 interface AdminSidebarProps {
@@ -14,10 +15,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useUser();
 
   const handleLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
-    navigate('/');
+    logout();
+    navigate('/admin', { replace: true });
     window.scrollTo(0, 0);
   };
 

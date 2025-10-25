@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { Eye } from 'lucide-react';
 import Checkbox from '../ui/Checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 const SignUpForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { register } = useUser();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
+    name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     termsAccepted: false,
@@ -21,22 +28,82 @@ const SignUpForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formState);
-    // Handle registration logic here
+    setError('');
+    
+    // Validation
+    if (!formState.termsAccepted) {
+      setError('Please accept the terms and conditions');
+      return;
+    }
+    
+    if (formState.password !== formState.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    
+    if (formState.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      await register(formState.name, formState.email, formState.password, formState.phone);
+      // Redirect to dashboard after successful registration
+      navigate('/dashboard');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 w-full max-w-[520px]">
       <h2 className="text-3xl font-semibold text-text-dark text-center mb-8">Create Account</h2>
+      
+      {error && (
+        <div className="mb-5 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          {error}
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formState.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3.5 border border-gray-200 rounded-md text-text-dark placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white"
+            required
+          />
+        </div>
         <div>
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={formState.email}
+            onChange={handleChange}
+            className="w-full px-4 py-3.5 border border-gray-200 rounded-md text-text-dark placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white"
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone Number"
+            value={formState.phone}
             onChange={handleChange}
             className="w-full px-4 py-3.5 border border-gray-200 rounded-md text-text-dark placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-white"
             required
@@ -56,6 +123,7 @@ const SignUpForm: React.FC = () => {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+            aria-label="Toggle password visibility"
           >
             <Eye size={20} />
           </button>
@@ -74,6 +142,7 @@ const SignUpForm: React.FC = () => {
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+            aria-label="Toggle confirm password visibility"
           >
             <Eye size={20} />
           </button>
@@ -86,8 +155,12 @@ const SignUpForm: React.FC = () => {
             onChange={handleChange}
           />
         </div>
-        <button type="submit" className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors">
-          Create Account
+        <button 
+          type="submit" 
+          disabled={loading}
+          className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
       <div className="mt-6 text-center text-sm">

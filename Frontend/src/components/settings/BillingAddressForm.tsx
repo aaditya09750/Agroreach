@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../ui/InputField';
 import SelectField from '../ui/SelectField';
@@ -8,6 +8,11 @@ const BillingAddressForm: React.FC = () => {
   const { billingAddress, updateBillingAddress } = useUser();
   const [formData, setFormData] = useState(billingAddress);
   const navigate = useNavigate();
+
+  // Update formData when billingAddress changes
+  useEffect(() => {
+    setFormData(billingAddress);
+  }, [billingAddress]);
 
   // US States
   const usStates = [
@@ -65,9 +70,9 @@ const BillingAddressForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateBillingAddress(formData);
+    await updateBillingAddress(formData);
     setTimeout(() => {
       window.scrollTo(0, 0);
       navigate('/dashboard');

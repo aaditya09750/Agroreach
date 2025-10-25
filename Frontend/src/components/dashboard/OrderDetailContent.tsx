@@ -41,6 +41,10 @@ const OrderDetailContent: React.FC<{ order: Order }> = ({ order }) => {
   const { convertPrice, getCurrencySymbol } = useCurrency();
   const currencySymbol = getCurrencySymbol();
   
+  console.log('OrderDetailContent - order:', order);
+  console.log('OrderDetailContent - items:', order.items);
+  console.log('OrderDetailContent - item images:', order.items.map(item => ({ name: item.name, image: item.image })));
+  
   return (
     <div className="border border-border-color rounded-lg">
       <div className="p-6 flex flex-wrap justify-between items-center border-b border-border-color gap-4">
@@ -80,7 +84,15 @@ const OrderDetailContent: React.FC<{ order: Order }> = ({ order }) => {
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 object-contain rounded-md" />
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-16 h-16 object-contain rounded-md border border-gray-200" 
+                          onError={(e) => {
+                            console.error('Image failed to load:', item.image);
+                            e.currentTarget.src = 'https://via.placeholder.com/64?text=No+Image';
+                          }}
+                        />
                         <span className="text-sm font-medium text-text-dark">{item.name}</span>
                       </div>
                     </td>
@@ -96,7 +108,7 @@ const OrderDetailContent: React.FC<{ order: Order }> = ({ order }) => {
             <div className="p-4 border-b border-border-color flex justify-between">
               <div>
                 <p className="text-xs text-text-muted uppercase">Order ID:</p>
-                <p className="text-sm font-medium text-text-dark">#{order.id}</p>
+                <p className="text-sm font-medium text-text-dark">{order.orderId || `#${order._id || order.id}`}</p>
               </div>
               <div>
                 <p className="text-xs text-text-muted uppercase">Payment Method:</p>

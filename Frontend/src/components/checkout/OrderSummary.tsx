@@ -56,7 +56,7 @@ const OrderSummary: React.FC = () => {
     return missing;
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     // Validate cart
     if (cartItems.length === 0) {
       alert('Your cart is empty');
@@ -71,41 +71,57 @@ const OrderSummary: React.FC = () => {
       return;
     }
 
-    // Create order with cart items
-    const orderItems = cartItems.map(item => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-      image: item.image
-    }));
+    // Get selected payment method
+    const paymentMethodInput = document.querySelector('input[name="paymentMethod"]:checked') as HTMLInputElement;
+    const paymentMethod = paymentMethodInput?.value || 'cod';
 
-    addOrder({
-      total: `${currencySymbol}${total.toFixed(2)} (${cartItems.length} Product${cartItems.length > 1 ? 's' : ''})`,
-      items: orderItems,
-      subtotal: convertedSubtotal,
-      shipping,
-      gst,
-      billingAddress: {
-        firstName: billingAddress.firstName,
-        lastName: billingAddress.lastName,
-        email: billingAddress.email,
-        phone: billingAddress.phone,
-        streetAddress: billingAddress.streetAddress,
-        country: billingAddress.country,
-        state: billingAddress.state,
-        zipCode: billingAddress.zipCode,
-        companyName: billingAddress.companyName
+    try {
+      // Create order with proper format for backend
+      await addOrder({
+        shippingAddress: {
+          street: billingAddress.streetAddress,
+          city: billingAddress.state,
+          state: billingAddress.state,
+          postalCode: billingAddress.zipCode,
+          country: billingAddress.country
+        },
+        paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 
+                       paymentMethod === 'paypal' ? 'PayPal' : 'Amazon Pay',
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        })),
+        subtotal: convertedSubtotal,
+        shipping,
+        gst
+      });
+
+      // Clear cart
+      clearCart();
+
+      // Navigate to order history after a short delay to show notification
+      setTimeout(() => {
+        navigate('/order-history');
+      }, 1000);
+    } catch (error: unknown) {
+      console.error('Failed to place order:', error);
+      
+      let errorMessage = 'Failed to place order. Please try again.';
+      
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = (error as { response?: { data?: { message?: string; errors?: Array<{ message: string }> } } }).response;
+        if (response?.data?.message) {
+          errorMessage = response.data.message;
+        } else if (response?.data?.errors && Array.isArray(response.data.errors)) {
+          errorMessage = response.data.errors.map((e: { message: string }) => e.message).join(', ');
+        }
       }
-    });
-
-    // Clear cart
-    clearCart();
-
-    // Navigate to order history after a short delay to show notification
-    setTimeout(() => {
-      navigate('/order-history');
-    }, 500);
+      
+      alert(errorMessage);
+    }
   };
 
   return (

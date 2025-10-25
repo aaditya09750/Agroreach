@@ -7,6 +7,7 @@ import ContactPage from './pages/user/ContactPage';
 import AboutPage from './pages/user/AboutPage';
 import SignInPage from './pages/user/SignInPage';
 import SignUpPage from './pages/user/SignUpPage';
+import LogoutPage from './pages/user/LogoutPage';
 import DashboardPage from './pages/user/DashboardPage';
 import OrderHistoryPage from './pages/user/OrderHistoryPage';
 import OrderDetailPage from './pages/user/OrderDetailPage';
@@ -15,12 +16,14 @@ import CheckoutPage from './pages/user/CheckoutPage';
 import SettingsPage from './pages/user/SettingsPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
+import ProtectedRoute from './components/routes/ProtectedRoute';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { UserProvider } from './context/UserContext';
 import { OrderProvider } from './context/OrderContext';
+import { NotificationProvider } from './context/NotificationContext';
 import CartNotification from './components/ui/CartNotification';
 import UserNotification from './components/ui/UserNotification';
 import OrderNotification from './components/ui/OrderNotification';
@@ -43,37 +46,64 @@ function App() {
   return (
     <CurrencyProvider>
       <LanguageProvider>
-        <ProductProvider>
-          <CartProvider>
-            <UserProvider>
-              <OrderProvider>
-                <Router>
-                    <CartNotification />
-                    <UserNotification />
-                    <OrderNotification />
-                    <Routes>
+        <UserProvider>
+          <NotificationProvider>
+            <ProductProvider>
+              <CartProvider>
+                <OrderProvider>
+                  <Router>
+                      <CartNotification />
+                      <UserNotification />
+                      <OrderNotification />
+                      <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/shop" element={<ShopPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/signin" element={<SignInPage />} />
                       <Route path="/signup" element={<SignUpPage />} />
-                      <Route path="/dashboard" element={<DashboardPage />} />
-                      <Route path="/order-history" element={<OrderHistoryPage />} />
-                      <Route path="/dashboard/order/:orderId" element={<OrderDetailPage />} />
+                      <Route path="/logout" element={<LogoutPage />} />
+                      <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                          <DashboardPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/order-history" element={
+                        <ProtectedRoute>
+                          <OrderHistoryPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/order/:orderId" element={
+                        <ProtectedRoute>
+                          <OrderDetailPage />
+                        </ProtectedRoute>
+                      } />
                       <Route path="/cart" element={<CartPage />} />
-                      <Route path="/checkout" element={<CheckoutPage />} />
-                      <Route path="/settings" element={<SettingsPage />} />
+                      <Route path="/checkout" element={
+                        <ProtectedRoute>
+                          <CheckoutPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/settings" element={
+                        <ProtectedRoute>
+                          <SettingsPage />
+                        </ProtectedRoute>
+                      } />
                       <Route path="/admin" element={<AdminLoginPage />} />
-                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                      <Route path="/admin/dashboard" element={
+                        <ProtectedRoute adminOnly>
+                          <AdminDashboard />
+                        </ProtectedRoute>
+                      } />
                     </Routes>
                 </Router>
               </OrderProvider>
-            </UserProvider>
-          </CartProvider>
-        </ProductProvider>
-      </LanguageProvider>
-    </CurrencyProvider>
+            </CartProvider>
+          </ProductProvider>
+        </NotificationProvider>
+      </UserProvider>
+    </LanguageProvider>
+  </CurrencyProvider>
   );
 }
 

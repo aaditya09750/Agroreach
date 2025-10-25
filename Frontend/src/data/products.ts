@@ -15,7 +15,8 @@ import productImg13 from '../assets/Products/img (13).png'; //Green Apple
 import productImg14 from '../assets/Products/img (14).png'; // Fresh Cauliflower
 import productImg15 from '../assets/Products/img (15).png'; // Eggplant (Brinjal)
 export interface Product {
-    id: number;
+    id: number | string;
+    _id?: string; // MongoDB ID
     name: string;
     image: string;
     images: string[];
@@ -23,16 +24,18 @@ export interface Product {
     oldPrice?: number;
     rating: number;
     reviewCount: number;
-    status?: 'sale' | 'out-of-stock' | 'hover';
+    viewCount?: number;
+    status?: 'sale' | 'new' | 'out-of-stock' | 'hover' | null;
     stockStatus: 'In Stock' | 'Out of Stock';
-    discount?: string;
-    brand: {
+    stock?: number;
+    discount?: string | number;
+    brand?: {
         name: string;
         logo: string;
     };
-    description: string;
+    description?: string;
     category: string;
-    tags: string[];
+    tags?: string[];
     isHotDeal?: boolean;
     isBestSeller?: boolean;
     isTopRated?: boolean;

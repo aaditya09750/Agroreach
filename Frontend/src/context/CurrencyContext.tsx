@@ -25,7 +25,7 @@ interface CurrencyProviderProps {
 }
 
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
-  const [currency, setCurrency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('INR');
 
   const convertPrice = (usdPrice: number): number => {
     // No conversion, just return the same price ---- conversion rate 1 USD = 82 INR code

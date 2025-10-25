@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import vegetablesImg from '../../assets/vegetables 1.png';
 import fruitsImg from '../../assets/fruits 1.png';
 import fishImg from '../../assets/fish 1.png';
+import { useProduct } from '../../context/ProductContext';
 
 
 interface CategoryCardProps {
@@ -28,20 +29,39 @@ const TopCategory: React.FC = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [activeIndicator, setActiveIndicator] = useState(0); // 0, 1, or 2 for the 3 dots
+  const { products } = useProduct();
+
+  // Calculate category counts dynamically from products
+  const getCategoryCount = (categoryName: string): number => {
+    return products.filter(product => {
+      const productCategory = product.category?.toLowerCase() || '';
+      const searchCategory = categoryName.toLowerCase();
+      
+      // Match category names
+      if (searchCategory.includes('vegetable')) {
+        return productCategory.includes('vegetable');
+      } else if (searchCategory.includes('fruit')) {
+        return productCategory.includes('fruit');
+      } else if (searchCategory.includes('fish')) {
+        return productCategory.includes('fish');
+      }
+      return false;
+    }).length;
+  };
 
   const baseCategories = [
-    { image: vegetablesImg, title: 'Vegetables', count: 165 },
-    { image: fruitsImg, title: 'Fresh Fruit', count: 47 },
-    { image: fishImg, title: 'River Fish', count: 34 },
-    { image: vegetablesImg, title: 'Vegetables', count: 15 },
-    { image: fruitsImg, title: 'Fresh Fruit', count: 98 },
-    { image: fishImg, title: 'River Fish', count: 34 },
-    { image: vegetablesImg, title: 'Vegetables', count: 574 },
-    { image: fruitsImg, title: 'Fresh Fruit', count: 137 },
-    { image: fishImg, title: 'River Fish', count: 34 },
-    { image: vegetablesImg, title: 'Vegetables', count: 84 },
-    { image: fruitsImg, title: 'Fresh Fruit', count: 48 },
-    { image: fishImg, title: 'River Fish', count: 34 },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
+    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
+    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
+    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
+    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
   ];
 
   const updateScrollButtons = () => {
