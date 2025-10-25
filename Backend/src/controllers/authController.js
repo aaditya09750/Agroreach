@@ -55,6 +55,7 @@ exports.signup = async (req, res) => {
       message: 'User registered successfully',
       data: {
         user: {
+          _id: user._id,
           id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -124,6 +125,7 @@ exports.signin = async (req, res) => {
       message: 'Login successful',
       data: {
         user: {
+          _id: user._id,
           id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,

@@ -51,9 +51,15 @@ const SignUpForm: React.FC = () => {
     setLoading(true);
     
     try {
-      await register(formState.name, formState.email, formState.password, formState.phone);
-      // Redirect to dashboard after successful registration
-      navigate('/dashboard');
+      const user = await register(formState.name, formState.email, formState.password, formState.phone);
+      
+      // Only navigate if user was successfully created
+      if (user) {
+        // Use replace to prevent going back to signup page
+        navigate('/dashboard', { replace: true });
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

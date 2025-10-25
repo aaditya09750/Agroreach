@@ -3,9 +3,10 @@ import AdminSidebar from '../../components/admin/AdminSidebar';
 import AdminOverview from '../../components/admin/AdminOverview';
 import AdminAddProduct from '../../components/admin/AdminAddProduct';
 import AdminOrders from '../../components/admin/AdminOrders';
+import AdminCustomers from '../../components/admin/AdminCustomers';
 import AdminHeader from '../../components/admin/AdminHeader';
 
-type AdminView = 'overview' | 'add-product' | 'orders';
+type AdminView = 'overview' | 'add-product' | 'orders' | 'customers';
 
 const AdminDashboard: React.FC = () => {
   const [activeView, setActiveView] = useState<AdminView>('overview');
@@ -19,6 +20,8 @@ const AdminDashboard: React.FC = () => {
         return <AdminAddProduct />;
       case 'orders':
         return <AdminOrders />;
+      case 'customers':
+        return <AdminCustomers />;
       default:
         return <AdminOverview />;
     }

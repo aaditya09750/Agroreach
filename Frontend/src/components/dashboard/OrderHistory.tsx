@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrder } from '../../context/OrderContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const OrderHistory: React.FC = () => {
   const { orders } = useOrder();
+  const { convertPrice, getCurrencySymbol } = useCurrency();
+  const currencySymbol = getCurrencySymbol();
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
 
@@ -35,21 +38,29 @@ const OrderHistory: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-color">
-                {currentOrders.map((order) => (
-                  <tr key={order._id || order.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">
-                      {order.orderId || `#${order._id || order.id}`}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.date}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.total}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.status}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link to={`/dashboard/order/${order._id || order.id}`} className="text-primary font-medium hover:underline">
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {currentOrders.map((order) => {
+                  // Extract numeric value from total string (e.g., "$856.68" -> 856.68)
+                  const numericTotal = parseFloat(order.total.replace(/[^0-9.-]+/g, ''));
+                  const convertedTotal = convertPrice(numericTotal);
+                  
+                  return (
+                    <tr key={order._id || order.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">
+                        {order.orderId || `#${order._id || order.id}`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.date}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">
+                        {currencySymbol}{convertedTotal.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.status}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Link to={`/dashboard/order/${order._id || order.id}`} className="text-primary font-medium hover:underline">
+                          View Details
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

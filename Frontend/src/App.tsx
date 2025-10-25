@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './i18n/config'; // Import i18n configuration
+import { authService } from './services/authService';
 import HomePage from './pages/user/HomePage';
 import ShopPage from './pages/user/ShopPage';
 import ContactPage from './pages/user/ContactPage';
@@ -33,6 +34,9 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Migrate old localStorage keys to new format
+    authService.migrateOldStorage();
+    
     const timer = setTimeout(() => {
       setLoading(false);
     }, 100);

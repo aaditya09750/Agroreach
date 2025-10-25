@@ -97,7 +97,7 @@ const CartTotal: React.FC = () => {
           },
           paymentMethod: 'Cash on Delivery',
           items: cartItems.map(item => ({
-            id: item.id,
+            id: item.id, // orderService will transform to 'product'
             name: item.name,
             price: item.price,
             quantity: item.quantity,
@@ -105,7 +105,8 @@ const CartTotal: React.FC = () => {
           })),
           subtotal: convertedSubtotal,
           shipping,
-          gst
+          tax: gst, // Backend expects 'tax' field
+          total // Add total field required by backend
         });
 
         // Clear cart
@@ -117,7 +118,9 @@ const CartTotal: React.FC = () => {
         }, 1000);
       } catch (error) {
         console.error('Failed to place order:', error);
-        alert('Failed to place order. Please try again.');
+        // Show more specific error message
+        const errorMessage = error instanceof Error ? error.message : 'Failed to place order. Please try again.';
+        alert(errorMessage);
       }
     }
   };

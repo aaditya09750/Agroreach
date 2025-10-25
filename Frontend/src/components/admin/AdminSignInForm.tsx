@@ -35,8 +35,8 @@ const AdminSignInForm: React.FC = () => {
       if (user && user.role === 'admin') {
         navigate('/admin/dashboard', { replace: true });
       } else if (user && user.role !== 'admin') {
-        // Non-admin user tried to access admin portal
-        logout(); // Properly clear user state
+        // Non-admin user tried to access admin portal - clear their user session
+        logout(false); // Logout user session only
         setError('Access denied. This portal is for administrators only.');
       } else {
         setError('Login failed. Please check your credentials and try again.');

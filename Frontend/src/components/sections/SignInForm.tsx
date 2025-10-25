@@ -31,11 +31,17 @@ const SignInForm: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(formState.email, formState.password);
-      // Redirect to the page they tried to visit or home page
-      const locationState = location.state as { from?: { pathname?: string } } | null;
-      const from = locationState?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      const user = await login(formState.email, formState.password);
+      
+      // Only navigate if login was successful
+      if (user) {
+        // Redirect to the page they tried to visit or home page
+        const locationState = location.state as { from?: { pathname?: string } } | null;
+        const from = locationState?.from?.pathname || '/';
+        navigate(from, { replace: true });
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

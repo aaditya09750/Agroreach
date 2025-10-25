@@ -296,9 +296,8 @@ exports.deleteProduct = async (req, res) => {
       await imageHandler.deleteMultipleImages(product.images);
     }
 
-    // Soft delete - set isActive to false
-    product.isActive = false;
-    await product.save();
+    // Hard delete - permanently remove from database
+    await Product.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,

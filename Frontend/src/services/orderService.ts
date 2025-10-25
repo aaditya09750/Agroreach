@@ -37,6 +37,8 @@ export interface CreateOrderData {
   subtotal?: number;
   shipping?: number;
   gst?: number;
+  tax?: number;
+  total?: number;
 }
 
 export const orderService = {
@@ -54,13 +56,15 @@ export const orderService = {
 
     console.log('Transformed items:', items);
 
-    // Calculate totals
+    // Calculate totals - use provided values or calculate
     const subtotal = orderData.subtotal || 0;
     const shipping = orderData.shipping || 0;
-    const tax = orderData.gst || 0;
-    const total = subtotal + shipping + tax;
+    const tax = orderData.tax || orderData.gst || 0;
+    const total = orderData.total || (subtotal + shipping + tax);
 
-    // Ensure billingAddress has all required fields
+    // Build billingAddress from available data
+    // If billingAddress is provided and has required fields, use it
+    // Otherwise, validation will fail on backend
     const billingAddress = {
       firstName: orderData.billingAddress?.firstName || '',
       lastName: orderData.billingAddress?.lastName || '',
@@ -74,6 +78,14 @@ export const orderService = {
     };
 
     console.log('Final billing address:', billingAddress);
+    
+    // Validate that required billing address fields are present
+    if (!billingAddress.firstName || !billingAddress.lastName || 
+        !billingAddress.email || !billingAddress.phone || 
+        !billingAddress.streetAddress || !billingAddress.country || 
+        !billingAddress.state || !billingAddress.zipCode) {
+      throw new Error('Please complete your billing address in Settings before placing an order');
+    }
 
     const payload = {
       items,
@@ -87,9 +99,20 @@ export const orderService = {
 
     console.log('Sending to backend:', payload);
 
-    const response = await api.post('/orders', payload);
-    console.log('Backend response:', response.data);
-    return response.data;
+    try {
+      const response = await api.post('/orders', payload);
+      console.log('Backend response:', response.data);
+      return response.data;
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string; errors?: Array<{ field: string; message: string }> }; status?: number } };
+      console.error('Backend error response:', axiosError.response?.data);
+      console.error('Backend error status:', axiosError.response?.status);
+      console.error('Backend error message:', axiosError.response?.data?.message);
+      if (axiosError.response?.data?.errors) {
+        console.error('Validation errors:', axiosError.response.data.errors);
+      }
+      throw error;
+    }
   },
 
   getMyOrders: async () => {

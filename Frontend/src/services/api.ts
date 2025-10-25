@@ -13,7 +13,20 @@ export const api = axios.create({
 // Add token to requests
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Determine which token to use based on the current page/route
+    const currentPath = window.location.pathname;
+    const isAdminPath = currentPath.startsWith('/admin');
+    
+    let token: string | null = null;
+    
+    if (isAdminPath) {
+      // On admin routes, use admin token
+      token = localStorage.getItem('admin_token');
+    } else {
+      // On user routes, use user token
+      token = localStorage.getItem('user_token');
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,16 +43,19 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Check if we're on admin login page - don't redirect
       const currentPath = window.location.pathname;
-      if (currentPath !== '/admin' && currentPath !== '/signin') {
-        // Only redirect if not already on a login page
-        if (currentPath.startsWith('/admin')) {
+      
+      // Determine if this was an admin or user session and clear accordingly
+      if (currentPath.startsWith('/admin')) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        if (currentPath !== '/admin') {
           window.location.href = '/admin';
-        } else {
+        }
+      } else {
+        localStorage.removeItem('user_token');
+        localStorage.removeItem('user_user');
+        if (currentPath !== '/signin') {
           window.location.href = '/signin';
         }
       }

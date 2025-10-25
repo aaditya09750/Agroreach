@@ -39,7 +39,7 @@ export const adminService = {
   },
 
   // Orders Management
-  getAllOrders: async (params?: { status?: string; page?: number; limit?: number; search?: string }) => {
+  getAllOrders: async (params?: { status?: string; page?: number; limit?: number; search?: string; userId?: string }) => {
     const response = await api.get('/admin/orders', { params });
     return response.data;
   },

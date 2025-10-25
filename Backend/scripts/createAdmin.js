@@ -82,5 +82,5 @@ const createAdmin = async () => {
   }
 };
 
-// Run the script
+// Run the script -- node Backend/scripts/createAdmin.js
 createAdmin();

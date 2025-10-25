@@ -73,8 +73,10 @@ export const authService = {
   register: async (userData: RegisterData): Promise<AuthResponse> => {
     const response = await api.post('/auth/signup', userData);
     if (response.data.data?.token) {
-      localStorage.setItem('token', response.data.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      const user = response.data.data.user;
+      const storagePrefix = user?.role === 'admin' ? 'admin_' : 'user_';
+      localStorage.setItem(`${storagePrefix}token`, response.data.data.token);
+      localStorage.setItem(`${storagePrefix}user`, JSON.stringify(user));
     }
     return response.data;
   },
@@ -82,15 +84,18 @@ export const authService = {
   login: async (credentials: LoginData): Promise<AuthResponse> => {
     const response = await api.post('/auth/signin', credentials);
     if (response.data.data?.token) {
-      localStorage.setItem('token', response.data.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      const user = response.data.data.user;
+      const storagePrefix = user?.role === 'admin' ? 'admin_' : 'user_';
+      localStorage.setItem(`${storagePrefix}token`, response.data.data.token);
+      localStorage.setItem(`${storagePrefix}user`, JSON.stringify(user));
     }
     return response.data;
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  logout: (isAdmin: boolean = false) => {
+    const storagePrefix = isAdmin ? 'admin_' : 'user_';
+    localStorage.removeItem(`${storagePrefix}token`);
+    localStorage.removeItem(`${storagePrefix}user`);
   },
 
   getCurrentUser: async () => {
@@ -98,16 +103,54 @@ export const authService = {
     return response.data;
   },
 
-  getStoredUser: () => {
-    const userStr = localStorage.getItem('user');
+  getStoredUser: (isAdmin: boolean = false) => {
+    const storagePrefix = isAdmin ? 'admin_' : 'user_';
+    const userStr = localStorage.getItem(`${storagePrefix}user`);
     return userStr ? JSON.parse(userStr) : null;
   },
 
-  getStoredToken: () => {
-    return localStorage.getItem('token');
+  getStoredToken: (isAdmin: boolean = false) => {
+    const storagePrefix = isAdmin ? 'admin_' : 'user_';
+    return localStorage.getItem(`${storagePrefix}token`);
   },
 
-  setStoredUser: (user: AuthResponse['user']) => {
-    localStorage.setItem('user', JSON.stringify(user));
+  setStoredUser: (user: AuthResponse['user'], isAdmin: boolean = false) => {
+    const storagePrefix = isAdmin ? 'admin_' : 'user_';
+    localStorage.setItem(`${storagePrefix}user`, JSON.stringify(user));
+  },
+
+  // Helper to check if user is admin based on stored data
+  isAdminSession: () => {
+    return localStorage.getItem('admin_token') !== null;
+  },
+
+  // Helper to check if user session exists
+  isUserSession: () => {
+    return localStorage.getItem('user_token') !== null;
+  },
+
+  // Migrate old localStorage keys to new format (run once on app load)
+  migrateOldStorage: () => {
+    const oldToken = localStorage.getItem('token');
+    const oldUser = localStorage.getItem('user');
+    
+    if (oldToken && oldUser) {
+      try {
+        const user = JSON.parse(oldUser);
+        const storagePrefix = user?.role === 'admin' ? 'admin_' : 'user_';
+        
+        // Move to new keys
+        localStorage.setItem(`${storagePrefix}token`, oldToken);
+        localStorage.setItem(`${storagePrefix}user`, oldUser);
+        
+        // Remove old keys
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        console.log('Successfully migrated old localStorage keys');
+      } catch (error) {
+        console.error('Error migrating localStorage:', error);
+      }
+    }
   },
 };

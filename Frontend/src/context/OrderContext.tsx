@@ -70,8 +70,10 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   // Load orders when user logs in
   useEffect(() => {
     if (user) {
+      console.log('OrderContext: User logged in, loading orders for:', user.email);
       loadOrders();
     } else {
+      console.log('OrderContext: No user, clearing orders');
       setOrders([]);
     }
   }, [user]);
@@ -79,14 +81,16 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   const loadOrders = async () => {
     try {
       setLoading(true);
+      console.log('OrderContext: Fetching orders from server...');
       const response = await orderService.getMyOrders();
       
-      console.log('Raw orders response:', response);
+      console.log('OrderContext: Raw orders response:', response);
       
       // Backend returns { success: true, data: [...], pagination: {...} }
       const ordersData = response.data || response;
       
-      console.log('Orders data:', ordersData);
+      console.log('OrderContext: Orders data:', ordersData);
+      console.log('OrderContext: Number of orders loaded:', ordersData.length);
       
       const mappedOrders = ordersData.map((order: {
         _id: string;
@@ -185,6 +189,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   const mapOrderStatus = (status: string) => {
     const statusMap: Record<string, Order['status']> = {
       'pending': 'Order received',
+      'processing': 'Processing',
       'confirmed': 'Processing',
       'shipped': 'On the way',
       'delivered': 'Delivered',
@@ -214,21 +219,32 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
         throw new Error('Shipping address is required');
       }
       
-      // Merge billing address into order data with proper field mapping
-      const completeOrderData = {
-        ...orderData,
-        billingAddress: {
-          firstName: billingAddress.firstName,
-          lastName: billingAddress.lastName,
-          email: billingAddress.email,
-          phone: billingAddress.phone,
-          streetAddress: orderData.shippingAddress.street,
-          country: orderData.shippingAddress.country,
-          state: orderData.shippingAddress.state,
-          zipCode: orderData.shippingAddress.postalCode,
-          companyName: billingAddress.companyName || ''
-        }
-      };
+      // Check if billing address is populated in UserContext
+      const hasBillingAddress = billingAddress.firstName && 
+                               billingAddress.lastName && 
+                               billingAddress.email && 
+                               billingAddress.phone;
+      
+      // Only merge billing address if it's populated, otherwise let orderService handle it
+      let completeOrderData = orderData;
+      
+      if (hasBillingAddress) {
+        // Merge billing address into order data with proper field mapping
+        completeOrderData = {
+          ...orderData,
+          billingAddress: {
+            firstName: billingAddress.firstName,
+            lastName: billingAddress.lastName,
+            email: billingAddress.email,
+            phone: billingAddress.phone,
+            streetAddress: orderData.shippingAddress.street,
+            country: orderData.shippingAddress.country,
+            state: orderData.shippingAddress.state,
+            zipCode: orderData.shippingAddress.postalCode,
+            companyName: billingAddress.companyName || ''
+          }
+        };
+      }
 
       console.log('Complete order data:', completeOrderData);
       

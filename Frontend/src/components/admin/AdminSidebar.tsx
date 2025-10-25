@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Home, Package, ShoppingBag, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
+import { Home, Package, ShoppingBag, Users, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import HelpModal from '../modal/HelpModal';
 
 interface AdminSidebarProps {
-  activeView: 'overview' | 'add-product' | 'orders';
-  setActiveView: (view: 'overview' | 'add-product' | 'orders') => void;
+  activeView: 'overview' | 'add-product' | 'orders' | 'customers';
+  setActiveView: (view: 'overview' | 'add-product' | 'orders' | 'customers') => void;
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
 }
@@ -18,7 +18,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
   const { logout } = useUser();
 
   const handleLogout = () => {
-    logout();
+    logout(true); // Explicitly logout admin session only
     navigate('/admin', { replace: true });
     window.scrollTo(0, 0);
   };
@@ -40,6 +40,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeView, setActiveView, 
       view: 'orders' as const, 
       hasDropdown: true,
       subItems: ['All Orders', 'Pending', 'Completed']
+    },
+    { 
+      id: 'customers', 
+      label: 'Customers', 
+      icon: Users, 
+      view: 'customers' as const
     },
   ];
 

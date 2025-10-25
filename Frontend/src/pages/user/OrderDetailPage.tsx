@@ -49,9 +49,11 @@ const OrderDetailPage: React.FC = () => {
             }),
             total: `$${serverOrder.total.toFixed(2)}`,
             status: serverOrder.status === 'pending' ? 'Order received' :
+                   serverOrder.status === 'processing' ? 'Processing' :
                    serverOrder.status === 'confirmed' ? 'Processing' :
                    serverOrder.status === 'shipped' ? 'On the way' :
-                   serverOrder.status === 'delivered' ? 'Delivered' : 'Order received',
+                   serverOrder.status === 'delivered' ? 'Delivered' :
+                   serverOrder.status === 'cancelled' ? 'Cancelled' : 'Order received',
             items: serverOrder.items?.map((item: {
               product: string | { _id: string; name: string; images?: string[] };
               name?: string;

@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const User = require('../models/User');
 const Product = require('../models/Product');
+const Cart = require('../models/Cart');
 const { getPagination, buildPaginationResponse, calculatePercentageChange } = require('../utils/helpers');
 
 // @desc    Get dashboard statistics
@@ -160,10 +161,18 @@ exports.getDashboardStats = async (req, res) => {
 // @access  Private/Admin
 exports.getAllOrders = async (req, res) => {
   try {
-    const { page, limit, status, search, startDate, endDate } = req.query;
+    const { page, limit, status, search, startDate, endDate, userId } = req.query;
+
+    console.log('getAllOrders called with params:', { page, limit, status, search, startDate, endDate, userId });
 
     // Build filter
     const filter = {};
+
+    // Filter by user ID if provided
+    if (userId) {
+      filter.user = userId;
+      console.log('Filtering orders by userId:', userId);
+    }
 
     if (status) {
       filter.status = status;
@@ -183,19 +192,27 @@ exports.getAllOrders = async (req, res) => {
       if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
 
-    // Pagination
+    // Pagination - skip pagination if filtering by userId
     const { skip, limit: limitNum, page: pageNum } = getPagination(page, limit);
 
     // Get orders
-    const orders = await Order.find(filter)
+    let ordersQuery = Order.find(filter)
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limitNum)
       .populate('user', 'firstName lastName email')
       .populate('items.product', 'name images');
+    
+    // Only apply pagination if not filtering by userId (to get all user's orders)
+    if (!userId) {
+      ordersQuery = ordersQuery.skip(skip).limit(limitNum);
+    }
+    
+    const orders = await ordersQuery;
 
     // Get total count
     const total = await Order.countDocuments(filter);
+
+    console.log(`Found ${orders.length} orders for filter:`, filter);
+    console.log(`Total orders in DB matching filter: ${total}`);
 
     // Build response
     const response = buildPaginationResponse(orders, total, pageNum, limitNum);
@@ -357,18 +374,25 @@ exports.getAllUsers = async (req, res) => {
       ];
     }
 
-    // Pagination
+    // Pagination - if no limit provided, fetch all users
     const { skip, limit: limitNum, page: pageNum } = getPagination(page, limit);
 
     // Get users
-    const users = await User.find(filter)
+    let userQuery = User.find(filter)
       .select('-password')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limitNum);
+      .sort({ createdAt: -1 });
+    
+    // Only apply pagination if limit is provided
+    if (limit) {
+      userQuery = userQuery.skip(skip).limit(limitNum);
+    }
+    
+    const users = await userQuery;
 
     // Get total count
     const total = await User.countDocuments(filter);
+
+    console.log(`Fetching users - Total in DB: ${total}, Returned: ${users.length}`);
 
     // Build response
     const response = buildPaginationResponse(users, total, pageNum, limitNum);
@@ -414,6 +438,67 @@ exports.toggleUserActive = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating user status',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/admin/users/:id
+// @access  Private/Admin
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Don't allow deleting admin users
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Cannot delete admin users'
+      });
+    }
+
+    console.log(`Starting complete deletion of user: ${user.email} (ID: ${req.params.id})`);
+
+    // Delete all orders associated with this user
+    const deletedOrders = await Order.deleteMany({ user: req.params.id });
+    console.log(`✓ Deleted ${deletedOrders.deletedCount} orders`);
+
+    // Delete user's cart
+    const deletedCart = await Cart.deleteOne({ user: req.params.id });
+    console.log(`✓ Deleted cart (${deletedCart.deletedCount} cart found)`);
+
+    // Delete user's product reviews/ratings if you have them
+    // Uncomment if you add reviews in the future:
+    // const deletedReviews = await Review.deleteMany({ user: req.params.id });
+    // console.log(`✓ Deleted ${deletedReviews.deletedCount} reviews`);
+
+    // Delete the user account
+    await User.findByIdAndDelete(req.params.id);
+    console.log(`✓ Deleted user account`);
+
+    console.log(`Complete deletion finished for user: ${user.email}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'User and all associated data deleted successfully',
+      data: {
+        deletedOrders: deletedOrders.deletedCount,
+        deletedCart: deletedCart.deletedCount > 0
+      }
+    });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting user',
       error: error.message
     });
   }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 
@@ -10,8 +10,19 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminOnly = false }) => {
   const { user, loading } = useUser();
   const location = useLocation();
+  const [isReady, setIsReady] = useState(false);
 
-  if (loading) {
+  // Give a small delay to ensure context is fully updated
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setIsReady(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  if (loading || !isReady) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

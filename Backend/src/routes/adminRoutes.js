@@ -8,6 +8,7 @@ const {
   deleteOrder,
   getAllUsers,
   toggleUserActive,
+  deleteUser,
   getRecentProducts
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/auth');
@@ -29,6 +30,7 @@ router.delete('/orders/:id', deleteOrder);
 // Users management
 router.get('/users', getAllUsers);
 router.patch('/users/:id/toggle-active', toggleUserActive);
+router.delete('/users/:id', deleteUser);
 
 // Products management
 router.get('/products/recent', getRecentProducts);

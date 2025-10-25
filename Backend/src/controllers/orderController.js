@@ -9,6 +9,9 @@ const { getPagination, buildPaginationResponse } = require('../utils/helpers');
 // @access  Private
 exports.createOrder = async (req, res) => {
   try {
+    console.log('=== CREATE ORDER START ===');
+    console.log('Authenticated user ID:', req.user._id);
+    console.log('Authenticated user email:', req.user.email);
     console.log('Create order request body:', req.body);
     
     const {
@@ -76,29 +79,67 @@ exports.createOrder = async (req, res) => {
 
     // Generate unique order ID
     const year = new Date().getFullYear();
-    const count = await Order.countDocuments();
-    const orderId = `ORD-${year}-${String(count + 1).padStart(5, '0')}`;
+    
+    // Find the last order for this year to get the next sequential number
+    const lastOrder = await Order.findOne({ 
+      orderId: new RegExp(`^ORD-${year}-`) 
+    }).sort({ createdAt: -1 });
+    
+    let nextNumber = 1;
+    if (lastOrder && lastOrder.orderId) {
+      const lastNumber = parseInt(lastOrder.orderId.split('-')[2]);
+      nextNumber = lastNumber + 1;
+    }
+    
+    let orderId = `ORD-${year}-${String(nextNumber).padStart(5, '0')}`;
 
     console.log('Generated order ID:', orderId);
 
-    // Create order
-    const order = new Order({
-      orderId,
-      user: req.user._id,
-      items: orderItems,
-      billingAddress,
-      paymentMethod,
-      subtotal,
-      shipping,
-      tax,
-      total,
-      notes,
-      status: 'pending'
-    });
+    // Create order with retry mechanism for duplicate key errors
+    let order;
+    let retries = 0;
+    const maxRetries = 3;
+    
+    while (retries < maxRetries) {
+      try {
+        order = new Order({
+          orderId,
+          user: req.user._id,
+          items: orderItems,
+          billingAddress,
+          paymentMethod,
+          subtotal,
+          shipping,
+          tax,
+          total,
+          notes,
+          status: 'pending'
+        });
 
-    console.log('Saving order...');
-    await order.save();
-    console.log('Order saved successfully with ID:', order._id);
+        console.log('Saving order...');
+        await order.save();
+        console.log('Order saved successfully!');
+        break; // Success, exit loop
+      } catch (error) {
+        if (error.code === 11000 && retries < maxRetries - 1) {
+          // Duplicate key error, generate new ID with timestamp
+          retries++;
+          const timestamp = Date.now().toString().slice(-4);
+          orderId = `ORD-${year}-${String(nextNumber).padStart(5, '0')}-${timestamp}`;
+          console.log(`Duplicate order ID detected, retrying with: ${orderId}`);
+        } else {
+          throw error; // Re-throw if not duplicate or max retries reached
+        }
+      }
+    }
+    
+    if (!order) {
+      throw new Error('Failed to create order after multiple attempts');
+    }
+    console.log('Order ID:', order._id);
+    console.log('Order belongs to user:', order.user);
+    console.log('Order orderId:', order.orderId);
+    console.log('=== CREATE ORDER END ===');
 
     // Clear user's cart
     await Cart.findOneAndUpdate(
@@ -145,6 +186,10 @@ exports.createOrder = async (req, res) => {
 // @access  Private
 exports.getUserOrders = async (req, res) => {
   try {
+    console.log('=== GET USER ORDERS START ===');
+    console.log('Fetching orders for user ID:', req.user._id);
+    console.log('User email:', req.user.email);
+    
     const { page, limit, status } = req.query;
 
     // Build filter
@@ -164,10 +209,12 @@ exports.getUserOrders = async (req, res) => {
       .limit(limitNum)
       .populate('items.product', 'name images');
 
-    console.log('Get user orders - Found', orders.length, 'orders');
+    console.log('Get user orders - Found', orders.length, 'orders for user:', req.user.email);
     if (orders.length > 0) {
+      console.log('First order ID:', orders[0].orderId);
       console.log('First order items:', JSON.stringify(orders[0].items, null, 2));
     }
+    console.log('=== GET USER ORDERS END ===');
 
     // Get total count
     const total = await Order.countDocuments(filter);

@@ -7,8 +7,8 @@ const LogoutPage: React.FC = () => {
   const { logout } = useUser();
 
   useEffect(() => {
-    // Perform logout
-    logout();
+    // Perform logout - explicitly logout user session only
+    logout(false);
     
     // Redirect to home page after a brief delay
     const timer = setTimeout(() => {

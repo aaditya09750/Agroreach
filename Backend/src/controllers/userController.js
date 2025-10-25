@@ -20,6 +20,7 @@ exports.getProfile = async (req, res) => {
       success: true,
       data: {
         user: {
+          _id: user._id,
           id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -81,13 +82,15 @@ exports.updateProfile = async (req, res) => {
       message: 'Profile updated successfully',
       data: {
         user: {
+          _id: user._id,
           id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
           phone: user.phone,
           role: user.role,
-          profileImage: user.profileImage
+          profileImage: user.profileImage,
+          billingAddress: user.billingAddress
         }
       }
     });

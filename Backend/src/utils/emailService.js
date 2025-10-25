@@ -2,19 +2,34 @@ const nodemailer = require('nodemailer');
 
 // Create transporter
 const createTransporter = () => {
-  return nodemailer.createTransporter({
-    service: process.env.EMAIL_SERVICE || 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+  try {
+    if (!nodemailer || typeof nodemailer.createTransport !== 'function') {
+      console.error('Nodemailer is not properly loaded');
+      return null;
     }
-  });
+    
+    return nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE || 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+  } catch (error) {
+    console.error('Error creating email transporter:', error);
+    return null;
+  }
 };
 
 // Send email
 exports.sendEmail = async (options) => {
   try {
     const transporter = createTransporter();
+    
+    if (!transporter) {
+      console.log('Email transporter not available, skipping email send');
+      return;
+    }
 
     const mailOptions = {
       from: `AR E-commerce <${process.env.EMAIL_USER}>`,
