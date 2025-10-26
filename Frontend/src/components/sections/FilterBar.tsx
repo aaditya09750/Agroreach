@@ -1,6 +1,7 @@
 import React from 'react';
 import ShopDropdown from '../ui/ShopDropdown';
 import { X } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 interface ActiveFilterTagProps {
   label: string;
@@ -35,6 +36,9 @@ const FilterBar: React.FC<FilterBarProps> = ({
   onSortChange,
   resultCount,
 }) => {
+  const { getCurrencySymbol } = useCurrency();
+  const currencySymbol = getCurrencySymbol();
+
   const categories = [
     'All Categories',
     'Fresh Fruit',
@@ -45,11 +49,11 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
   const priceRanges = [
     'All Prices',
-    'Under $10',
-    '$10 - $25',
-    '$25 - $50',
-    '$50 - $100',
-    'Over $100',
+    `Under ${currencySymbol}10`,
+    `${currencySymbol}10 - ${currencySymbol}25`,
+    `${currencySymbol}25 - ${currencySymbol}50`,
+    `${currencySymbol}50 - ${currencySymbol}100`,
+    `Over ${currencySymbol}100`,
   ];
 
   const sortOptions = [

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { orderService, CreateOrderData } from '../services/orderService';
 import { useUser } from './UserContext';
+import { useCurrency } from './CurrencyContext';
 import { getImageUrl } from '../utils/imageUtils';
 
 export interface OrderItem {
@@ -62,6 +63,7 @@ interface OrderProviderProps {
 
 export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   const { user, billingAddress } = useUser();
+  const { currency } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -232,6 +234,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
         // Merge billing address into order data with proper field mapping
         completeOrderData = {
           ...orderData,
+          currency: currency, // Add currency to order
           billingAddress: {
             firstName: billingAddress.firstName,
             lastName: billingAddress.lastName,
@@ -243,6 +246,12 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
             zipCode: orderData.shippingAddress.postalCode,
             companyName: billingAddress.companyName || ''
           }
+        };
+      } else {
+        // Add currency even if billing address is not set
+        completeOrderData = {
+          ...orderData,
+          currency: currency
         };
       }
 

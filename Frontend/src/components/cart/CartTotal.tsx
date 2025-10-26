@@ -58,7 +58,7 @@ const EmptyCartNotification: React.FC<{ isOpen: boolean; onClose: () => void }> 
 
 const CartTotal: React.FC = () => {
   const { getCartTotal, cartItems, clearCart } = useCart();
-  const { convertPrice, getCurrencySymbol } = useCurrency();
+  const { convertPrice, getCurrencySymbol, currency } = useCurrency();
   const { billingAddress } = useUser();
   const { addOrder } = useOrder();
   const navigate = useNavigate();
@@ -106,7 +106,8 @@ const CartTotal: React.FC = () => {
           subtotal: convertedSubtotal,
           shipping,
           tax: gst, // Backend expects 'tax' field
-          total // Add total field required by backend
+          total, // Add total field required by backend
+          currency: currency // Add currency to order
         });
 
         // Clear cart

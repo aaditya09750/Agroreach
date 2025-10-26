@@ -9,7 +9,7 @@ import ValidationModal from '../modal/ValidationModal';
 
 const OrderSummary: React.FC = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const { convertPrice, getCurrencySymbol } = useCurrency();
+  const { convertPrice, getCurrencySymbol, currency } = useCurrency();
   const { billingAddress } = useUser();
   const { addOrder } = useOrder();
   const navigate = useNavigate();
@@ -96,7 +96,8 @@ const OrderSummary: React.FC = () => {
         })),
         subtotal: convertedSubtotal,
         shipping,
-        gst
+        gst,
+        currency: currency // Add currency to order
       });
 
       // Clear cart

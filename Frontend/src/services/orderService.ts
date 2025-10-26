@@ -39,6 +39,7 @@ export interface CreateOrderData {
   gst?: number;
   tax?: number;
   total?: number;
+  currency?: string;
 }
 
 export const orderService = {
@@ -94,10 +95,12 @@ export const orderService = {
       subtotal,
       shipping,
       tax,
-      total
+      total,
+      currency: orderData.currency || 'USD' // Include currency in payload
     };
 
     console.log('Sending to backend:', payload);
+    console.log('Currency being sent:', orderData.currency);
 
     try {
       const response = await api.post('/orders', payload);

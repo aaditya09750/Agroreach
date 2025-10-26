@@ -75,12 +75,6 @@ description: Juicy red cherries with sweet-tart flavor and firm texture. Great f
 category: Fresh Fruit
 tags: Fresh Fruit, Cherry, Red, Sweet, Antioxidants
 
-name: Chinese Cabbage
-price: 45.00
-description: Tender Chinese cabbage with crisp leaves and delicate flavor. Ideal for Asian stir-fries, soups, and salads. Rich in vitamins A, C, and K for nutritious cooking.
-category: Vegetables
-tags: Vegetables, Chinese Cabbage, Bok Choy, Asian, Fresh
-
 name: Fresh Corn
 price: 20.00
 description: Sweet corn cobs with tender golden kernels. Perfect for grilling, boiling, or adding to salads and curries. High in fiber and natural sugars for satisfying meals.
@@ -116,6 +110,8 @@ price: 120.00
 description: Crisp green apples with tangy-sweet flavor. Perfect for snacking, salads, or baking. High in fiber and vitamin C for healthy eating habits.
 category: Fresh Fruit
 tags: Fresh Fruit, Apple, Green, Tangy, Crisp
+
+--------Till this done
 
 name: Green Chilli
 price: 25.00

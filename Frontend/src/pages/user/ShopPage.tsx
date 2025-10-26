@@ -8,9 +8,12 @@ import ProductGrid from '../../components/sections/ProductGrid';
 import Pagination from '../../components/ui/Pagination';
 import ProductDetailModal from '../../components/modal/ProductDetailModal';
 import { useProduct } from '../../context/ProductContext';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const ShopPage: React.FC = () => {
   const { isModalOpen, selectedProduct, closeModal, openModal, products } = useProduct();
+  const { getCurrencySymbol } = useCurrency();
+  const currencySymbol = getCurrencySymbol();
   const location = useLocation();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -81,16 +84,23 @@ const ShopPage: React.FC = () => {
       filtered = filtered.filter((product) => {
         const price = product.price;
         
+        // Dynamically match against currency symbol
+        const under10 = `Under ${currencySymbol}10`;
+        const range10to25 = `${currencySymbol}10 - ${currencySymbol}25`;
+        const range25to50 = `${currencySymbol}25 - ${currencySymbol}50`;
+        const range50to100 = `${currencySymbol}50 - ${currencySymbol}100`;
+        const over100 = `Over ${currencySymbol}100`;
+        
         switch (selectedPrice) {
-          case 'Under $10':
+          case under10:
             return price < 10;
-          case '$10 - $25':
+          case range10to25:
             return price >= 10 && price <= 25;
-          case '$25 - $50':
+          case range25to50:
             return price >= 25 && price <= 50;
-          case '$50 - $100':
+          case range50to100:
             return price >= 50 && price <= 100;
-          case 'Over $100':
+          case over100:
             return price > 100;
           default:
             return true;

@@ -22,8 +22,11 @@ exports.createOrder = async (req, res) => {
       shipping = 0,
       tax = 0,
       total,
-      notes
+      notes,
+      currency = 'USD' // Default to USD if not provided
     } = req.body;
+
+    console.log('Currency received:', currency);
 
     // Validate items
     if (!items || items.length === 0) {
@@ -147,14 +150,31 @@ exports.createOrder = async (req, res) => {
       { items: [] }
     );
 
-    // Send order confirmation email
+    // Send order confirmation email with complete invoice
     try {
       await sendOrderConfirmation(billingAddress.email, {
         orderId: order.orderId,
-        total: order.total
+        customerName: `${billingAddress.firstName} ${billingAddress.lastName}`,
+        items: orderItems,
+        billingAddress: billingAddress,
+        paymentMethod: paymentMethod,
+        subtotal: subtotal,
+        shipping: shipping,
+        tax: tax,
+        total: total,
+        currency: currency, // Pass currency for dynamic symbol
+        orderDate: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
       });
+      console.log('Order confirmation email sent to:', billingAddress.email);
     } catch (emailError) {
       console.error('Failed to send order confirmation email:', emailError);
+      // Don't fail the order if email fails
     }
 
     // Populate order
