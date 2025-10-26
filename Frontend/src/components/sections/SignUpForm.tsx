@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Eye } from 'lucide-react';
 import Checkbox from '../ui/Checkbox';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 
 const SignUpForm: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register } = useUser();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -55,8 +56,10 @@ const SignUpForm: React.FC = () => {
       
       // Only navigate if user was successfully created
       if (user) {
-        // Use replace to prevent going back to signup page
-        navigate('/dashboard', { replace: true });
+        // Redirect to the page they tried to visit or dashboard
+        const locationState = location.state as { from?: { pathname?: string } } | null;
+        const from = locationState?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
       } else {
         setError('Registration failed. Please try again.');
       }

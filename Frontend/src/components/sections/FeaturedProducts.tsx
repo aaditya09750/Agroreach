@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../ui/ProductCard';
 import SectionHeader from '../ui/SectionHeader';
-import { shopProducts } from '../../data/products';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useProduct } from '../../context/ProductContext';
 import { Star, ShoppingCart, ArrowRight } from 'lucide-react';
@@ -44,20 +43,14 @@ const SmallProductCard: React.FC<SmallProductCardProps> = ({ image, name, price,
   
   const handleClick = () => {
     if (productId) {
-      // First try to find in context products (dynamic)
-      let product = products.find(p => 
+      // Find the product in context products
+      const product = products.find(p => 
         p.id === productId || 
         p._id === productId || 
         String(p.id) === String(productId) || 
         String(p._id) === String(productId)
       );
-      // Fallback to static products if not found
-      if (!product) {
-        product = shopProducts.find(p => 
-          p.id === productId || 
-          String(p.id) === String(productId)
-        );
-      }
+      
       if (product) {
         openModal(product);
       }

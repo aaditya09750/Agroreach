@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Package, Truck, AlertTriangle, Star } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
-import { shopProducts, Product } from '../../data/products';
+import { useProduct } from '../../context/ProductContext';
+import { Product } from '../../data/products';
 
 type TimeFilter = 'all-time' | 'today' | 'week' | 'month' | 'year';
 
 const AdminOverview: React.FC = () => {
   const { getCurrencySymbol } = useCurrency();
+  const { products } = useProduct();
   const [overviewFilter, setOverviewFilter] = useState<TimeFilter>('all-time');
   const [incomeFilter, setIncomeFilter] = useState<TimeFilter>('all-time');
   const [showOverviewDropdown, setShowOverviewDropdown] = useState(false);
@@ -78,33 +80,38 @@ const AdminOverview: React.FC = () => {
   // Function to get popular products based on time filter
   const getPopularProducts = (filter: TimeFilter) => {
     const getProductsByFilter = (): Product[] => {
+      // If products are not loaded yet, return empty array
+      if (!products || products.length === 0) {
+        return [];
+      }
+      
       switch (filter) {
         case 'today':
           // Show first 4 products for today
-          return shopProducts.slice(0, 4);
+          return products.slice(0, 4);
         case 'week':
           // Show products 3-6 for this week
-          return shopProducts.slice(2, 6);
+          return products.slice(2, 6);
         case 'month':
           // Show products 5-8 for this month
-          return shopProducts.slice(4, 8);
+          return products.slice(4, 8);
         case 'year':
           // Show products 8-11 for this year
-          return shopProducts.slice(7, 11);
+          return products.slice(7, 11);
         case 'all-time':
         default:
           // Show products based on rating for all time
-          return [...shopProducts]
-            .sort((a, b) => b.rating - a.rating)
+          return [...products]
+            .sort((a, b) => (b.rating || 0) - (a.rating || 0))
             .slice(0, 4);
       }
     };
 
-    const products = getProductsByFilter();
+    const filteredProducts = getProductsByFilter();
 
     // Generate earnings based on filter and product properties
     const generateEarnings = (product: Product, filterType: TimeFilter): number => {
-      const baseEarning = product.price * product.rating * 100;
+      const baseEarning = product.price * (product.rating || 0) * 100;
       
       switch (filterType) {
         case 'today':
@@ -121,7 +128,7 @@ const AdminOverview: React.FC = () => {
       }
     };
 
-    return products.map(product => ({
+    return filteredProducts.map(product => ({
       id: product.id,
       name: product.name,
       category: product.category,

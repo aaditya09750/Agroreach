@@ -8,7 +8,8 @@ import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useUser } from '../../context/UserContext';
-import { shopProducts, Product } from '../../data/products';
+import { useProduct } from '../../context/ProductContext';
+import { Product } from '../../data/products';
 
 const CurrencyDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -169,6 +170,7 @@ const MidBar: React.FC = () => {
   const { getCartCount, getCartTotal } = useCart();
   const { convertPrice, getCurrencySymbol } = useCurrency();
   const { user } = useUser();
+  const { products } = useProduct();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -199,7 +201,7 @@ const MidBar: React.FC = () => {
     setSearchQuery(query);
     
     if (query.trim().length > 0) {
-      const filtered = shopProducts.filter(product =>
+      const filtered = products.filter(product =>
         product.name.toLowerCase().includes(query.toLowerCase()) ||
         product.category?.toLowerCase().includes(query.toLowerCase()) ||
         product.tags?.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
@@ -231,7 +233,7 @@ const MidBar: React.FC = () => {
   };
 
   // Handle product click
-  const handleProductClick = (productId: number) => {
+  const handleProductClick = (productId: string | number) => {
     setShowResults(false);
     setSearchQuery('');
     navigate('/shop', { state: { productId } });
