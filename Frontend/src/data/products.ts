@@ -1,795 +1,240 @@
-// Import product images
-import productImg1 from '../assets/Products/img (1).png'; // Corn
-import productImg2 from '../assets/Products/img (2).png'; //  Chinese Cabbage (Bok Choy)
-import productImg3 from '../assets/Products/img (3).png'; // Big Potatoes
-import productImg4 from '../assets/Products/img (4).png'; // Fresh Mango
-import productImg5 from '../assets/Products/img (5).png'; //    Red Tomatoes 
-import productImg6 from '../assets/Products/img (6).png'; // Red Chili
-import productImg7 from '../assets/Products/img (7).png'; //Red Capsicum (Bell Pepper)
-import productImg8 from '../assets/Products/img (8).png'; // Ladies Finger (Okra)
-import productImg9 from '../assets/Products/img (9).png'; //Green Lettuce
-import productImg10 from '../assets/Products/img (10).png'; // Green Cucumber
-import productImg11 from '../assets/Products/img (11).png'; // Green Chili
-import productImg12 from '../assets/Products/img (12).png'; //Green Capsicum (Bell Pepper)
-import productImg13 from '../assets/Products/img (13).png'; //Green Apple
-import productImg14 from '../assets/Products/img (14).png'; // Fresh Cauliflower
-import productImg15 from '../assets/Products/img (15).png'; // Eggplant (Brinjal)
-export interface Product {
-    id: number | string;
-    _id?: string; // MongoDB ID
-    name: string;
-    image: string;
-    images: string[];
-    price: number;
-    oldPrice?: number;
-    rating: number;
-    reviewCount: number;
-    viewCount?: number;
-    status?: 'sale' | 'new' | 'out-of-stock' | 'hover' | null;
-    stockStatus: 'In Stock' | 'Out of Stock';
-    stock?: number;
-    discount?: string | number;
-    brand?: {
-        name: string;
-        logo: string;
-    };
-    description?: string;
-    category: string;
-    tags?: string[];
-    isHotDeal?: boolean;
-    isBestSeller?: boolean;
-    isTopRated?: boolean;
-}
-  
-  export const shopProducts: Product[] = [
-    {
-    id: 1,
-    name: 'Fresh Corn',
-    price: 14.99,
-    rating: 4,
-    image: productImg1,
-    images: [
-      productImg1,
-      productImg1,
-      productImg1,
-      productImg1,
-    ], 
-    description: 'Sweet corn kernels bursting with natural sugars and golden color. Perfect for grilling, boiling, or adding to dishes. Rich in fiber and essential nutrients for wholesome, satisfying meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Corn', 'Fresh', 'Sweet Corn', 'Yellow']
-  },
-    {
-      id: 2,
-      name: 'Chinese Cabbage',
-      price: 17.28,
-      oldPrice: 48.00,
-      rating: 5,
-      status: 'hover',
-      image: productImg2,
-      images: [
-        productImg2,
-        productImg2,
-        productImg2,
-        productImg2,
-      ],
-      description: 'Fresh Chinese cabbage with crisp, tender leaves and mild flavor. Also known as Bok Choy, perfect for stir-fries, soups, and Asian dishes. Rich in vitamins A, C, and K for nutritious meals.',
-      reviewCount: 4,
-      stockStatus: 'In Stock',
-      discount: '64% Off',
-      brand: { name: 'Farmary', logo: 'farmary' },
-      category: 'Vegetables',
-      tags: ['Vegetables', 'Cabbage', 'Bok Choy', 'Chinese', 'Fresh']
-    },
-    {
-    id: 3,
-    name: 'Big Potatoes',
-    price: 14.99,
-    oldPrice: 20.99,
-    rating: 4,
-    status: 'out-of-stock',
-    image: productImg3,
-    images: [
-      productImg3,
-      productImg3,
-      productImg3,
-      productImg3,
-    ], 
-    description: 'Fresh farm-grown potatoes, perfect for roasting, mashing, or frying. Rich in nutrients and fiber, these versatile potatoes bring authentic flavor to your kitchen. Carefully selected for quality and taste.', 
-    reviewCount: 0, 
-    stockStatus: 'Out of Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Potato', 'Fresh', 'Organic', 'Root Vegetable']
-  },
-    {
-    id: 4,
-    name: 'Fresh Mango',
-    price: 8.99,
-    rating: 4,
-    image: productImg4,
-    images: [
-      productImg4,
-      productImg4,
-      productImg4,
-      productImg4,
-    ], 
-    description: 'Tropical mangoes with sweet, juicy flesh and aromatic flavor. Handpicked at peak ripeness for maximum taste. Rich in vitamins A and C, perfect for smoothies, desserts, or enjoying fresh.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fruit', 'Mango', 'Fresh', 'Tropical', 'Sweet']
-  },
-    {
-    id: 5,
-    name: 'Red Tomatoes',
-    price: 6.49,
-    rating: 4,
-    image: productImg5,
-    images: [
-      productImg5,
-      productImg5,
-      productImg5,
-      productImg5,
-    ], 
-    description: 'Vine-ripened tomatoes bursting with fresh flavor and vibrant color. Essential for salads, sauces, and cooking. Loaded with lycopene and vitamins for nutritious, delicious meals every day.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Tomato', 'Fresh', 'Red', 'Salad']
-  },
-    {
-    id: 6,
-    name: 'Red Chili',
-    price: 12.99,
-    rating: 4,
-    image: productImg6,
-    images: [
-      productImg6,
-      productImg6,
-      productImg6,
-      productImg6,
-    ], 
-    description: 'Spicy red chilies adding intense heat and vibrant color to any dish. Perfect for curries, salsas, and marinades. Fresh and fiery, these peppers boost metabolism while enhancing your culinary creations.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Chili', 'Spicy', 'Red', 'Hot Pepper']
-  },
-    {
-    id: 7,
-    name: 'Red Capsicum',
-    price: 18.50,
-    rating: 4,
-    image: productImg7,
-    images: [
-      productImg7,
-      productImg7,
-      productImg7,
-      productImg7,
-    ], 
-    description: 'Sweet red bell peppers with vibrant color and crunchy texture. Perfect for grilling, roasting, or eating raw. Exceptionally high in vitamin C and antioxidants for nutritious, colorful dishes.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Capsicum', 'Bell Pepper', 'Red', 'Fresh']
-  },
-    {
-    id: 8,
-    name: 'Ladies Finger',
-    price: 9.49,
-    rating: 4,
-    image: productImg8,
-    images: [
-      productImg8,
-      productImg8,
-      productImg8,
-      productImg8,
-    ], 
-    description: 'Tender okra pods packed with vitamins and minerals. Known for their unique texture and health benefits, these fresh ladies fingers are ideal for curries, stir-fries, and traditional recipes.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Okra', 'Fresh', 'Healthy', 'Green Vegetable']
-  },
-    {
-    id: 9,
-    name: 'Green Lettuce',
-    price: 22.99,
-    rating: 4,
-    image: productImg9,
-    images: [
-      productImg9,
-      productImg9,
-      productImg9,
-      productImg9,
-    ], 
-    description: 'Fresh, crispy lettuce leaves perfect for salads and sandwiches. Crunchy texture with mild flavor adds freshness to meals. Low in calories and packed with vitamins for healthy eating habits.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Lettuce', 'Fresh', 'Green', 'Salad']
-  },
-    {
-    id: 10,
-    name: 'Green Cucumber',
-    price: 11.99,
-    rating: 4,
-    image: productImg10,
-    images: [
-      productImg10,
-      productImg10,
-      productImg10,
-      productImg10,
-    ], 
-    description: 'Crisp and refreshing cucumbers with cool, hydrating flesh. Ideal for salads, pickles, or fresh snacks. Low in calories yet high in water content, promoting healthy hydration and digestion.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cucumber', 'Fresh', 'Green', 'Salad']
-  },
-    {
-    id: 11,
-    name: 'Green Chili',
-    price: 5.99,
-    rating: 4,
-    image: productImg11,
-    images: [
-      productImg11,
-      productImg11,
-      productImg11,
-      productImg11,
-    ], 
-    description: 'Spicy green chilies adding heat and flavor to any dish. Perfect for curries, salsas, and marinades. Fresh and fiery, these peppers boost metabolism while enhancing your culinary creations.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Chili', 'Spicy', 'Fresh', 'Hot Pepper']
-  },
-    {
-    id: 12,
-    name: 'Green Capsicum',
-    price: 7.99,
-    oldPrice: 20.99,
-    rating: 4,
-    status: 'sale',
-    image: productImg12,
-    images: [
-      productImg12,
-      productImg12,
-      productImg12,
-      productImg12,
-    ], 
-    description: 'Fresh bell peppers with crisp texture and mild, slightly bitter taste. Excellent for stir-fries, salads, and stuffing. Loaded with vitamin C and antioxidants for healthy cooking options.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Capsicum', 'Bell Pepper', 'Green', 'Fresh']
-  },
-    {
-    id: 13,
-    name: 'Green Apple',
-    price: 16.50,
-    rating: 4,
-    image: productImg13,
-    images: [
-      productImg13,
-      productImg13,
-      productImg13,
-      productImg13,
-    ], 
-    description: 'Crisp and tangy green apples bursting with natural sweetness. Perfect for snacking, baking, or adding to salads. High in antioxidants and vitamin C for a healthy lifestyle choice.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fruit', 'Apple', 'Fresh', 'Green', 'Organic']
-  },
-    {
-    id: 14,
-    name: 'Fresh Cauliflower',
-    price: 8.49,
-    rating: 4,
-    image: productImg14,
-    images: [
-      productImg14,
-      productImg14,
-      productImg14,
-      productImg14,
-    ], 
-    description: 'Premium white cauliflower heads with tight florets and fresh taste. Versatile for steaming, roasting, or rice alternatives. Packed with vitamins and minerals for nutritious family meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cauliflower', 'Fresh', 'White', 'Organic']
-  },
-    {
-    id: 15,
-    name: 'Eggplant',
-    price: 10.99,
-    rating: 4,
-    image: productImg15,
-    images: [
-      productImg15,
-      productImg15,
-      productImg15,
-      productImg15,
-    ], 
-    description: 'Tropical mangoes with sweet, juicy flesh and aromatic flavor. Handpicked at peak ripeness for maximum taste. Rich in vitamins A and C, perfect for smoothies, desserts, or enjoying fresh.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fruit', 'Mango', 'Fresh', 'Tropical', 'Sweet']
-  },
-  {
-    id: 20,
-    name: 'Red Tomatoes',
-    price: 19.99,
-    rating: 4,
-    image: productImg5,
-    images: [
-      productImg5,
-      productImg5,
-      productImg5,
-      productImg5,
-    ], 
-    description: 'Vine-ripened tomatoes bursting with fresh flavor and vibrant color. Essential for salads, sauces, and cooking. Loaded with lycopene and vitamins for nutritious, delicious meals every day.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Tomato', 'Fresh', 'Red', 'Salad']
-  },
-  {
-    id: 21,
-    name: 'Red Chili',
-    price: 24.99,
-    rating: 4,
-    image: productImg6,
-    images: [
-      productImg6,
-      productImg6,
-      productImg6,
-      productImg6,
-    ], 
-    description: 'Spicy red chilies adding intense heat and vibrant color to any dish. Perfect for curries, salsas, and marinades. Fresh and fiery, these peppers boost metabolism while enhancing your culinary creations.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Chili', 'Spicy', 'Red', 'Hot Pepper']
-  },
-  {
-    id: 22,
-    name: 'Red Capsicum',
-    price: 28.99,
-    rating: 4,
-    image: productImg7,
-    images: [
-      productImg7,
-      productImg7,
-      productImg7,
-      productImg7,
-    ], 
-    description: 'Sweet red bell peppers with vibrant color and crunchy texture. Perfect for grilling, roasting, or eating raw. Exceptionally high in vitamin C and antioxidants for nutritious, colorful dishes.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Capsicum', 'Bell Pepper', 'Red', 'Fresh']
-  },
-  {
-    id: 23,
-    name: 'Ladies Finger',
-    price: 10.49,
-    rating: 4,
-    image: productImg8,
-    images: [
-      productImg8,
-      productImg8,
-      productImg8,
-      productImg8,
-    ], 
-    description: 'Tender okra pods packed with vitamins and minerals. Known for their unique texture and health benefits, these fresh ladies fingers are ideal for curries, stir-fries, and traditional recipes.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Okra', 'Fresh', 'Healthy', 'Green Vegetable']
-  },
-  {
-    id: 24,
-    name: 'Green Lettuce',
-    price: 4.99,
-    rating: 4,
-    image: productImg9,
-    images: [
-      productImg9,
-      productImg9,
-      productImg9,
-      productImg9,
-    ], 
-    description: 'Fresh, crispy lettuce leaves perfect for salads and sandwiches. Crunchy texture with mild flavor adds freshness to meals. Low in calories and packed with vitamins for healthy eating habits.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Lettuce', 'Fresh', 'Green', 'Salad']
-  },
-  {
-    id: 16,
-    name: 'Fresh Corn',
-    price: 13.49,
-    rating: 4,
-    image: productImg1,
-    images: [
-      productImg1,
-      productImg1,
-      productImg1,
-      productImg1,
-    ], 
-    description: 'Sweet corn kernels bursting with natural sugars and golden color. Perfect for grilling, boiling, or adding to dishes. Rich in fiber and essential nutrients for wholesome, satisfying meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Corn', 'Fresh', 'Sweet Corn', 'Yellow']
-  },
-  {
-    id: 17,
-    name: 'Chinese Cabbage',
-    price: 9.99,
-    rating: 4,
-    image: productImg2,
-    images: [
-      productImg2,
-      productImg2,
-      productImg2,
-      productImg2,
-    ], 
-    description: 'Fresh Chinese cabbage with crisp, tender leaves and mild flavor. Also known as Bok Choy, perfect for stir-fries, soups, and Asian dishes. Rich in vitamins A, C, and K for nutritious meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cabbage', 'Bok Choy', 'Chinese', 'Fresh']
-  },
-  {
-    id: 18,
-    name: 'Big Potatoes',
-    price: 12.99,
-    rating: 4,
-    image: productImg3,
-    images: [
-      productImg3,
-      productImg3,
-      productImg3,
-      productImg3,
-    ], 
-    description: 'Fresh farm-grown potatoes, perfect for roasting, mashing, or frying. Rich in nutrients and fiber, these versatile potatoes bring authentic flavor to your kitchen. Carefully selected for quality and taste.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Potato', 'Fresh', 'Organic', 'Root Vegetable']
-  },
-  {
-    id: 19,
-    name: 'Fresh Mango',
-    price: 11.49,
-    rating: 4,
-    image: productImg4,
-    images: [
-      productImg4,
-      productImg4,
-      productImg4,
-      productImg4,
-    ], 
-    description: 'Tropical mangoes with sweet, juicy flesh and aromatic flavor. Handpicked at peak ripeness for maximum taste. Rich in vitamins A and C, perfect for smoothies, desserts, or enjoying fresh.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Eggplant', 'Fresh', 'Purple', 'Organic']
-  },
-  {
-    id: 20,
-    name: 'Fresh Cauliflower',
-    price: 19.99,
-    rating: 4,
-    image: productImg5,
-    images: [
-      productImg5,
-      productImg5,
-      productImg5,
-      productImg5,
-    ], 
-    description: 'Premium white cauliflower heads with tight florets and fresh taste. Versatile for steaming, roasting, or rice alternatives. Packed with vitamins and minerals for nutritious family meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cauliflower', 'Fresh', 'White', 'Organic']
-  },
-  {
-    id: 21,
-    name: 'Green Apple',
-    price: 24.99,
-    rating: 4,
-    image: productImg6,
-    images: [
-      productImg6,
-      productImg6,
-      productImg6,
-      productImg6,
-    ], 
-    description: 'Crisp and tangy green apples bursting with natural sweetness. Perfect for snacking, baking, or adding to salads. High in antioxidants and vitamin C for a healthy lifestyle choice.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fresh Fruit', 'Apple', 'Green', 'Organic', 'Healthy']
-  },
-  {
-    id: 22,
-    name: 'Fresh Mango',
-    price: 28.99,
-    rating: 4,
-    image: productImg7,
-    images: [
-      productImg7,
-      productImg7,
-      productImg7,
-      productImg7,
-    ], 
-    description: 'Tropical mangoes with sweet, juicy flesh and aromatic flavor. Handpicked at peak ripeness for maximum taste. Rich in vitamins A and C, perfect for smoothies, desserts, or enjoying fresh.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fresh Fruit', 'Mango', 'Tropical', 'Sweet', 'Juicy']
-  },
-  {
-    id: 23,
-    name: 'Green Capsicum',
-    price: 10.49,
-    rating: 4,
-    image: productImg8,
-    images: [
-      productImg8,
-      productImg8,
-      productImg8,
-      productImg8,
-    ], 
-    description: 'Fresh bell peppers with crisp texture and mild, slightly bitter taste. Excellent for stir-fries, salads, and stuffing. Loaded with vitamin C and antioxidants for healthy cooking options.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Capsicum', 'Bell Pepper', 'Green', 'Fresh']
-  },
-  {
-    id: 24,
-    name: 'Green Chili',
-    price: 4.99,
-    rating: 4,
-    image: productImg9,
-    images: [
-      productImg9,
-      productImg9,
-      productImg9,
-      productImg9,
-    ], 
-    description: 'Spicy green chilies adding heat and flavor to any dish. Perfect for curries, salsas, and marinades. Fresh and fiery, these peppers boost metabolism while enhancing your culinary creations.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Chili', 'Spicy', 'Hot Pepper', 'Fresh']
-  },
-  {
-    id: 25,
-    name: 'Green Cucumber',
-    price: 6.99,
-    oldPrice: 20.99,
-    rating: 4,
-    status: 'sale',
-    image: productImg10,
-    images: [
-      productImg10,
-      productImg10,
-      productImg10,
-      productImg10,
-    ], 
-    description: 'Crisp and refreshing cucumbers with cool, hydrating flesh. Ideal for salads, pickles, or fresh snacks. Low in calories yet high in water content, promoting healthy hydration and digestion.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cucumber', 'Fresh', 'Green', 'Salad']
-  },
-  {
-    id: 26,
-    name: 'Green Chili',
-    price: 15.99,
-    rating: 4,
-    image: productImg11,
-    images: [
-      productImg11,
-      productImg11,
-      productImg11,
-      productImg11,
-    ], 
-    description: 'Spicy green chilies adding heat and flavor to any dish. Perfect for curries, salsas, and marinades. Fresh and fiery, these peppers boost metabolism while enhancing your culinary creations.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Chili', 'Spicy', 'Green', 'Hot Pepper']
-  },
-  {
-    id: 27,
-    name: 'Green Capsicum',
-    price: 7.49,
-    rating: 4,
-    image: productImg12,
-    images: [
-      productImg12,
-      productImg12,
-      productImg12,
-      productImg12,
-    ], 
-    description: 'Fresh bell peppers with crisp texture and mild, slightly bitter taste. Excellent for stir-fries, salads, and stuffing. Loaded with vitamin C and antioxidants for healthy cooking options.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Capsicum', 'Bell Pepper', 'Green', 'Fresh']
-  },
-  {
-    id: 28,
-    name: 'Green Apple',
-    price: 11.99,
-    rating: 4,
-    image: productImg13,
-    images: [
-      productImg13,
-      productImg13,
-      productImg13,
-      productImg13,
-    ], 
-    description: 'Crisp and tangy green apples bursting with natural sweetness. Perfect for snacking, baking, or adding to salads. High in antioxidants and vitamin C for a healthy lifestyle choice.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fruit', 'Apple', 'Fresh', 'Green', 'Organic']
-  },
-  {
-    id: 29,
-    name: 'Fresh Cauliflower',
-    price: 13.99,
-    rating: 4,
-    image: productImg14,
-    images: [
-      productImg14,
-      productImg14,
-      productImg14,
-      productImg14,
-    ], 
-    description: 'Premium white cauliflower heads with tight florets and fresh taste. Versatile for steaming, roasting, or rice alternatives. Packed with vitamins and minerals for nutritious family meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cauliflower', 'Fresh', 'White', 'Organic']
-  },
-  {
-    id: 30,
-    name: 'Eggplant',
-    price: 9.49,
-    rating: 4,
-    image: productImg15,
-    images: [
-      productImg15,
-      productImg15,
-      productImg15,
-      productImg15,
-    ], 
-    description: 'Glossy purple eggplants with firm flesh and mild flavor. Perfect for grilling, roasting, or making delicious curries. Rich in fiber and antioxidants, bringing healthy versatility to your table.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Eggplant', 'Brinjal', 'Purple', 'Fresh']
-  },
-  {
-    id: 31,
-    name: 'Fresh Corn',
-    price: 12.49,
-    rating: 4,
-    image: productImg1,
-    images: [
-      productImg1,
-      productImg1,
-      productImg1,
-      productImg1,
-    ], 
-    description: 'Sweet corn kernels bursting with natural sugars and golden color. Perfect for grilling, boiling, or adding to dishes. Rich in fiber and essential nutrients for wholesome, satisfying meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Corn', 'Fresh', 'Sweet Corn', 'Yellow']
-  },
-  {
-    id: 32,
-    name: 'Chinese Cabbage',
-    price: 13.29,
-    rating: 4,
-    image: productImg2,
-    images: [
-      productImg2,
-      productImg2,
-      productImg2,
-      productImg2,
-    ], 
-    description: 'Fresh Chinese cabbage with crisp, tender leaves and mild flavor. Also known as Bok Choy, perfect for stir-fries, soups, and Asian dishes. Rich in vitamins A, C, and K for nutritious meals.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Cabbage', 'Bok Choy', 'Chinese', 'Fresh']
-  },
-  {
-    id: 33,
-    name: 'Big Potatoes',
-    price: 10.49,
-    rating: 4,
-    image: productImg3,
-    images: [
-      productImg3,
-      productImg3,
-      productImg3,
-      productImg3,
-    ], 
-    description: 'Fresh farm-grown potatoes, perfect for roasting, mashing, or frying. Rich in nutrients and fiber, these versatile potatoes bring authentic flavor to your kitchen. Carefully selected for quality and taste.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Vegetables', 
-    tags: ['Vegetables', 'Potato', 'Fresh', 'Organic', 'Root Vegetable']
-  },
-  {
-    id: 34,
-    name: 'Fresh Mango',
-    price: 12.79,
-    rating: 4,
-    image: productImg4,
-    images: [
-      productImg4,
-      productImg4,
-      productImg4,
-      productImg4,
-    ], 
-    description: 'Tropical mangoes with sweet, juicy flesh and aromatic flavor. Handpicked at peak ripeness for maximum taste. Rich in vitamins A and C, perfect for smoothies, desserts, or enjoying fresh.', 
-    reviewCount: 0, 
-    stockStatus: 'In Stock', 
-    brand: { name: 'Farmary', logo: 'farmary' }, 
-    category: 'Fresh Fruit', 
-    tags: ['Fruit', 'Mango', 'Fresh', 'Tropical', 'Sweet']
-  },
-  ];
+/*
+==========================================
+PRODUCT DATA
+==========================================
+
+name: Fresh Anjir
+price: 280.00
+description: Premium dried figs with natural sweetness and chewy texture. Packed with dietary fiber, minerals, and antioxidants. Perfect as a healthy snack or adding to desserts and salads.
+category: Dry Fruits
+tags: Dry Fruits, Anjir, Fig, Healthy, Nutritious
+
+name: Fresh Avocado
+price: 150.00
+description: Creamy avocados with rich, buttery texture and mild flavor. Great for salads, toasts, and smoothies. Loaded with healthy fats, fiber, and essential vitamins for balanced nutrition.
+category: Fresh Fruit
+tags: Fresh Fruit, Avocado, Exotic, Healthy Fats, Organic
+
+name: Fresh Banana
+price: 40.00
+description: Sweet yellow bananas naturally ripened for perfect taste. Rich in potassium and energy-boosting carbohydrates. Ideal for breakfast, smoothies, or as a quick healthy snack anytime.
+category: Fresh Fruit
+tags: Fresh Fruit, Banana, Yellow, Energy, Potassium
+
+name: Fresh Beetroot
+price: 35.00
+description: Vibrant red beets with earthy sweetness and firm texture. Excellent for salads, juices, or roasting. High in nitrates, fiber, and essential minerals supporting overall health.
+category: Vegetables
+tags: Vegetables, Beetroot, Red, Healthy, Root Vegetable
+
+name: Brussels Sprouts
+price: 120.00
+description: Tender Brussels sprouts with a slightly nutty flavor. Perfect for roasting, sautéing, or steaming. Rich in vitamins C and K, adding nutritious variety to your meals.
+category: Vegetables
+tags: Vegetables, Brussels Sprouts, Green, Nutritious, Healthy
+
+name: Fresh Cabbage
+price: 25.00
+description: Crisp green cabbage heads with tightly packed leaves. Versatile for salads, stir-fries, or traditional sabzi. Low in calories and high in vitamin C for everyday cooking.
+category: Vegetables
+tags: Vegetables, Cabbage, Green, Fresh, Crunchy
+
+name: Fresh Cauliflower
+price: 30.00
+description: White cauliflower with compact florets and mild taste. Perfect for curries, parathas, or rice alternatives. Packed with vitamins and antioxidants for wholesome family meals.
+category: Vegetables
+tags: Vegetables, Cauliflower, White, Fresh, Versatile
+
+name: Fresh Cherries
+price: 450.00
+description: Juicy red cherries with sweet-tart flavor and firm texture. Great for snacking, baking, or making preserves. Rich in antioxidants and vitamins for a healthy treat.
+category: Fresh Fruit
+tags: Fresh Fruit, Cherry, Red, Sweet, Antioxidants
+
+name: Chinese Cabbage
+price: 45.00
+description: Tender Chinese cabbage with crisp leaves and delicate flavor. Ideal for Asian stir-fries, soups, and salads. Rich in vitamins A, C, and K for nutritious cooking.
+category: Vegetables
+tags: Vegetables, Chinese Cabbage, Bok Choy, Asian, Fresh
+
+name: Fresh Corn
+price: 20.00
+description: Sweet corn cobs with tender golden kernels. Perfect for grilling, boiling, or adding to salads and curries. High in fiber and natural sugars for satisfying meals.
+category: Vegetables
+tags: Vegetables, Corn, Sweet, Yellow, Fresh
+
+name: Fresh Cucumber
+price: 30.00
+description: Cool and crisp cucumbers with refreshing taste. Perfect for salads, raita, or fresh juices. Low in calories and high in water content, ideal for hydration.
+category: Vegetables
+tags: Vegetables, Cucumber, Green, Fresh, Hydrating
+
+name: Fresh Eggplant
+price: 35.00
+description: Purple eggplants with glossy skin and creamy flesh. Excellent for bharta, curries, and grilling. Rich in fiber and antioxidants, bringing versatility to your kitchen.
+category: Vegetables
+tags: Vegetables, Eggplant, Brinjal, Purple, Fresh
+
+name: Farm Fresh Eggs
+price: 60.00
+description: Free-range eggs with rich golden yolks and superior taste. High-quality protein source for breakfast and baking. Fresh from local farms for nutritious, delicious meals.
+category: Dairy & Eggs
+tags: Dairy, Eggs, Protein, Fresh, Farm
+
+name: Fresh Garlic
+price: 80.00
+description: Aromatic garlic bulbs with pungent flavor and firm cloves. Essential for Indian cooking, tadka, and marinades. Known for health benefits and adding depth to every dish.
+category: Vegetables
+tags: Vegetables, Garlic, Aromatic, Spice, Fresh
+
+name: Green Apple
+price: 120.00
+description: Crisp green apples with tangy-sweet flavor. Perfect for snacking, salads, or baking. High in fiber and vitamin C for healthy eating habits.
+category: Fresh Fruit
+tags: Fresh Fruit, Apple, Green, Tangy, Crisp
+
+name: Green Chilli
+price: 25.00
+description: Fresh green chilies adding spice and flavor to dishes. Essential for Indian curries, chutneys, and tempering. Rich in vitamins while boosting metabolism naturally.
+category: Vegetables
+tags: Vegetables, Chilli, Green, Spicy, Hot
+
+name: Green Lettuce
+price: 50.00
+description: Fresh crisp lettuce with tender green leaves. Perfect for salads, wraps, and sandwiches. Low in calories and packed with vitamins for light, healthy meals.
+category: Vegetables
+tags: Vegetables, Lettuce, Green, Salad, Fresh
+
+name: Green Capsicum
+price: 60.00
+description: Fresh green bell peppers with crisp texture and mild taste. Great for stir-fries, stuffing, and salads. Loaded with vitamin C and antioxidants for nutritious cooking.
+category: Vegetables
+tags: Vegetables, Capsicum, Bell Pepper, Green, Fresh
+
+name: Premium Cashews
+price: 650.00
+description: Whole cashew nuts with creamy texture and buttery flavor. Perfect for snacking, sweets, and garnishing. Rich in healthy fats, protein, and minerals for balanced nutrition.
+category: Dry Fruits
+tags: Dry Fruits, Cashew, Kaju, Nuts, Premium
+
+name: Fresh Kale
+price: 80.00
+description: Nutrient-dense kale with dark green curly leaves. Excellent for salads, smoothies, and sautéing. Packed with vitamins, minerals, and antioxidants for superfood nutrition.
+category: Vegetables
+tags: Vegetables, Kale, Superfood, Green, Healthy
+
+name: Fresh Okra
+price: 40.00
+description: Tender okra pods perfect for traditional Indian bhindi. Ideal for stir-fries and curries. Rich in fiber, vitamins, and minerals supporting digestive health.
+category: Vegetables
+tags: Vegetables, Okra, Ladyfinger, Bhindi, Fresh
+
+name: Fresh Lemon
+price: 60.00
+description: Juicy lemons with tangy flavor and bright yellow color. Essential for cooking, drinks, and garnishing. High in vitamin C, boosting immunity and adding zest to meals.
+category: Fresh Fruit
+tags: Fresh Fruit, Lemon, Citrus, Tangy, Vitamin C
+
+name: Fresh Mango
+price: 100.00
+description: Sweet mangoes with juicy golden flesh and tropical aroma. Perfect for eating fresh, smoothies, or desserts. The king of fruits, rich in vitamins A and C.
+category: Fresh Fruit
+tags: Fresh Fruit, Mango, Tropical, Sweet, Seasonal
+
+name: Fresh Onion
+price: 35.00
+description: Fresh onions with layers of flavor essential for Indian cooking. Perfect for curries, salads, and tempering. Adds depth and taste to every savory dish.
+category: Vegetables
+tags: Vegetables, Onion, Fresh, Essential, Cooking
+
+name: Fresh Orange
+price: 80.00
+description: Juicy oranges bursting with sweet citrus flavor. Perfect for fresh juice or snacking. Loaded with vitamin C and natural sugars for refreshing nutrition.
+category: Fresh Fruit
+tags: Fresh Fruit, Orange, Citrus, Juicy, Vitamin C
+
+name: Raw Peanuts
+price: 90.00
+description: Fresh raw peanuts perfect for roasting and cooking. Great for making chutney, snacks, or oil. High in protein and healthy fats for nutritious eating.
+category: Dry Fruits
+tags: Dry Fruits, Peanut, Protein, Groundnut, Healthy
+
+name: Fresh Pear
+price: 150.00
+description: Sweet juicy pears with soft texture and delicate flavor. Perfect for snacking, salads, or desserts. Rich in fiber and antioxidants for healthy indulgence.
+category: Fresh Fruit
+tags: Fresh Fruit, Pear, Sweet, Juicy, Premium
+
+name: Fresh Green Peas
+price: 50.00
+description: Tender green peas with natural sweetness. Perfect for pulao, curries, and mixed vegetables. High in protein and fiber for wholesome vegetarian meals.
+category: Vegetables
+tags: Vegetables, Peas, Green, Fresh, Protein
+
+name: Fresh Pomegranate
+price: 120.00
+description: Ruby-red pomegranate with juicy sweet-tart arils. Perfect for snacking, juices, or garnishing. Rich in antioxidants and vitamins for healthy living.
+category: Fresh Fruit
+tags: Fresh Fruit, Pomegranate, Red, Antioxidants, Healthy
+
+name: Fresh Potatoes
+price: 25.00
+description: Versatile potatoes perfect for any dish. Great for frying, mashing, curries, or roasting. A staple vegetable rich in carbohydrates and essential nutrients.
+category: Vegetables
+tags: Vegetables, Potato, Fresh, Staple, Versatile
+
+name: Fresh Pumpkin
+price: 30.00
+description: Orange pumpkin with sweet flesh and smooth texture. Perfect for curries, soups, and traditional dishes. Rich in beta-carotene and fiber for healthy cooking.
+category: Vegetables
+tags: Vegetables, Pumpkin, Orange, Sweet, Nutritious
+
+name: Fresh Raspberries
+price: 400.00
+description: Delicate raspberries with sweet-tart flavor and vibrant color. Perfect for desserts, smoothies, or fresh eating. Packed with antioxidants and vitamins for premium nutrition.
+category: Fresh Fruit
+tags: Fresh Fruit, Raspberry, Berries, Premium, Antioxidants
+
+name: Red Chilli
+price: 150.00
+description: Fiery red chilies adding intense heat and color. Essential for Indian masalas, curries, and tempering. Dried or fresh, they bring authentic spice to cooking.
+category: Vegetables
+tags: Vegetables, Chilli, Red, Spicy, Hot
+
+name: Red Capsicum
+price: 100.00
+description: Sweet red bell peppers with vibrant color and crunchy texture. Perfect for salads, grilling, and stir-fries. Exceptionally high in vitamin C and antioxidants.
+category: Vegetables
+tags: Vegetables, Capsicum, Bell Pepper, Red, Sweet
+
+name: Fresh Strawberries
+price: 250.00
+description: Sweet red strawberries with juicy flesh and aromatic flavor. Perfect for desserts, smoothies, or eating fresh. Rich in vitamin C and antioxidants for delicious nutrition.
+category: Fresh Fruit
+tags: Fresh Fruit, Strawberry, Berries, Sweet, Red
+
+name: Fresh Tangerine
+price: 70.00
+description: Easy-to-peel tangerines with sweet citrus flavor. Perfect for snacking and fresh juice. Loaded with vitamin C and natural sweetness for refreshing taste.
+category: Fresh Fruit
+tags: Fresh Fruit, Tangerine, Citrus, Sweet, Easy Peel
+
+name: Fresh Tomatoes
+price: 30.00
+description: Juicy red tomatoes perfect for Indian cooking. Essential for curries, salads, and sauces. Rich in lycopene and vitamins for everyday nutritious meals.
+category: Vegetables
+tags: Vegetables, Tomato, Red, Fresh, Essential
+
+name: Premium Walnuts
+price: 800.00
+description: Whole walnuts with rich flavor and crunchy texture. Perfect for snacking, desserts, and garnishing. Loaded with omega-3 fatty acids and antioxidants for brain health.
+category: Dry Fruits
+tags: Dry Fruits, Walnut, Nuts, Omega-3, Premium
+
+name: Fresh Watermelon
+price: 40.00
+description: Sweet red watermelon with juicy, refreshing flesh. Perfect summer fruit for hydration and cooling. Low in calories and high in vitamins for healthy snacking.
+category: Fresh Fruit
+tags: Fresh Fruit, Watermelon, Red, Hydrating, Summer
+
+*/
