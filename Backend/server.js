@@ -13,6 +13,7 @@ const cartRoutes = require('./src/routes/cartRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const contactRoutes = require('./src/routes/contactRoutes');
+const newsletterRoutes = require('./src/routes/newsletterRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -76,10 +78,10 @@ mongoose
     useUnifiedTopology: true
   })
   .then(() => {
-    console.log('✅ MongoDB connected successfully');
+    console.log('MONGODB connected successfully...');
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
+    console.error('MONGODB connection error:', err.message,'...');
     process.exit(1);
   });
 
@@ -93,7 +95,7 @@ process.on('unhandledRejection', (err) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+  console.log(`SERVER is running on port ${PORT} in ${process.env.NODE_ENV} mode...`);
 });
 
 module.exports = app;

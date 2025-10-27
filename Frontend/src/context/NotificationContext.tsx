@@ -80,6 +80,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   }, []);
 
   const refreshNotifications = useCallback(async () => {
+    // Only fetch notifications on admin routes
+    const currentPath = window.location.pathname;
+    if (!currentPath.startsWith('/admin')) {
+      return;
+    }
+    
     try {
       // Fetch recent orders to generate notifications
       const ordersResponse = await adminService.getAllOrders({ page: 1, limit: 10 });
@@ -104,11 +110,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }
   }, []);
 
-  // Poll for new orders every 30 seconds
+  // Poll for new orders every 30 seconds (only on admin routes)
   useEffect(() => {
-    refreshNotifications();
-    const interval = setInterval(refreshNotifications, 30000);
-    return () => clearInterval(interval);
+    const currentPath = window.location.pathname;
+    
+    // Only set up polling on admin routes
+    if (currentPath.startsWith('/admin')) {
+      refreshNotifications();
+      const interval = setInterval(refreshNotifications, 30000);
+      return () => clearInterval(interval);
+    }
   }, [refreshNotifications]);
 
   // Update time ago every minute

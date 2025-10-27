@@ -33,8 +33,10 @@ export const adminService = {
     return response.data;
   },
 
-  getRecentProducts: async () => {
-    const response = await api.get('/admin/products/recent');
+  getRecentProducts: async (params?: { page?: number; limit?: number }) => {
+    const response = await api.get('/admin/products/recent', {
+      params: params || { limit: 10 }
+    });
     return response.data;
   },
 
@@ -61,7 +63,8 @@ export const adminService = {
 
   // Users Management
   getAllUsers: async (params?: { page?: number; limit?: number }) => {
-    const response = await api.get('/admin/users', { params });
+    const defaultParams = { limit: 1000, ...params };
+    const response = await api.get('/admin/users', { params: defaultParams });
     return response.data;
   },
 

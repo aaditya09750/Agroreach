@@ -1,7 +1,14 @@
 // Pagination helper
 exports.getPagination = (page = 1, limit = 10) => {
   const pageNum = parseInt(page, 10) || 1;
-  const limitNum = parseInt(limit, 10) || 10;
+  let limitNum = parseInt(limit, 10) || 10;
+  
+  // Set a maximum limit to prevent excessive data retrieval
+  const MAX_LIMIT = 1000;
+  if (limitNum > MAX_LIMIT) {
+    limitNum = MAX_LIMIT;
+  }
+  
   const skip = (pageNum - 1) * limitNum;
 
   return {

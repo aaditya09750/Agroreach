@@ -119,8 +119,31 @@ export const orderService = {
   },
 
   getMyOrders: async () => {
-    const response = await api.get('/orders/user');
-    return response.data;
+    console.log('orderService.getMyOrders: Calling GET /orders/user');
+    console.log('orderService.getMyOrders: API base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api');
+    try {
+      const response = await api.get('/orders/user');
+      console.log('orderService.getMyOrders: Response received:', response);
+      console.log('orderService.getMyOrders: Response data:', response.data);
+      console.log('orderService.getMyOrders: Response data type:', typeof response.data);
+      console.log('orderService.getMyOrders: Response data keys:', response.data ? Object.keys(response.data) : 'null');
+      console.log('orderService.getMyOrders: Response status:', response.status);
+      
+      // Log the actual structure
+      if (response.data && response.data.data) {
+        console.log('orderService.getMyOrders: Found response.data.data, length:', response.data.data.length);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('orderService.getMyOrders: Error occurred:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: unknown; status?: number } };
+        console.error('orderService.getMyOrders: Error response:', axiosError.response?.data);
+        console.error('orderService.getMyOrders: Error status:', axiosError.response?.status);
+      }
+      throw error;
+    }
   },
 
   getOrderById: async (id: string) => {

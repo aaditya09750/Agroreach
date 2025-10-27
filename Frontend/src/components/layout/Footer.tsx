@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import ARLogo from '../../assets/AR Logo.png';
 import TermsConditionsModal from '../modal/TermsConditionsModal';
 import PrivacyPolicyModal from '../modal/PrivacyPolicyModal';
+import Toast, { ToastType } from '../ui/Toast';
+import { newsletterService } from '../../services/newsletterService';
 
 // Scroll to top handler
 const scrollToTop = () => {
@@ -12,35 +14,99 @@ const scrollToTop = () => {
 
 const Subscription: React.FC = () => {
   const { t } = useTranslation();
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate email
+    if (!email) {
+      setToast({ message: 'Please enter your email address', type: 'warning' });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setToast({ message: 'Please enter a valid email address', type: 'error' });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await newsletterService.subscribe(email);
+      
+      if (response.success) {
+        setToast({ 
+          message: response.message || 'Successfully subscribed! Check your email for confirmation.', 
+          type: 'success' 
+        });
+        setEmail('');
+      } else {
+        setToast({ 
+          message: response.message || 'Failed to subscribe. Please try again.', 
+          type: 'error' 
+        });
+      }
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      setToast({ 
+        message: err.message || 'Something went wrong. Please try again later.', 
+        type: 'error' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   return (
-    <div className="bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-[120px] py-8 flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8">
-        {/* Newsletter Section */}
-        <div className="text-center lg:text-left">
-          <h3 className="text-xl font-semibold text-text-dark">{t('footer.subscribeTitle')}</h3>
-          <p className="text-sm text-text-muted mt-1">{t('footer.subscribeDesc')}</p>
-        </div>
+    <>
+      <div className="bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-[120px] py-8 flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8">
+          {/* Newsletter Section */}
+          <div className="text-center lg:text-left">
+            <h3 className="text-xl font-semibold text-text-dark">{t('footer.subscribeTitle')}</h3>
+            <p className="text-sm text-text-muted mt-1">{t('footer.subscribeDesc')}</p>
+          </div>
 
-        {/* Logo Section */}
-        <div className="flex items-center gap-2">
-          <img src={ARLogo} alt="Agroreach Logo" className="h-8 w-8 object-contain" />
-          <span className="text-2xl font-semibold text-text-dark">Agroreach</span>
-        </div>
+          {/* Logo Section */}
+          <div className="flex items-center gap-2">
+            <img src={ARLogo} alt="Agroreach Logo" className="h-8 w-8 object-contain" />
+            <span className="text-2xl font-semibold text-text-dark">Agroreach</span>
+          </div>
 
-        {/* Input Section */}
-        <div className="flex w-full max-w-md">
-          <input
-            type="email"
-            placeholder={t('footer.emailPlaceholder')}
-            className="w-full px-4 py-3 rounded-l-full border border-gray-100 focus:outline-none text-sm bg-white"
-          />
-          <button className="bg-primary text-white font-semibold px-6 py-3 rounded-r-full hover:bg-opacity-90 transition-colors whitespace-nowrap">
-            {t('footer.subscribe')}
-          </button>
+          {/* Input Section */}
+          <form onSubmit={handleSubscribe} className="flex w-full max-w-md">
+            <input
+              type="email"
+              placeholder={t('footer.emailPlaceholder')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+              className="w-full px-4 py-3 rounded-l-full border border-gray-100 focus:outline-none text-sm bg-white disabled:opacity-60 disabled:cursor-not-allowed"
+            />
+            <button 
+              type="submit"
+              disabled={isLoading}
+              className="bg-primary text-white font-semibold px-6 py-3 rounded-r-full hover:bg-opacity-90 transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Subscribing...' : t('footer.subscribe')}
+            </button>
+          </form>
         </div>
       </div>
-    </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </>
   );
 };
 

@@ -52,6 +52,10 @@ const AdminAddProduct: React.FC = () => {
   const [showEditStockDropdown, setShowEditStockDropdown] = useState(false);
   const [showEditFeaturesDropdown, setShowEditFeaturesDropdown] = useState(false);
   const [recentProducts, setRecentProducts] = useState<BackendProduct[]>([]);
+  const [displayedProducts, setDisplayedProducts] = useState<BackendProduct[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
@@ -74,18 +78,39 @@ const AdminAddProduct: React.FC = () => {
 
   // Load recent products on mount
   useEffect(() => {
-    loadRecentProducts();
+    loadRecentProducts(1);
   }, []);
 
-  const loadRecentProducts = async () => {
+  const loadRecentProducts = async (page: number = 1) => {
     try {
-      const response = await adminService.getRecentProducts();
+      setIsLoadingMore(true);
+      const response = await adminService.getRecentProducts({ limit: 10, page });
       if (response.success) {
-        setRecentProducts(response.data.products);
+        const newProducts = response.data.products;
+        
+        if (page === 1) {
+          // First load
+          setRecentProducts(newProducts);
+          setDisplayedProducts(newProducts);
+        } else {
+          // Load more
+          setRecentProducts(prev => [...prev, ...newProducts]);
+          setDisplayedProducts(prev => [...prev, ...newProducts]);
+        }
+        
+        // Check if there are more products to load
+        setHasMore(newProducts.length === 10);
+        setCurrentPage(page);
       }
     } catch (error) {
       console.error('Error loading recent products:', error);
+    } finally {
+      setIsLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    loadRecentProducts(currentPage + 1);
   };
 
   // Close dropdowns when clicking outside
@@ -200,8 +225,10 @@ const AdminAddProduct: React.FC = () => {
         setImageFiles([]);
         setImagePreviews([]);
 
-        // Refresh products list
-        await loadRecentProducts();
+        // Refresh products list - reset to page 1
+        setCurrentPage(1);
+        setHasMore(true);
+        await loadRecentProducts(1);
         await refreshProducts();
 
         // Clear message after 3 seconds
@@ -267,8 +294,10 @@ const AdminAddProduct: React.FC = () => {
       if (response.success) {
         setSubmitMessage({ type: 'success', text: 'Product deleted successfully!' });
         
-        // Refresh products list
-        await loadRecentProducts();
+        // Refresh products list - reset to page 1
+        setCurrentPage(1);
+        setHasMore(true);
+        await loadRecentProducts(1);
         await refreshProducts();
 
         // Clear message after 3 seconds
@@ -312,8 +341,10 @@ const AdminAddProduct: React.FC = () => {
       if (response.success) {
         setSubmitMessage({ type: 'success', text: 'Product updated successfully!' });
         
-        // Refresh products list
-        await loadRecentProducts();
+        // Refresh products list - reset to page 1
+        setCurrentPage(1);
+        setHasMore(true);
+        await loadRecentProducts(1);
         await refreshProducts();
         
         // Close modal
@@ -645,7 +676,7 @@ const AdminAddProduct: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-border-color">
-              {recentProducts.length === 0 ? (
+              {displayedProducts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
@@ -658,7 +689,7 @@ const AdminAddProduct: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                recentProducts.map((product) => (
+                displayedProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
@@ -716,6 +747,20 @@ const AdminAddProduct: React.FC = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Load More Button */}
+        {hasMore && displayedProducts.length > 0 && (
+          <div className="p-6 border-t border-border-color flex justify-center">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              {isLoadingMore ? 'Loading...' : 'Load More Products'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Edit Product Modal */}

@@ -12,7 +12,9 @@ export interface ProductFilters {
 
 export const productService = {
   getAllProducts: async (params?: ProductFilters) => {
-    const response = await api.get('/products', { params });
+    // Set a high default limit to get all products
+    const defaultParams = { limit: 1000, ...params };
+    const response = await api.get('/products', { params: defaultParams });
     return response.data;
   },
 
@@ -30,14 +32,14 @@ export const productService = {
 
   getProductsByCategory: async (category: string) => {
     const response = await api.get('/products', { 
-      params: { category } 
+      params: { category, limit: 1000 } 
     });
     return response.data;
   },
 
   searchProducts: async (searchTerm: string) => {
     const response = await api.get('/products', { 
-      params: { search: searchTerm } 
+      params: { search: searchTerm, limit: 1000 } 
     });
     return response.data;
   },

@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrder } from '../../context/OrderContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const OrderHistory: React.FC = () => {
-  const { orders } = useOrder();
+  const { orders, refreshOrders } = useOrder();
   const { convertPrice, getCurrencySymbol } = useCurrency();
   const currencySymbol = getCurrencySymbol();
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
+
+  // Refresh orders when component mounts
+  useEffect(() => {
+    console.log('OrderHistory: Component mounted, refreshing orders...');
+    refreshOrders();
+  }, [refreshOrders]);
 
   // Calculate pagination
   const indexOfLastOrder = currentPage * ordersPerPage;

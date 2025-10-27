@@ -141,6 +141,9 @@ exports.createOrder = async (req, res) => {
     }
     console.log('Order ID:', order._id);
     console.log('Order belongs to user:', order.user);
+    console.log('Order belongs to user (toString):', order.user.toString());
+    console.log('Authenticated user ID (toString):', req.user._id.toString());
+    console.log('User IDs match:', order.user.toString() === req.user._id.toString());
     console.log('Order orderId:', order.orderId);
     console.log('=== CREATE ORDER END ===');
 
@@ -208,12 +211,16 @@ exports.getUserOrders = async (req, res) => {
   try {
     console.log('=== GET USER ORDERS START ===');
     console.log('Fetching orders for user ID:', req.user._id);
+    console.log('Fetching orders for user ID (toString):', req.user._id.toString());
     console.log('User email:', req.user.email);
     
     const { page, limit, status } = req.query;
 
     // Build filter
     const filter = { user: req.user._id };
+    
+    console.log('Filter being used:', JSON.stringify(filter));
+    console.log('Filter user ID (toString):', filter.user.toString());
     
     if (status) {
       filter.status = status;

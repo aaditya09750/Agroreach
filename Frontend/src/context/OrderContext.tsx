@@ -5,7 +5,7 @@ import { useCurrency } from './CurrencyContext';
 import { getImageUrl } from '../utils/imageUtils';
 
 export interface OrderItem {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
   quantity: number;
@@ -87,12 +87,45 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
       const response = await orderService.getMyOrders();
       
       console.log('OrderContext: Raw orders response:', response);
+      console.log('OrderContext: Response type:', typeof response);
+      console.log('OrderContext: Response keys:', response ? Object.keys(response) : 'null');
       
       // Backend returns { success: true, data: [...], pagination: {...} }
-      const ordersData = response.data || response;
+      // orderService already extracts response.data from axios, so we get the backend's response object
+      // The actual orders array is in response.data
+      let ordersData = [];
+      
+      if (Array.isArray(response)) {
+        // Response is directly an array
+        console.log('OrderContext: Response is an array');
+        ordersData = response;
+      } else if (response && response.data && Array.isArray(response.data)) {
+        // Response has a data property with an array
+        console.log('OrderContext: Response has data property with array');
+        ordersData = response.data;
+      } else if (response && Array.isArray(response.data)) {
+        // Just in case
+        console.log('OrderContext: Using response.data');
+        ordersData = response.data;
+      } else {
+        console.error('OrderContext: Unexpected response structure:', response);
+        ordersData = [];
+      }
       
       console.log('OrderContext: Orders data:', ordersData);
       console.log('OrderContext: Number of orders loaded:', ordersData.length);
+      
+      if (!Array.isArray(ordersData)) {
+        console.error('OrderContext: ordersData is not an array!', typeof ordersData, ordersData);
+        setOrders([]);
+        return;
+      }
+      
+      if (ordersData.length === 0) {
+        console.warn('OrderContext: No orders found for user!');
+        setOrders([]);
+        return;
+      }
       
       const mappedOrders = ordersData.map((order: {
         _id: string;
@@ -145,7 +178,13 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
           let productName: string;
           let productImage: string;
 
-          if (typeof item.product === 'string') {
+          // Handle null or undefined product (deleted products)
+          if (!item.product) {
+            // Product was deleted, use item data
+            productId = 'deleted-product';
+            productName = item.name || 'Deleted Product';
+            productImage = getImageUrl(item.image);
+          } else if (typeof item.product === 'string') {
             // Product is just an ID
             productId = item.product;
             productName = item.name || 'Product';
@@ -180,9 +219,14 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
           companyName: order.billingAddress?.companyName || '',
         },
       }));
+      
+      console.log('OrderContext: Mapped orders:', mappedOrders);
+      console.log('OrderContext: Setting', mappedOrders.length, 'orders in state');
       setOrders(mappedOrders);
+      console.log('OrderContext: Orders state updated successfully');
     } catch (error) {
       console.error('Failed to load orders', error);
+      console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -201,8 +245,12 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   };
 
   const refreshOrders = async () => {
+    console.log('OrderContext.refreshOrders: Called, user exists:', !!user);
     if (user) {
+      console.log('OrderContext.refreshOrders: Loading orders...');
       await loadOrders();
+    } else {
+      console.warn('OrderContext.refreshOrders: No user found, cannot load orders');
     }
   };
 
@@ -257,8 +305,14 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
 
       console.log('Complete order data:', completeOrderData);
       
-      await orderService.createOrder(completeOrderData);
+      console.log('OrderContext: Creating order...');
+      const createResponse = await orderService.createOrder(completeOrderData);
+      console.log('OrderContext: Order created successfully:', createResponse);
+      console.log('OrderContext: Created order ID:', createResponse?.data?.order?._id);
+      
+      console.log('OrderContext: Refreshing orders list...');
       await loadOrders();
+      console.log('OrderContext: Orders list refreshed');
       
       // Show notification
       setNotificationMessage(`Order placed successfully!`);

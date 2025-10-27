@@ -56,7 +56,8 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const response = await productService.getAllProducts();
+      // Fetch all products without pagination limit
+      const response = await productService.getAllProducts({ limit: 1000 });
       // Backend returns { success: true, data: [...products...], pagination: {...} }
       const productsArray = response.data || [];
       const mappedProducts = productsArray.map((p: {

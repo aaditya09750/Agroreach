@@ -509,9 +509,15 @@ exports.deleteUser = async (req, res) => {
 // @access  Private/Admin
 exports.getRecentProducts = async (req, res) => {
   try {
+    const { limit, page } = req.query;
+    const limitNum = limit ? parseInt(limit, 10) : 10; // Default to 10 products per page
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const skip = (pageNum - 1) * limitNum;
+    
     const products = await Product.find({ isActive: true })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .skip(skip)
+      .limit(limitNum);
       // Removed .select() to return all fields
 
     res.status(200).json({

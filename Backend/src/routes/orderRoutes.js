@@ -16,8 +16,8 @@ const {
 router.use(protect);
 
 router.post('/', createOrderValidation, validate, createOrder);
-router.get('/user', getUserOrders); // Changed from '/' to '/user' to avoid conflicts
-router.get('/:id', getOrderById);
+router.get('/user', getUserOrders); // Must come BEFORE /:id to avoid conflicts
 router.patch('/:id/cancel', cancelOrder);
+router.get('/:id', getOrderById); // Dynamic routes should come last
 
 module.exports = router;

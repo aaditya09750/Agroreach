@@ -53,9 +53,20 @@ export default {
             opacity: '1',
           },
         },
+        slideInRight: {
+          '0%': {
+            transform: 'translateX(100%)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          },
+        },
       },
       animation: {
         'slideInTop': 'slideInTop 0.3s both',
+        'slideInRight': 'slideInRight 0.3s ease-out',
       },
     },
   },
