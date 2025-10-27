@@ -5,8 +5,10 @@ import { Link } from 'react-router-dom';
 import { productService } from '../../services/productService';
 import { Product } from '../../data/products';
 import { getImageUrls } from '../../utils/imageUtils';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const NewestProducts: React.FC = () => {
+  const { t } = useTranslation();
   const [newestProductsData, setNewestProductsData] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +83,7 @@ const NewestProducts: React.FC = () => {
       <section>
         <div className="flex justify-between items-center mb-12">
           <div className="text-left">
-            <h2 className="text-4xl font-semibold text-text-dark">Newest Products</h2>
+            <h2 className="text-4xl font-semibold text-text-dark">{t('products.newest')}</h2>
             <div className="flex items-center gap-1 mt-4">
               <div className="w-3 h-1 bg-primary/30 rounded-full"></div>
               <div className="w-10 h-1 bg-primary rounded-full"></div>
@@ -89,7 +91,7 @@ const NewestProducts: React.FC = () => {
             </div>
           </div>
           <Link to="/shop" onClick={handleViewAllClick} className="flex items-center gap-2 text-primary font-medium hover:text-primary/80 transition-colors">
-            View All <ArrowRight size={18} />
+            {t('products.viewAll')} <ArrowRight size={18} />
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
@@ -109,7 +111,7 @@ const NewestProducts: React.FC = () => {
     <section>
       <div className="flex justify-between items-center mb-12">
         <div className="text-left">
-            <h2 className="text-4xl font-semibold text-text-dark">Newest Products</h2>
+            <h2 className="text-4xl font-semibold text-text-dark">{t('products.newest')}</h2>
             <div className="flex items-center gap-1 mt-4">
                 <div className="w-3 h-1 bg-primary/30 rounded-full"></div>
                 <div className="w-10 h-1 bg-primary rounded-full"></div>
@@ -117,7 +119,7 @@ const NewestProducts: React.FC = () => {
             </div>
         </div>
         <Link to="/shop" onClick={handleViewAllClick} className="flex items-center gap-2 text-primary font-medium hover:text-primary/80 transition-colors">
-          View All <ArrowRight size={18} />
+          {t('products.viewAll')} <ArrowRight size={18} />
         </Link>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
@@ -127,7 +129,7 @@ const NewestProducts: React.FC = () => {
           ))
         ) : (
           <div className="col-span-full text-center py-12">
-            <p className="text-text-muted">No products available yet</p>
+            <p className="text-text-muted">{t('products.noProductsFound')}</p>
           </div>
         )}
       </div>

@@ -4,9 +4,12 @@ import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useUser } from '../../context/UserContext';
 import { useOrder } from '../../context/OrderContext';
+import { useTranslation } from '../../i18n/useTranslation';
 import { ShoppingCart, X } from 'lucide-react';
 
 const EmptyCartNotification: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
+  
   React.useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
@@ -38,10 +41,10 @@ const EmptyCartNotification: React.FC<{ isOpen: boolean; onClose: () => void }> 
         </div>
         <div className="flex-1">
           <h4 className="font-semibold text-text-dark mb-1">
-            Your Cart is Empty
+            {t('cart.empty')}
           </h4>
           <p className="text-sm text-text-muted">
-            Please add items to your cart before placing an order.
+            {t('cart.emptyMessage')}
           </p>
         </div>
         <button
@@ -61,6 +64,7 @@ const CartTotal: React.FC = () => {
   const { convertPrice, getCurrencySymbol, currency } = useCurrency();
   const { billingAddress } = useUser();
   const { addOrder } = useOrder();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showEmptyCartNotification, setShowEmptyCartNotification] = useState(false);
   
@@ -128,23 +132,23 @@ const CartTotal: React.FC = () => {
 
   return (
     <div className="border border-border-color rounded-lg p-6">
-      <h3 className="text-lg font-medium text-text-dark mb-4">Cart Total</h3>
+      <h3 className="text-lg font-medium text-text-dark mb-4">{t('cart.cartTotal')}</h3>
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-text-dark-gray">Subtotal:</span>
+          <span className="text-text-dark-gray">{t('cart.subtotal')}:</span>
           <span className="font-medium text-text-dark">{currencySymbol}{convertedSubtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-text-dark-gray">Shipping:</span>
-          <span className="font-medium text-text-dark">Free</span>
+          <span className="text-text-dark-gray">{t('cart.shipping')}:</span>
+          <span className="font-medium text-text-dark">{t('cart.free')}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-text-dark-gray">GST (18%):</span>
+          <span className="text-text-dark-gray">{t('cart.gst')} (18%):</span>
           <span className="font-medium text-text-dark">{currencySymbol}{gst.toFixed(2)}</span>
         </div>
         <hr className="border-border-color !my-4" />
         <div className="flex justify-between text-base">
-          <span className="text-text-dark-gray">Total:</span>
+          <span className="text-text-dark-gray">{t('cart.total')}:</span>
           <span className="font-semibold text-text-dark">{currencySymbol}{total.toFixed(2)}</span>
         </div>
       </div>
@@ -153,7 +157,7 @@ const CartTotal: React.FC = () => {
           onClick={handleCheckout}
           className="block w-full mt-6 bg-primary text-white text-center font-semibold py-3 rounded-full hover:bg-opacity-90 transition-colors"
         >
-          Place Order
+          {t('cart.placeOrder')}
         </button>
       ) : (
         <Link 
@@ -166,7 +170,7 @@ const CartTotal: React.FC = () => {
           }}
           className="block w-full mt-6 bg-primary text-white text-center font-semibold py-3 rounded-full hover:bg-opacity-90 transition-colors"
         >
-          Proceed to checkout
+          {t('cart.proceedToCheckout')}
         </Link>
       )}
 

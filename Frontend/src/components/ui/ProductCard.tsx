@@ -3,6 +3,7 @@ import { Star, ShoppingCart } from 'lucide-react';
 import { Product } from '../../data/products';
 import { useProduct } from '../../context/ProductContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
   <div className="flex gap-0.5">
@@ -15,6 +16,7 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const { openModal } = useProduct();
   const { convertPrice, getCurrencySymbol } = useCurrency();
+  const { t, translateProduct } = useTranslation();
   const { image, name, price, oldPrice, rating, status, discount, stockStatus } = product;
 
   const isHover = status === 'hover';
@@ -34,19 +36,19 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     <div className={cardClasses} onClick={() => openModal(product)}>
       <div className="relative mb-4">
         {isSale && (
-          <div className="absolute top-2 left-2 bg-sale text-white text-xs font-semibold px-2 py-1 rounded z-10">Sale 50%</div>
+          <div className="absolute top-2 left-2 bg-sale text-white text-xs font-semibold px-2 py-1 rounded z-10">{t('products.sale')} 50%</div>
         )}
         {isOutOfStock && (
-          <div className="absolute top-2 left-2 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-md z-10">Out of Stock</div>
+          <div className="absolute top-2 left-2 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-md z-10">{t('products.outOfStock')}</div>
         )}
         <img 
           src={image} 
-          alt={name} 
+          alt={translateProduct(name)} 
           className={`w-full h-auto aspect-square object-contain transition-opacity ${isOutOfStock ? 'opacity-30' : 'opacity-100'}`} 
         />
       </div>
       <div className="flex-grow">
-        <p className={`text-sm ${isHover ? 'text-primary' : 'text-text-light'}`}>{name}</p>
+        <p className={`text-sm ${isHover ? 'text-primary' : 'text-text-light'}`}>{translateProduct(name)}</p>
         <div className="flex items-center gap-2 mt-1">
             <p className="text-base font-medium text-text-dark">{currencySymbol}{convertedPrice.toFixed(2)}</p>
             {hasDiscount && oldPrice && <p className="text-sm text-gray-300 line-through opacity-60">{currencySymbol}{convertPrice(oldPrice).toFixed(2)}</p>}
@@ -64,6 +66,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
           if (isOutOfStock) return;
         }}
         disabled={isOutOfStock}
+        aria-label={t('products.addToCart')}
+        title={isOutOfStock ? t('products.outOfStock') : t('products.addToCart')}
       >
         <ShoppingCart size={20} />
       </button>

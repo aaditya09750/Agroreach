@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useUser } from '../../context/UserContext';
+import { useTranslation } from '../../i18n/useTranslation';
 import { contactService } from '../../services/contactService';
 import { useNavigate } from 'react-router-dom';
 import ContactNotification from '../ui/ContactNotification';
@@ -70,6 +71,7 @@ const ContactInfoCard: React.FC = () => {
 const ContactForm: React.FC = () => {
     const { user } = useUser();
     const { currency } = useCurrency();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     
     const [formState, setFormState] = useState({
@@ -171,16 +173,16 @@ const ContactForm: React.FC = () => {
           message={notification.message}
           onClose={hideNotification}
         />
-        <h2 className="text-2xl font-semibold text-text-dark">Just Say Hello!</h2>
+        <h2 className="text-2xl font-semibold text-text-dark">{t('contact.justSayHello')}</h2>
         <p className="mt-2 text-sm text-text-muted max-w-md">
-          Have a question about our products or need assistance with your order? We're here to help! Reach out to us and we'll get back to you shortly.
+          {t('contact.description')}
         </p>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               name="name"
-              placeholder="Your Name"
+              placeholder={t('contact.yourName')}
               value={formState.name}
               onChange={handleChange}
               required
@@ -190,7 +192,7 @@ const ContactForm: React.FC = () => {
             <input
               type="email"
               name="email"
-              placeholder="Your Email"
+              placeholder={t('contact.yourEmail')}
               value={formState.email}
               onChange={handleChange}
               required
@@ -201,7 +203,7 @@ const ContactForm: React.FC = () => {
           <div>
             <textarea
               name="message"
-              placeholder="Your Message"
+              placeholder={t('contact.yourMessage')}
               value={formState.message}
               onChange={handleChange}
               required
@@ -213,7 +215,7 @@ const ContactForm: React.FC = () => {
             <input
               type="text"
               name="subject"
-              placeholder="Subject"
+              placeholder={t('contact.subject')}
               value={formState.subject}
               onChange={handleChange}
               required
@@ -227,7 +229,7 @@ const ContactForm: React.FC = () => {
               disabled={isSubmitting}
               className="bg-primary text-white font-semibold py-4 px-10 rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? t('contact.sending') : t('contact.sendMessage')}
             </button>
           </div>
         </form>

@@ -111,8 +111,6 @@ description: Crisp green apples with tangy-sweet flavor. Perfect for snacking, s
 category: Fresh Fruit
 tags: Fresh Fruit, Apple, Green, Tangy, Crisp
 
---------Till this done
-
 name: Green Chilli
 price: 25.00
 description: Fresh green chilies adding spice and flavor to dishes. Essential for Indian curries, chutneys, and tempering. Rich in vitamins while boosting metabolism naturally.
@@ -131,6 +129,7 @@ description: Fresh green bell peppers with crisp texture and mild taste. Great f
 category: Vegetables
 tags: Vegetables, Capsicum, Bell Pepper, Green, Fresh
 
+
 name: Premium Cashews
 price: 650.00
 description: Whole cashew nuts with creamy texture and buttery flavor. Perfect for snacking, sweets, and garnishing. Rich in healthy fats, protein, and minerals for balanced nutrition.
@@ -142,6 +141,8 @@ price: 80.00
 description: Nutrient-dense kale with dark green curly leaves. Excellent for salads, smoothies, and sautéing. Packed with vitamins, minerals, and antioxidants for superfood nutrition.
 category: Vegetables
 tags: Vegetables, Kale, Superfood, Green, Healthy
+
+--------Till this done--------
 
 name: Fresh Okra
 price: 40.00

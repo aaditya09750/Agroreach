@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const BillingAddressCard: React.FC = () => {
   const { billingAddress } = useUser();
+  const { t } = useTranslation();
 
   return (
     <div className="border border-border-color rounded-lg p-8 h-full">
-      <p className="text-sm font-medium text-text-nav uppercase tracking-wider">Billing Address</p>
+      <p className="text-sm font-medium text-text-nav uppercase tracking-wider">{t('dashboard.billingAddress')}</p>
       <div className="mt-4 space-y-2 text-text-dark-gray">
         {billingAddress.firstName || billingAddress.lastName ? (
           <>
@@ -29,7 +31,7 @@ const BillingAddressCard: React.FC = () => {
             )}
           </>
         ) : (
-          <p className="text-sm text-gray-400 ">No billing address added yet</p>
+          <p className="text-sm text-gray-400 ">{t('dashboard.noBillingAddress')}</p>
         )}
       </div>
       <Link 
@@ -37,7 +39,7 @@ const BillingAddressCard: React.FC = () => {
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
         className="mt-6 inline-block text-base font-medium text-primary hover:underline"
       >
-        {billingAddress.firstName ? 'Edit Address' : 'Add Address'}
+        {billingAddress.firstName ? t('dashboard.editAddress') : t('dashboard.addAddress')}
       </Link>
     </div>
   );

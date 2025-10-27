@@ -3,8 +3,10 @@ import { Eye } from 'lucide-react';
 import Checkbox from '../ui/Checkbox';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const SignInForm: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUser();
@@ -40,13 +42,13 @@ const SignInForm: React.FC = () => {
         const from = locationState?.from?.pathname || '/';
         navigate(from, { replace: true });
       } else {
-        setError('Login failed. Please try again.');
+        setError(t('auth.loginFailed'));
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Login failed. Please try again.');
+        setError(t('auth.loginFailed'));
       }
     } finally {
       setLoading(false);
@@ -55,7 +57,7 @@ const SignInForm: React.FC = () => {
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 w-full max-w-[520px]">
-      <h2 className="text-3xl font-semibold text-text-dark text-center">Sign In</h2>
+      <h2 className="text-3xl font-semibold text-text-dark text-center">{t('auth.signIn')}</h2>
       
       {error && (
         <div className="mt-5 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
@@ -67,7 +69,7 @@ const SignInForm: React.FC = () => {
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder={t('auth.emailPlaceholder')}
             value={formState.email}
             onChange={handleChange}
             className="w-full px-4 py-3.5 border border-border-color rounded-md text-text-dark-gray placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
@@ -78,7 +80,7 @@ const SignInForm: React.FC = () => {
           <input
             type={showPassword ? 'text' : 'password'}
             name="password"
-            placeholder="Password"
+            placeholder={t('auth.passwordPlaceholder')}
             value={formState.password}
             onChange={handleChange}
             className="w-full px-4 py-3.5 border border-border-color rounded-md text-text-dark-gray placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
@@ -88,31 +90,31 @@ const SignInForm: React.FC = () => {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-muted"
-            aria-label="Toggle password visibility"
+            aria-label={t('auth.togglePasswordVisibility')}
           >
             <Eye size={20} />
           </button>
         </div>
         <div className="flex justify-between items-center text-sm">
           <Checkbox
-            label="Remember me"
+            label={t('auth.rememberMe')}
             name="rememberMe"
             checked={formState.rememberMe}
             onChange={handleChange}
           />
-          <Link to="/signin" className="text-text-dark-gray hover:text-primary">Forget Password</Link>
+          <Link to="/signin" className="text-text-dark-gray hover:text-primary">{t('auth.forgotPassword')}</Link>
         </div>
         <button 
           type="submit" 
           disabled={loading}
           className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? t('common.loading') : t('auth.signIn')}
         </button>
       </form>
       <div className="mt-5 text-center text-sm">
-        <span className="text-text-dark-gray">Don’t have account?</span>
-        <Link to="/signup" className="text-text-dark font-medium hover:text-primary"> Register</Link>
+        <span className="text-text-dark-gray">{t('auth.dontHaveAccount')}</span>
+        <Link to="/signup" className="text-text-dark font-medium hover:text-primary"> {t('auth.signUp')}</Link>
       </div>
     </div>
   );

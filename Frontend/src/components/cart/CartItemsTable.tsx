@@ -1,21 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useTranslation } from '../../i18n/useTranslation';
 import CartItemRow from './CartItemRow';
 
 const CartItemsTable: React.FC = () => {
   const { cartItems } = useCart();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (cartItems.length === 0) {
     return (
       <div className="border border-border-color rounded-lg p-12 text-center">
-        <p className="text-xl text-text-muted mb-4">Your cart is empty</p>
+        <p className="text-xl text-text-muted mb-4">{t('cart.empty')}</p>
         <button 
           onClick={() => navigate('/shop')}
           className="bg-primary text-white font-semibold py-3 px-8 rounded-full hover:bg-primary/90 transition-colors"
         >
-          Continue Shopping
+          {t('cart.continueShopping')}
         </button>
       </div>
     );
@@ -26,10 +28,10 @@ const CartItemsTable: React.FC = () => {
       <table className="w-full text-left">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Product</th>
-            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Price</th>
-            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Quantity</th>
-            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">Subtotal</th>
+            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">{t('cart.product')}</th>
+            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">{t('cart.price')}</th>
+            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">{t('cart.quantity')}</th>
+            <th className="px-6 py-3 text-xs font-medium text-text-muted uppercase tracking-wider">{t('cart.subtotal')}</th>
             <th className="px-6 py-3"></th>
           </tr>
         </thead>
@@ -44,7 +46,7 @@ const CartItemsTable: React.FC = () => {
           onClick={() => navigate('/shop')}
           className="bg-gray-100 text-text-dark font-semibold py-3 px-8 rounded-full hover:bg-gray-200 transition-colors"
         >
-          Return to shop
+          {t('cart.returnToShop')}
         </button>
       </div>
     </div>

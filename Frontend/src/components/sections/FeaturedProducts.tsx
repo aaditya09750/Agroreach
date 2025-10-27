@@ -4,6 +4,7 @@ import ProductCard from '../ui/ProductCard';
 import SectionHeader from '../ui/SectionHeader';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useProduct } from '../../context/ProductContext';
+import { useTranslation } from '../../i18n/useTranslation';
 import { Star, ShoppingCart, ArrowRight } from 'lucide-react';
 import { productService } from '../../services/productService';
 import { getImageUrls } from '../../utils/imageUtils';
@@ -32,6 +33,7 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
 );
 
 const SmallProductCard: React.FC<SmallProductCardProps> = ({ image, name, price, oldPrice, rating, isHover, productId, discount, stockStatus }) => {
+  const { t } = useTranslation();
   const { convertPrice, getCurrencySymbol } = useCurrency();
   const { openModal, products } = useProduct();
   const convertedPrice = convertPrice(price);
@@ -64,7 +66,7 @@ const SmallProductCard: React.FC<SmallProductCardProps> = ({ image, name, price,
     >
       <div className="relative w-24 h-24 flex-shrink-0">
         {isOutOfStock && (
-          <div className="absolute top-0 left-0 bg-gray-900 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded z-10">Out</div>
+          <div className="absolute top-0 left-0 bg-gray-900 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded z-10">{t('products.out')}</div>
         )}
         <img 
           src={image} 
@@ -98,24 +100,29 @@ const SmallProductCard: React.FC<SmallProductCardProps> = ({ image, name, price,
   );
 };
 
-const DealSection: React.FC<{ title: string; products: SmallProductCardProps[] }> = ({ title, products }) => (
-  <div>
-    <h3 className="text-xl font-medium text-text-dark mb-4">{title}</h3>
-    <div className="space-y-4">
-      {products.length > 0 ? (
-        products.map((product, index) => (
-          <SmallProductCard key={index} {...product} />
-        ))
-      ) : (
-        <div className="text-center py-8 text-text-muted">
-          <p className="text-sm">No {title.toLowerCase()} available</p>
-        </div>
-      )}
+const DealSection: React.FC<{ title: string; products: SmallProductCardProps[] }> = ({ title, products }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <div>
+      <h3 className="text-xl font-medium text-text-dark mb-4">{title}</h3>
+      <div className="space-y-4">
+        {products.length > 0 ? (
+          products.map((product, index) => (
+            <SmallProductCard key={index} {...product} />
+          ))
+        ) : (
+          <div className="text-center py-8 text-text-muted">
+            <p className="text-sm">{t('products.noDealsAvailable', { dealType: title.toLowerCase() })}</p>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const BannerCard: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleShopNowClick = () => {
@@ -129,13 +136,13 @@ const BannerCard: React.FC = () => {
       style={{backgroundImage: `url(${bannerImage})`}}
     >
       <div className="pt-12 pb-8 px-8 text-center flex flex-col items-center h-full">
-        <p className="text-xs uppercase tracking-widest font-medium text-text-dark">WINTER SALE</p>
-        <p className="text-5xl font-semibold text-primary mt-2">75% off</p>
+        <p className="text-xs uppercase tracking-widest font-medium text-text-dark">{t('products.winterSale')}</p>
+        <p className="text-5xl font-semibold text-primary mt-2">{t('products.percentOff')}</p>
         <button 
           onClick={handleShopNowClick}
           className="mt-6 bg-white text-primary font-semibold py-3 px-8 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow"
         >
-          Shop Now <ArrowRight size={18} />
+          {t('products.shopNow')} <ArrowRight size={18} />
         </button>
       </div>
     </div>
@@ -143,6 +150,7 @@ const BannerCard: React.FC = () => {
 };
 
 const FeaturedProducts: React.FC = () => {
+  const { t } = useTranslation();
   const { products } = useProduct();
   const [hotDeals, setHotDeals] = useState<SmallProductCardProps[]>([]);
   const [bestSeller, setBestSeller] = useState<SmallProductCardProps[]>([]);
@@ -165,7 +173,7 @@ const FeaturedProducts: React.FC = () => {
         ]);
 
         // Map Hot Deals
-        const hotDealsData = (hotDealsResponse.data || []).map((p: any) => {
+        const hotDealsData = (hotDealsResponse.data || []).map((p: Record<string, unknown>) => {
           const imageUrls = getImageUrls(p.images);
           return {
             image: imageUrls[0],
@@ -180,7 +188,7 @@ const FeaturedProducts: React.FC = () => {
         });
 
         // Map Best Sellers
-        const bestSellerData = (bestSellerResponse.data || []).map((p: any) => {
+        const bestSellerData = (bestSellerResponse.data || []).map((p: Record<string, unknown>) => {
           const imageUrls = getImageUrls(p.images);
           return {
             image: imageUrls[0],
@@ -195,7 +203,7 @@ const FeaturedProducts: React.FC = () => {
         });
 
         // Map Top Rated
-        const topRatedData = (topRatedResponse.data || []).map((p: any) => {
+        const topRatedData = (topRatedResponse.data || []).map((p: Record<string, unknown>) => {
           const imageUrls = getImageUrls(p.images);
           return {
             image: imageUrls[0],
@@ -229,7 +237,7 @@ const FeaturedProducts: React.FC = () => {
   return (
     <section>
       {/* Featured Products Section */}
-      <SectionHeader title="Featured Products" />
+      <SectionHeader title={t('products.featured')} />
       <div className="overflow-x-auto mt-12 scrollbar-hide">
         <div className="flex gap-5 justify-center px-4">
           {featuredProductsData.map((product) => (
@@ -265,9 +273,9 @@ const FeaturedProducts: React.FC = () => {
           </>
         ) : (
           <>
-            <DealSection title="Hot Deals" products={hotDeals.length > 0 ? hotDeals : []} />
-            <DealSection title="Best Seller" products={bestSeller.length > 0 ? bestSeller : []} />
-            <DealSection title="Top Rated" products={topRated.length > 0 ? topRated : []} />
+            <DealSection title={t('products.hotDeals')} products={hotDeals.length > 0 ? hotDeals : []} />
+            <DealSection title={t('products.bestSeller')} products={bestSeller.length > 0 ? bestSeller : []} />
+            <DealSection title={t('products.topRated')} products={topRated.length > 0 ? topRated : []} />
             <BannerCard />
           </>
         )}

@@ -2,8 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useOrder } from '../../context/OrderContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const OrderHistoryTable: React.FC = () => {
+  const { t } = useTranslation();
   const { orders } = useOrder();
   const { convertPrice, getCurrencySymbol } = useCurrency();
   const currencySymbol = getCurrencySymbol();
@@ -14,9 +16,9 @@ const OrderHistoryTable: React.FC = () => {
   return (
     <div className="border border-border-color rounded-lg">
       <div className="p-6 flex justify-between items-center">
-        <h3 className="text-xl font-medium text-text-dark">Recent Order History</h3>
+        <h3 className="text-xl font-medium text-text-dark">{t('dashboard.recentOrders')}</h3>
         <Link to="/order-history" className="text-base font-medium text-primary">
-          View All
+          {t('dashboard.viewAll')}
         </Link>
       </div>
       {recentOrders.length > 0 ? (
@@ -24,10 +26,10 @@ const OrderHistoryTable: React.FC = () => {
           <table className="w-full text-left">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">Order ID</th>
-                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">{t('dashboard.orderId')}</th>
+                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">{t('dashboard.date')}</th>
+                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">{t('dashboard.total')}</th>
+                <th className="px-6 py-3 text-xs font-medium text-text-light uppercase tracking-wider">{t('dashboard.status')}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -49,7 +51,7 @@ const OrderHistoryTable: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-text-dark-gray">{order.status}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link to={`/dashboard/order/${order._id || order.id}`} className="text-primary hover:text-green-700">
-                        View Details
+                        {t('dashboard.viewDetails')}
                       </Link>
                     </td>
                   </tr>

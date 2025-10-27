@@ -5,6 +5,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { adminService } from '../../services/adminService';
 import { getImageUrl } from '../../utils/imageUtils';
+import { generateInvoicePDF } from '../../utils/pdfGenerator';
 
 interface OrderProduct {
   name: string;
@@ -22,6 +23,9 @@ interface OrderData {
   phone: string;
   date: string;
   total: string;
+  subtotal?: string;
+  shipping?: string;
+  tax?: string;
   status: string;
   items: number;
   shippingAddress: {
@@ -157,6 +161,9 @@ const AdminOrders: React.FC = () => {
             };
             createdAt: string;
             total: number;
+            subtotal?: number;
+            shipping?: number;
+            tax?: number;
             status: string;
             items: Array<{
               product: { _id: string; name: string; images?: string[] };
@@ -179,6 +186,9 @@ const AdminOrders: React.FC = () => {
               year: 'numeric' 
             }),
             total: order.total.toFixed(2),
+            subtotal: order.subtotal ? order.subtotal.toFixed(2) : undefined,
+            shipping: order.shipping !== undefined ? order.shipping.toFixed(2) : undefined,
+            tax: order.tax ? order.tax.toFixed(2) : undefined,
             status: mapBackendStatusToFrontend(order.status), // Map backend status to frontend
             items: order.items.length,
             shippingAddress: {
@@ -434,6 +444,64 @@ const AdminOrders: React.FC = () => {
   const handleViewOrder = (order: OrderData) => {
     setSelectedOrder(order);
     setShowOrderModal(true);
+  };
+
+  const handlePrintInvoice = () => {
+    if (!selectedOrder) return;
+
+    try {
+      // Parse total values from strings
+      const parsePrice = (price: string | undefined) => {
+        if (!price) return 0;
+        return parseFloat(price.replace(/[^0-9.-]+/g, ''));
+      };
+
+      const total = parsePrice(selectedOrder.total);
+      const subtotal = selectedOrder.subtotal ? parsePrice(selectedOrder.subtotal) : total * 0.926; // ~8% tax
+      const shipping = selectedOrder.shipping ? parsePrice(selectedOrder.shipping) : 0;
+      const tax = selectedOrder.tax ? parsePrice(selectedOrder.tax) : total - subtotal - shipping;
+
+      generateInvoicePDF({
+        orderId: selectedOrder.orderId,
+        customerName: selectedOrder.customer,
+        email: selectedOrder.email,
+        phone: selectedOrder.phone,
+        date: new Date(selectedOrder.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }),
+        items: selectedOrder.products.map(product => ({
+          name: product.name,
+          quantity: product.quantity,
+          price: product.price
+        })),
+        subtotal: subtotal,
+        shipping: shipping,
+        tax: tax,
+        total: total,
+        paymentMethod: selectedOrder.paymentMethod,
+        shippingAddress: selectedOrder.shippingAddress,
+        currency: currency
+      });
+
+      addNotification({
+        type: 'system',
+        title: 'Invoice Downloaded',
+        message: `Invoice for order ${selectedOrder.orderId} has been downloaded successfully`,
+        read: false,
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      addNotification({
+        type: 'system',
+        title: 'Invoice Generation Failed',
+        message: 'Failed to generate invoice. Please try again.',
+        read: false,
+        icon: 'error'
+      });
+    }
   };
 
   const closeOrderModal = () => {
@@ -955,15 +1023,25 @@ const AdminOrders: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-text-muted">Subtotal</p>
-                    <p className="text-sm font-medium text-text-dark">{getCurrencySymbol()}{selectedOrder.total}</p>
+                    <p className="text-sm font-medium text-text-dark">
+                      {getCurrencySymbol()}{selectedOrder.subtotal || selectedOrder.total}
+                    </p>
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-text-muted">Shipping</p>
-                    <p className="text-sm font-medium text-text-dark">{getCurrencySymbol()}0.00</p>
+                    <p className="text-sm font-medium text-text-dark">
+                      {selectedOrder.shipping === '0.00' || !selectedOrder.shipping ? (
+                        <span className="text-primary font-semibold">Free</span>
+                      ) : (
+                        `${getCurrencySymbol()}${selectedOrder.shipping}`
+                      )}
+                    </p>
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-text-muted">Tax</p>
-                    <p className="text-sm font-medium text-text-dark">{getCurrencySymbol()}0.00</p>
+                    <p className="text-sm font-medium text-text-dark">
+                      {getCurrencySymbol()}{selectedOrder.tax || '0.00'}
+                    </p>
                   </div>
                   <div className="border-t border-border-color pt-3 flex items-center justify-between">
                     <p className="text-base font-semibold text-text-dark">Total</p>
@@ -1050,7 +1128,10 @@ const AdminOrders: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3 pt-2">
-                <button className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
+                <button 
+                  onClick={handlePrintInvoice}
+                  className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                >
                   Print Invoice
                 </button>
                 <button className="flex-1 px-6 py-3 border border-border-color text-text-dark rounded-lg hover:bg-gray-50 transition-colors font-medium">

@@ -4,6 +4,7 @@ import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useUser } from '../../context/UserContext';
 import { useOrder } from '../../context/OrderContext';
+import { useTranslation } from '../../i18n/useTranslation';
 import RadioInput from '../ui/RadioInput';
 import ValidationModal from '../modal/ValidationModal';
 
@@ -12,6 +13,7 @@ const OrderSummary: React.FC = () => {
   const { convertPrice, getCurrencySymbol, currency } = useCurrency();
   const { billingAddress } = useUser();
   const { addOrder } = useOrder();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [missingFields, setMissingFields] = useState<string[]>([]);
@@ -128,10 +130,10 @@ const OrderSummary: React.FC = () => {
   return (
     <div className="border border-border-color rounded-lg p-6 space-y-6">
       <div>
-        <h3 className="text-xl font-medium text-text-dark mb-3">Order Summary</h3>
+        <h3 className="text-xl font-medium text-text-dark mb-3">{t('checkout.orderSummary')}</h3>
         <div className="space-y-3">
           {cartItems.length === 0 ? (
-            <p className="text-text-dark-gray text-sm">No items in cart</p>
+            <p className="text-text-dark-gray text-sm">{t('checkout.noItems')}</p>
           ) : (
             cartItems.map(item => {
               const itemTotal = item.price * item.quantity;
@@ -152,32 +154,32 @@ const OrderSummary: React.FC = () => {
         </div>
         <div className="mt-4 pt-4 border-t border-border-color space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-text-dark-gray">Subtotal:</span>
+            <span className="text-text-dark-gray">{t('cart.subtotal')}:</span>
             <span className="font-medium text-text-dark">{currencySymbol}{convertedSubtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-dark-gray">Shipping:</span>
-            <span className="font-medium text-text-dark">Free</span>
+            <span className="text-text-dark-gray">{t('cart.shipping')}:</span>
+            <span className="font-medium text-text-dark">{t('cart.free')}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-dark-gray">GST (18%):</span>
+            <span className="text-text-dark-gray">{t('cart.gst')} (18%):</span>
             <span className="font-medium text-text-dark">{currencySymbol}{gst.toFixed(2)}</span>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-border-color">
           <div className="flex justify-between text-base">
-            <span className="text-text-dark font-medium">Total:</span>
+            <span className="text-text-dark font-medium">{t('cart.total')}:</span>
             <span className="font-semibold text-text-dark">{currencySymbol}{total.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-xl font-medium text-text-dark mb-4">Payment Method</h3>
+        <h3 className="text-xl font-medium text-text-dark mb-4">{t('checkout.paymentMethod')}</h3>
         <div className="space-y-2.5">
-          <RadioInput name="paymentMethod" label="Cash on Delivery" value="cod" defaultChecked />
-          <RadioInput name="paymentMethod" label="Paypal" value="paypal" />
-          <RadioInput name="paymentMethod" label="Amazon Pay" value="amazon" />
+          <RadioInput name="paymentMethod" label={t('checkout.cashOnDelivery')} value="cod" defaultChecked />
+          <RadioInput name="paymentMethod" label={t('checkout.paypal')} value="paypal" />
+          <RadioInput name="paymentMethod" label={t('checkout.amazonPay')} value="amazon" />
         </div>
       </div>
 
@@ -185,7 +187,7 @@ const OrderSummary: React.FC = () => {
         onClick={handlePlaceOrder}
         className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors"
       >
-        Place Order
+        {t('cart.placeOrder')}
       </button>
 
       {/* Validation Modal */}

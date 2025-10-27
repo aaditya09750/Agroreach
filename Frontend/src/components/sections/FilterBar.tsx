@@ -2,6 +2,7 @@ import React from 'react';
 import ShopDropdown from '../ui/ShopDropdown';
 import { X } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 interface ActiveFilterTagProps {
   label: string;
@@ -36,11 +37,12 @@ const FilterBar: React.FC<FilterBarProps> = ({
   onSortChange,
   resultCount,
 }) => {
+  const { t } = useTranslation();
   const { getCurrencySymbol } = useCurrency();
   const currencySymbol = getCurrencySymbol();
 
   const categories = [
-    'All Categories',
+    t('products.allCategories'),
     'Fresh Fruit',
     'Vegetables',
     'Meat & Fish',
@@ -48,34 +50,34 @@ const FilterBar: React.FC<FilterBarProps> = ({
   ];
 
   const priceRanges = [
-    'All Prices',
-    `Under ${currencySymbol}10`,
+    t('products.allPrices'),
+    `${t('products.under')} ${currencySymbol}10`,
     `${currencySymbol}10 - ${currencySymbol}25`,
     `${currencySymbol}25 - ${currencySymbol}50`,
     `${currencySymbol}50 - ${currencySymbol}100`,
-    `Over ${currencySymbol}100`,
+    `${t('products.over')} ${currencySymbol}100`,
   ];
 
   const sortOptions = [
-    'Latest',
-    'Price: Low to High',
-    'Price: High to Low',
-    'Name: A-Z',
-    'Name: Z-A',
+    t('products.latest'),
+    t('products.priceLowToHigh'),
+    t('products.priceHighToLow'),
+    t('products.nameAZ'),
+    t('products.nameZA'),
     'Rating: High to Low',
   ];
 
   // Build active filters array
   const activeFilters: { label: string; onRemove: () => void }[] = [];
   
-  if (selectedCategory && selectedCategory !== 'All Categories') {
+  if (selectedCategory && selectedCategory !== t('products.allCategories')) {
     activeFilters.push({
       label: selectedCategory,
       onRemove: () => onCategoryChange(null),
     });
   }
   
-  if (selectedPrice && selectedPrice !== 'All Prices') {
+  if (selectedPrice && selectedPrice !== t('products.allPrices')) {
     activeFilters.push({
       label: selectedPrice,
       onRemove: () => onPriceChange(null),
@@ -122,7 +124,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               />
             ))}
           </div>
-          <span className="text-sm text-text-dark">{resultCount.toLocaleString()} Results found.</span>
+          <span className="text-sm text-text-dark">{resultCount.toLocaleString()} {t('products.resultsFound')}</span>
         </div>
       )}
     </div>

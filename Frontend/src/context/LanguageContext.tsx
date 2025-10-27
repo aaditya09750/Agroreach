@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import i18n from '../i18n/config';
 
 export type Language = 'English' | 'Marathi' | 'Hindi';
@@ -24,10 +24,28 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('English');
+  // Get saved language from localStorage or default to English
+  const getSavedLanguage = (): Language => {
+    const saved = localStorage.getItem('language');
+    if (saved === 'Marathi' || saved === 'Hindi' || saved === 'English') {
+      return saved as Language;
+    }
+    return 'English';
+  };
+
+  const [language, setLanguageState] = useState<Language>(getSavedLanguage());
+
+  // Initialize i18n with saved language on mount
+  useEffect(() => {
+    const langCode = language === 'English' ? 'en' : language === 'Marathi' ? 'mr' : 'hi';
+    i18n.changeLanguage(langCode);
+  }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
+    
+    // Save to localStorage
+    localStorage.setItem('language', lang);
     
     // Sync with i18n - convert language name to language code
     const langCode = lang === 'English' ? 'en' : lang === 'Marathi' ? 'mr' : 'hi';

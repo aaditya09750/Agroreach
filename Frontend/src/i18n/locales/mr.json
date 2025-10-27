@@ -70,7 +70,15 @@
     "inStock": "स्टॉकमध्ये आहे",
     "outOfStock": "स्टॉक संपला",
     "rating": "रेटिंग",
-    "sku": "SKU"
+    "sku": "SKU",
+    "relatedProducts": "संबंधित उत्पादने",
+    "productDetails": "उत्पादन तपशील",
+    "description": "वर्णन",
+    "reviews": "पुनरावलोकने",
+    "weight": "वजन",
+    "category": "श्रेणी",
+    "tags": "टॅग",
+    "share": "शेअर करा"
   },
   "category": {
     "topCategory": "शीर्ष श्रेणी",
@@ -79,7 +87,13 @@
     "river": "नदी मासे",
     "meat": "मांस",
     "water": "पाणी आणि पेये",
-    "snacks": "स्नॅक्स"
+    "snacks": "स्नॅक्स",
+    "allProducts": "सर्व उत्पादने",
+    "filterBy": "फिल्टर करा",
+    "sortBy": "क्रमवारी लावा",
+    "priceRange": "किंमत श्रेणी",
+    "applyFilter": "फिल्टर लागू करा",
+    "clearAll": "सर्व साफ करा"
   },
   "testimonials": {
     "title": "ग्राहक प्रशस्तिपत्र",
@@ -96,7 +110,14 @@
     "cartTotal": "कार्ट एकूण",
     "couponCode": "कूपन कोड",
     "applyCoupon": "कूपन लागू करा",
-    "proceedToCheckout": "चेकआउटसाठी पुढे जा"
+    "proceedToCheckout": "चेकआउटसाठी पुढे जा",
+    "emptyCart": "तुमची कार्ट रिकामी आहे",
+    "continueShopping": "खरेदी सुरू ठेवा",
+    "removeItem": "आयटम काढून टाका",
+    "shipping": "शिपिंग",
+    "tax": "कर",
+    "total": "एकूण",
+    "discount": "सवलत"
   },
   "checkout": {
     "title": "चेकआउट",
@@ -113,7 +134,14 @@
     "orderSummary": "ऑर्डर सारांश",
     "placeOrder": "ऑर्डर द्या",
     "shippingCharge": "शिपिंग",
-    "total": "एकूण"
+    "total": "एकूण",
+    "paymentMethod": "पेमेंट पद्धत",
+    "cashOnDelivery": "कॅश ऑन डिलिव्हरी",
+    "creditCard": "क्रेडिट कार्ड",
+    "debitCard": "डेबिट कार्ड",
+    "paypal": "PayPal",
+    "additionalInfo": "अतिरिक्त माहिती",
+    "orderNotes": "ऑर्डर नोट्स"
   },
   "dashboard": {
     "navigation": "नेव्हिगेशन",
@@ -122,11 +150,25 @@
     "shoppingCart": "शॉपिंग कार्ट",
     "settings": "सेटिंग्ज",
     "logOut": "लॉग आउट",
-    "accountDetails": "खाते तपशील",
+    "accountDetails": "खात्याचे तपशील",
     "billingAddress": "बिलिंग पत्ता",
     "edit": "संपादित करा",
     "recentOrders": "अलीकडील ऑर्डर इतिहास",
-    "viewAll": "सर्व पहा"
+    "viewAll": "सर्व पहा",
+    "totalOrders": "एकूण ऑर्डर",
+    "pendingOrders": "प्रलंबित ऑर्डर",
+    "completedOrders": "पूर्ण ऑर्डर",
+    "orderNumber": "ऑर्डर क्रमांक",
+    "date": "तारीख",
+    "status": "स्थिती",
+    "totalAmount": "एकूण रक्कम",
+    "actions": "क्रिया",
+    "viewDetails": "तपशील पहा",
+    "pending": "प्रलंबित",
+    "processing": "प्रक्रियेत",
+    "shipped": "पाठवले",
+    "delivered": "वितरित",
+    "cancelled": "रद्द केले"
   },
   "contact": {
     "getInTouch": "संपर्कात रहा",
@@ -134,19 +176,51 @@
     "fullName": "पूर्ण नाव",
     "emailAddress": "ईमेल पत्ता",
     "message": "संदेश",
-    "sendButton": "संदेश पाठवा"
+    "sendButton": "संदेश पाठवा",
+    "contactInfo": "संपर्क माहिती",
+    "address": "पत्ता",
+    "phoneNumber": "फोन नंबर",
+    "emailUs": "आम्हाला ईमेल करा",
+    "followUs": "आम्हाला फॉलो करा",
+    "ourLocation": "आमचे स्थान"
   },
   "about": {
     "whoWeAre": "आम्ही कोण आहोत",
     "ourStory": "आमची कथा",
     "ourTeam": "आमची अद्भुत टीम",
-    "ourValues": "आमची मूल्ये"
+    "ourValues": "आमची मूल्ये",
+    "ourMission": "आमचे ध्येय",
+    "ourVision": "आमची दृष्टी",
+    "whyChooseUs": "आम्हाला का निवडा",
+    "freshProducts": "100% ताजी उत्पादने",
+    "organicCertified": "ऑर्गॅनिक प्रमाणित",
+    "directFromFarm": "थेट शेतातून",
+    "qualityAssurance": "गुणवत्ता हमी",
+    "customerSatisfaction": "ग्राहक समाधान",
+    "sustainableFarming": "शाश्वत शेती"
+  },
+  "auth": {
+    "signIn": "साइन इन करा",
+    "signUp": "साइन अप करा",
+    "email": "ईमेल पत्ता",
+    "password": "पासवर्ड",
+    "confirmPassword": "पासवर्डची पुष्टी करा",
+    "forgotPassword": "पासवर्ड विसरलात?",
+    "dontHaveAccount": "खाते नाही?",
+    "alreadyHaveAccount": "आधीच खाते आहे?",
+    "createAccount": "खाते तयार करा",
+    "rememberMe": "मला लक्षात ठेवा",
+    "firstName": "पहिले नाव",
+    "lastName": "आडनाव",
+    "phoneNumber": "फोन नंबर",
+    "termsAgree": "मी अटी व शर्तींशी सहमत आहे",
+    "privacyAgree": "मी गोपनीयता धोरणाशी सहमत आहे"
   },
   "common": {
     "welcome": "स्वागत आहे",
     "loading": "लोड होत आहे...",
     "error": "त्रुटी",
-    "success": "यशस्वी",
+    "success": "यश",
     "cancel": "रद्द करा",
     "confirm": "पुष्टी करा",
     "close": "बंद करा",
@@ -162,6 +236,45 @@
     "apply": "लागू करा",
     "selectAll": "सर्व निवडा",
     "noResults": "कोणतीही उत्पादने सापडली नाहीत",
-    "viewAllResults": "सर्व परिणाम पहा"
+    "viewAllResults": "सर्व परिणाम पहा",
+    "readMore": "अधिक वाचा",
+    "learnMore": "अधिक जाणून घ्या",
+    "seeMore": "अधिक पहा",
+    "showLess": "कमी दाखवा",
+    "all": "सर्व",
+    "none": "काहीही नाही",
+    "yes": "होय",
+    "no": "नाही",
+    "ok": "ठीक आहे",
+    "downloadInvoice": "बीजक डाउनलोड करा",
+    "printInvoice": "बीजक प्रिंट करा",
+    "orderDetails": "ऑर्डर तपशील",
+    "shippingAddress": "शिपिंग पत्ता",
+    "billingAddress": "बिलिंग पत्ता",
+    "paymentMethod": "पेमेंट पद्धत",
+    "orderDate": "ऑर्डर तारीख",
+    "estimatedDelivery": "अंदाजे डिलिव्हरी"
+  },
+  "notifications": {
+    "addedToCart": "उत्पादन कार्टमध्ये जोडले",
+    "removedFromCart": "उत्पादन कार्टमधून काढले",
+    "orderPlaced": "ऑर्डर यशस्वीरित्या दिली",
+    "orderCancelled": "ऑर्डर रद्द केली",
+    "profileUpdated": "प्रोफाइल यशस्वीरित्या अपडेट केले",
+    "passwordChanged": "पासवर्ड यशस्वीरित्या बदलला",
+    "emailSent": "ईमेल यशस्वीरित्या पाठवला",
+    "errorOccurred": "एक त्रुटी आली. कृपया पुन्हा प्रयत्न करा.",
+    "loginSuccess": "लॉगिन यशस्वी",
+    "logoutSuccess": "लॉगआउट यशस्वी",
+    "signupSuccess": "खाते यशस्वीरित्या तयार केले"
+  },
+  "validation": {
+    "required": "हे फील्ड आवश्यक आहे",
+    "invalidEmail": "अवैध ईमेल पत्ता",
+    "passwordMismatch": "पासवर्ड जुळत नाहीत",
+    "minLength": "किमान लांबी {{min}} वर्ण आहे",
+    "maxLength": "कमाल लांबी {{max}} वर्ण आहे",
+    "invalidPhone": "अवैध फोन नंबर",
+    "invalidZip": "अवैध पिन कोड"
   }
 }

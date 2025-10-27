@@ -7,6 +7,7 @@ import Icon5 from '../../assets/Icon (4).png';
 import Icon6 from '../../assets/Icon (5).png';
 import BgImage from '../../assets/BG.png';
 import aboutManImage from '../../assets/about/AboutMan.png';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const FeatureItem: React.FC<{ icon: string; title: string; description: string; }> = ({ icon, title, description }) => (
     <div className="flex items-start gap-4">
@@ -21,13 +22,15 @@ const FeatureItem: React.FC<{ icon: string; title: string; description: string; 
 );
 
 const AboutFeatures: React.FC = () => {
+    const { t } = useTranslation();
+    
     const features = [
-        { icon: Icon1, title: "100% Organic Food", description: "Certified organic & pesticide-free produce." },
-        { icon: Icon2, title: "Great Support 24/7", description: "Always ready to assist you" },
-        { icon: Icon3, title: "Customer Feedback", description: "5000+ satisfied customers" },
-        { icon: Icon4, title: "100% Secure Payment", description: "Multiple safe payment options" },
-        { icon: Icon5, title: "Free Shipping", description: "Free delivery on orders above within 5km" },
-        { icon: Icon6, title: "Farm Fresh Quality", description: "Delivered within 24-48 hours." },
+        { icon: Icon1, title: t('about.organicFood'), description: t('about.organicFoodDesc') },
+        { icon: Icon2, title: t('about.greatSupport'), description: t('about.greatSupportDesc') },
+        { icon: Icon3, title: t('about.customerFeedback'), description: t('about.customerFeedbackDesc') },
+        { icon: Icon4, title: t('about.securePayment'), description: t('about.securePaymentDesc') },
+        { icon: Icon5, title: t('about.freeShipping'), description: t('about.freeShippingDesc') },
+        { icon: Icon6, title: t('about.farmFresh'), description: t('about.farmFreshDesc') },
     ];
 
     return (
@@ -36,14 +39,14 @@ const AboutFeatures: React.FC = () => {
                 <div className="relative">
                     <img 
                         src={aboutManImage} 
-                        alt="Farmer with fresh produce" 
+                        alt={t('about.farmerWithProduce')}
                         className="relative w-full h-auto rounded-lg z-10" 
                     />
                 </div>
                 <div>
-                    <h2 className="text-5xl font-bold text-text-dark leading-tight">100% Trusted Organic Food Store</h2>
+                    <h2 className="text-5xl font-bold text-text-dark leading-tight">{t('about.trustedStore')}</h2>
                     <p className="mt-6 text-base text-text-muted leading-relaxed">
-                        We source directly from certified organic farms across India, ensuring every product meets the highest quality standards. Our commitment to freshness and sustainability makes us your trusted partner for healthy living.
+                        {t('about.trustedStoreDesc')}
                     </p>
                     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         {features.map((feature, index) => (

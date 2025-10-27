@@ -3,9 +3,11 @@ import InputField from '../ui/InputField';
 import SelectField from '../ui/SelectField';
 import Checkbox from '../ui/Checkbox';
 import { useUser } from '../../context/UserContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const BillingForm: React.FC = () => {
   const { billingAddress, updateBillingAddress } = useUser();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState(billingAddress);
 
   // Update formData when billingAddress changes (e.g., from settings page)
@@ -51,8 +53,8 @@ const BillingForm: React.FC = () => {
       [name]: value
     };
     setFormData(updatedData);
-    // Update context silently (without notification) so it's available for order placement
-    updateBillingAddress(updatedData, true);
+    // Update context silently so it's available for order placement
+    updateBillingAddress(updatedData);
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -73,106 +75,106 @@ const BillingForm: React.FC = () => {
       };
     }
     setFormData(updatedData);
-    // Update context silently (without notification) so it's available for order placement
-    updateBillingAddress(updatedData, true);
+    // Update context silently so it's available for order placement
+    updateBillingAddress(updatedData);
   };
 
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-medium text-text-dark mb-6">Billing Information</h2>
+        <h2 className="text-2xl font-medium text-text-dark mb-6">{t('checkout.billingInformation')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           <InputField 
-            label="First name" 
+            label={t('checkout.firstName')} 
             name="firstName" 
-            placeholder="Your first name" 
+            placeholder={t('checkout.firstNamePlaceholder')} 
             value={formData.firstName}
             onChange={handleInputChange}
             required
           />
           <InputField 
-            label="Last name" 
+            label={t('checkout.lastName')} 
             name="lastName" 
-            placeholder="Your last name" 
+            placeholder={t('checkout.lastNamePlaceholder')} 
             value={formData.lastName}
             onChange={handleInputChange}
             required
           />
           <div className="md:col-span-2">
             <InputField 
-              label="Company Name (optional)" 
+              label={t('checkout.companyName')} 
               name="companyName" 
-              placeholder="Company name" 
+              placeholder={t('checkout.companyNamePlaceholder')} 
               value={formData.companyName}
               onChange={handleInputChange}
             />
           </div>
           <div className="md:col-span-2">
             <InputField 
-              label="Street Address" 
+              label={t('checkout.streetAddress')} 
               name="streetAddress" 
-              placeholder="Street address" 
+              placeholder={t('checkout.streetAddressPlaceholder')} 
               value={formData.streetAddress}
               onChange={handleInputChange}
               required
             />
           </div>
           <SelectField 
-            label="Country / Region" 
+            label={t('checkout.country')} 
             name="country" 
             options={['United States', 'India']} 
-            placeholder="Select country" 
+            placeholder={t('checkout.selectCountry')} 
             value={formData.country}
             onChange={handleSelectChange}
             required
           />
           <SelectField 
-            label="States" 
+            label={t('checkout.states')} 
             name="state" 
             options={availableStates} 
-            placeholder="Select state" 
+            placeholder={t('checkout.selectState')} 
             value={formData.state}
             onChange={handleSelectChange}
             required
           />
           <InputField 
-            label="Zip Code" 
+            label={t('checkout.zipCode')} 
             name="zipCode" 
-            placeholder="Zip Code" 
+            placeholder={t('checkout.zipCodePlaceholder')} 
             value={formData.zipCode}
             onChange={handleInputChange}
             required
           />
           <InputField 
-            label="Email" 
+            label={t('checkout.email')} 
             name="email" 
             type="email" 
-            placeholder="Email Address" 
+            placeholder={t('checkout.emailPlaceholder')} 
             value={formData.email}
             onChange={handleInputChange}
             required
           />
           <InputField 
-            label="Phone" 
+            label={t('checkout.phone')} 
             name="phone" 
             type="tel" 
-            placeholder="Phone number" 
+            placeholder={t('checkout.phonePlaceholder')} 
             value={formData.phone}
             onChange={handleInputChange}
             required
           />
         </div>
         <div className="mt-5">
-          <Checkbox label="Ship to a different address" name="shipToDifferent" />
+          <Checkbox label={t('checkout.shipToDifferent')} name="shipToDifferent" />
         </div>
       </div>
       <hr className="border-border-color" />
       <div>
-        <h2 className="text-2xl font-medium text-text-dark mb-6">Additional Info</h2>
+        <h2 className="text-2xl font-medium text-text-dark mb-6">{t('checkout.additionalInfo')}</h2>
         <InputField 
-          label="Order Notes (Optional)" 
+          label={t('checkout.orderNotes')} 
           name="orderNotes" 
-          placeholder="Notes about your order, e.g. special notes for delivery" 
+          placeholder={t('checkout.orderNotesPlaceholder')} 
           isTextarea={true}
           rows={4}
         />

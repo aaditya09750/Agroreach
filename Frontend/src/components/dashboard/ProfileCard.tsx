@@ -1,17 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import { useTranslation } from '../../i18n/useTranslation';
 import { User } from 'lucide-react';
 
 const ProfileCard: React.FC = () => {
   const { profile } = useUser();
+  const { t } = useTranslation();
 
   return (
     <div className="border border-border-color rounded-lg p-8 h-full flex flex-col items-center text-center">
       {profile.image ? (
         <img
           src={profile.image}
-          alt="Profile"
+          alt={t('dashboard.profile')}
           className="w-32 h-32 rounded-full object-cover"
         />
       ) : (
@@ -22,15 +24,15 @@ const ProfileCard: React.FC = () => {
       <h3 className="text-xl font-medium text-text-dark mt-4">
         {profile.firstName || profile.lastName 
           ? `${profile.firstName} ${profile.lastName}`.trim() 
-          : 'Guest User'}
+          : t('dashboard.guestUser')}
       </h3>
-      <p className="text-sm text-text-muted mt-1">Customer</p>
+      <p className="text-sm text-text-muted mt-1">{t('dashboard.customer')}</p>
       <Link 
         to="/settings" 
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
         className="mt-4 text-base font-medium text-primary hover:underline"
       >
-        Edit Profile
+        {t('dashboard.editProfile')}
       </Link>
     </div>
   );

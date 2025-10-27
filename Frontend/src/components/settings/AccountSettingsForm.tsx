@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import InputField from '../ui/InputField';
 import { useUser } from '../../context/UserContext';
 import { Edit2, User } from 'lucide-react';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const AccountSettingsForm: React.FC = () => {
+  const { t } = useTranslation();
   const { profile, updateProfile } = useUser();
   const [formData, setFormData] = useState(profile);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +52,7 @@ const AccountSettingsForm: React.FC = () => {
   return (
     <div className="border border-border-color rounded-lg">
       <div className="p-6 border-b border-border-color">
-        <h3 className="text-xl font-medium text-text-dark">Account Settings</h3>
+        <h3 className="text-xl font-medium text-text-dark">{t('dashboard.accountSettings')}</h3>
       </div>
       <div className="p-6">
         <form onSubmit={handleSubmit}>
@@ -72,7 +74,7 @@ const AccountSettingsForm: React.FC = () => {
                   type="button"
                   onClick={handleImageClick}
                   className="absolute bottom-2 right-2 bg-white p-2.5 rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                  aria-label="Edit profile image"
+                  aria-label={t('dashboard.editProfileImage')}
                 >
                   <Edit2 className="w-5 h-5 text-gray-700" />
                 </button>
@@ -89,33 +91,33 @@ const AccountSettingsForm: React.FC = () => {
             <div className="lg:col-span-2 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <InputField 
-                  label="First name" 
+                  label={t('dashboard.firstName')}
                   name="firstName" 
-                  placeholder="Enter your first name" 
+                  placeholder={t('checkout.firstNamePlaceholder')}
                   value={formData.firstName}
                   onChange={handleChange}
                 />
                 <InputField 
-                  label="Last Name" 
+                  label={t('dashboard.lastName')}
                   name="lastName" 
-                  placeholder="Enter your last name" 
+                  placeholder={t('checkout.lastNamePlaceholder')}
                   value={formData.lastName}
                   onChange={handleChange}
                 />
               </div>
               <InputField 
-                label="Email" 
+                label={t('dashboard.email')}
                 name="email" 
                 type="email" 
-                placeholder="Enter your email address" 
+                placeholder={t('dashboard.emailPlaceholder')}
                 value={formData.email}
                 onChange={handleChange}
               />
               <InputField 
-                label="Phone Number" 
+                label={t('dashboard.phoneNumber')}
                 name="phone" 
                 type="tel" 
-                placeholder="Enter your phone number" 
+                placeholder={t('dashboard.phoneNumberPlaceholder')}
                 value={formData.phone}
                 onChange={handleChange}
               />
@@ -123,7 +125,7 @@ const AccountSettingsForm: React.FC = () => {
                 type="submit"
                 className="bg-primary text-white font-semibold py-3 px-8 rounded-full hover:bg-opacity-90 transition-colors"
               >
-                Save Changes
+                {t('dashboard.saveChanges')}
               </button>
             </div>
           </div>

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import InputField from '../ui/InputField';
 import SelectField from '../ui/SelectField';
 import { useUser } from '../../context/UserContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const BillingAddressForm: React.FC = () => {
+  const { t } = useTranslation();
   const { billingAddress, updateBillingAddress } = useUser();
   const [formData, setFormData] = useState(billingAddress);
   const navigate = useNavigate();
@@ -82,79 +84,79 @@ const BillingAddressForm: React.FC = () => {
   return (
     <div className="border border-border-color rounded-lg">
       <div className="p-6 border-b border-border-color">
-        <h3 className="text-xl font-medium text-text-dark">Billing Address</h3>
+        <h3 className="text-xl font-medium text-text-dark">{t('dashboard.billingAddress')}</h3>
       </div>
       <div className="p-6">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             <InputField 
-              label="First name" 
+              label={t('dashboard.firstName')}
               name="firstName" 
-              placeholder="Enter your first name" 
+              placeholder={t('checkout.firstNamePlaceholder')}
               value={formData.firstName}
               onChange={handleInputChange}
             />
             <InputField 
-              label="Last name" 
+              label={t('dashboard.lastName')}
               name="lastName" 
-              placeholder="Enter your last name" 
+              placeholder={t('checkout.lastNamePlaceholder')}
               value={formData.lastName}
               onChange={handleInputChange}
             />
             <div className="md:col-span-2">
               <InputField 
-                label="Company Name (optional)" 
+                label={t('dashboard.companyName')}
                 name="companyName" 
-                placeholder="Enter company name (optional)" 
+                placeholder={t('dashboard.companyNamePlaceholder')}
                 value={formData.companyName}
                 onChange={handleInputChange}
               />
             </div>
             <div className="md:col-span-2">
               <InputField 
-                label="Street Address" 
+                label={t('dashboard.streetAddress')}
                 name="streetAddress" 
-                placeholder="Enter your street address" 
+                placeholder={t('dashboard.streetAddressPlaceholder')}
                 value={formData.streetAddress}
                 onChange={handleInputChange}
               />
             </div>
             <SelectField 
-              label="Country / Region" 
+              label={t('dashboard.countryRegion')}
               name="country" 
               options={['United States', 'India']} 
-              placeholder="Select country" 
+              placeholder={t('dashboard.selectCountry')}
               value={formData.country}
               onChange={handleSelectChange}
             />
             <SelectField 
-              label="States" 
+              label={t('dashboard.states')}
               name="state" 
               options={availableStates} 
-              placeholder="Select state" 
+              placeholder={t('dashboard.selectState')}
               value={formData.state}
               onChange={handleSelectChange}
             />
             <InputField 
-              label="Zip Code" 
+              label={t('dashboard.zipCode')}
               name="zipCode" 
-              placeholder="Enter zip code" 
+              placeholder={t('dashboard.zipCodePlaceholder')}
               value={formData.zipCode}
               onChange={handleInputChange}
             />
             <InputField 
-              label="Email" 
+              label={t('dashboard.email')}
               name="email" 
               type="email" 
-              placeholder="Enter your email address" 
+              placeholder={t('dashboard.emailPlaceholder')}
               value={formData.email}
               onChange={handleInputChange}
             />
             <InputField 
-              label="Phone" 
+              label={t('dashboard.phone')}
               name="phone" 
               type="tel" 
-              placeholder="Enter your phone number" 
+              placeholder={t('dashboard.phoneNumberPlaceholder')}
               value={formData.phone}
               onChange={handleInputChange}
             />
@@ -163,7 +165,7 @@ const BillingAddressForm: React.FC = () => {
             type="submit"
             className="mt-6 bg-primary text-white font-semibold py-3 px-8 rounded-full hover:bg-opacity-90 transition-colors"
           >
-            Save Changes
+            {t('dashboard.saveChanges')}
           </button>
         </form>
       </div>
