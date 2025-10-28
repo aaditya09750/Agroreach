@@ -67,6 +67,7 @@ const CartTotal: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showEmptyCartNotification, setShowEmptyCartNotification] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   
   const subtotal = getCartTotal();
   const convertedSubtotal = convertPrice(subtotal);
@@ -88,6 +89,8 @@ const CartTotal: React.FC = () => {
 
     if (hasAddress && cartItems.length > 0) {
       e.preventDefault();
+      
+      setIsPlacingOrder(true);
       
       try {
         // Create order with proper format for backend
@@ -126,6 +129,8 @@ const CartTotal: React.FC = () => {
         // Show more specific error message
         const errorMessage = error instanceof Error ? error.message : 'Failed to place order. Please try again.';
         alert(errorMessage);
+      } finally {
+        setIsPlacingOrder(false);
       }
     }
   };
@@ -155,9 +160,10 @@ const CartTotal: React.FC = () => {
       {hasAddress ? (
         <button
           onClick={handleCheckout}
-          className="block w-full mt-6 bg-primary text-white text-center font-semibold py-3 rounded-full hover:bg-opacity-90 transition-colors"
+          disabled={isPlacingOrder}
+          className="block w-full mt-6 bg-primary text-white text-center font-semibold py-3 rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {t('cart.placeOrder')}
+          {isPlacingOrder ? t('cart.placingOrder') : t('cart.placeOrder')}
         </button>
       ) : (
         <Link 

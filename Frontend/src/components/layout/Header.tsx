@@ -135,6 +135,7 @@ const LanguageDropdown: React.FC = () => {
 const TopBar: React.FC = () => {
   const { currency } = useCurrency();
   const { t } = useTranslation();
+  const { user } = useUser();
   const address = currency === 'INR' 
     ? 'Ambegaon - 410503, Pune, Maharashtra, India'
     : 'Lincoln- 344, Illinois, Chicago, USA';
@@ -154,12 +155,16 @@ const TopBar: React.FC = () => {
             </>
           )}
           <CurrencyDropdown />
-          <div className="border-l border-border-color h-3"></div>
-          <div className="flex items-center gap-1">
-            <Link to="/signin" className="hover:text-primary">{t('header.signIn')}</Link>
-            <span>/</span>
-            <Link to="/signup" className="hover:text-primary">{t('header.signUp')}</Link>
-          </div>
+          {!user && (
+            <>
+              <div className="border-l border-border-color h-3"></div>
+              <div className="flex items-center gap-1">
+                <Link to="/signin" className="hover:text-primary">{t('header.signIn')}</Link>
+                <span>/</span>
+                <Link to="/signup" className="hover:text-primary">{t('header.signUp')}</Link>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

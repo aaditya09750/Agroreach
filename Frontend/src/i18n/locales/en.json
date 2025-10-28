@@ -3,6 +3,7 @@
     "storeLocation": "Store Location",
     "signIn": "Sign In",
     "signUp": "Sign Up",
+    "logout": "Logout",
     "shoppingCart": "Shopping cart",
     "searchPlaceholder": "Search Products Here...",
     "search": "Search",
@@ -157,6 +158,7 @@
     "discount": "Discount",
     "free": "Free",
     "placeOrder": "Place Order",
+    "placingOrder": "Placing Order...",
     "emptyMessage": "Please add items to your cart before placing an order"
   },
   "checkout": {

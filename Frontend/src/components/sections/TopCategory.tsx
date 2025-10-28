@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import vegetablesImg from '../../assets/vegetables 1.png';
 import fruitsImg from '../../assets/fruits 1.png';
-import fishImg from '../../assets/fish 1.png';
+import dairyImg from '../../assets/Dairy 1.png';
 import { useProduct } from '../../context/ProductContext';
 
 
@@ -10,10 +11,14 @@ interface CategoryCardProps {
   image: string;
   title: string;
   count: number;
+  onClick: () => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ image, title, count }) => (
-  <div className="flex-shrink-0 w-full sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(16.666%-20px)] text-center p-6 border border-border-color hover:border-primary hover:bg-primary-extra-light hover:shadow-product-hover rounded-md flex flex-col items-center gap-3 cursor-pointer transition-all duration-300">
+const CategoryCard: React.FC<CategoryCardProps> = ({ image, title, count, onClick }) => (
+  <div 
+    onClick={onClick}
+    className="flex-shrink-0 w-full sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(16.666%-20px)] text-center p-6 border border-border-color hover:border-primary hover:bg-primary-extra-light hover:shadow-product-hover rounded-md flex flex-col items-center gap-3 cursor-pointer transition-all duration-300"
+  >
     <div className="w-16 h-16 flex items-center justify-center">
       <img src={image} alt={title} className="w-full h-full object-contain" />
     </div>
@@ -30,6 +35,13 @@ const TopCategory: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [activeIndicator, setActiveIndicator] = useState(0); // 0, 1, or 2 for the 3 dots
   const { products } = useProduct();
+  const navigate = useNavigate();
+
+  // Handle category click to navigate to shop with filter
+  const handleCategoryClick = (categoryTitle: string) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/shop', { state: { category: categoryTitle } });
+  };
 
   // Calculate category counts dynamically from products
   const getCategoryCount = (categoryName: string): number => {
@@ -42,26 +54,26 @@ const TopCategory: React.FC = () => {
         return productCategory.includes('vegetable');
       } else if (searchCategory.includes('fruit')) {
         return productCategory.includes('fruit');
-      } else if (searchCategory.includes('fish')) {
-        return productCategory.includes('fish');
+      } else if (searchCategory.includes('dairy')) {
+        return productCategory.includes('dairy') || productCategory.includes('egg');
       }
       return false;
     }).length;
   };
 
   const baseCategories = [
-    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
-    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
-    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
-    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
-    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
-    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
-    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
-    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
-    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
-    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables') },
-    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit') },
-    { image: fishImg, title: 'River Fish', count: getCategoryCount('River Fish') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables'), onClick: () => handleCategoryClick('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit'), onClick: () => handleCategoryClick('Fresh Fruit') },
+    { image: dairyImg, title: 'Dairy & Eggs', count: getCategoryCount('Dairy & Eggs'), onClick: () => handleCategoryClick('Dairy & Eggs') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables'), onClick: () => handleCategoryClick('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit'), onClick: () => handleCategoryClick('Fresh Fruit') },
+    { image: dairyImg, title: 'Dairy & Eggs', count: getCategoryCount('Dairy & Eggs'), onClick: () => handleCategoryClick('Dairy & Eggs') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables'), onClick: () => handleCategoryClick('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit'), onClick: () => handleCategoryClick('Fresh Fruit') },
+    { image: dairyImg, title: 'Dairy & Eggs', count: getCategoryCount('Dairy & Eggs'), onClick: () => handleCategoryClick('Dairy & Eggs') },
+    { image: vegetablesImg, title: 'Vegetables', count: getCategoryCount('Vegetables'), onClick: () => handleCategoryClick('Vegetables') },
+    { image: fruitsImg, title: 'Fresh Fruit', count: getCategoryCount('Fresh Fruit'), onClick: () => handleCategoryClick('Fresh Fruit') },
+    { image: dairyImg, title: 'Dairy & Eggs', count: getCategoryCount('Dairy & Eggs'), onClick: () => handleCategoryClick('Dairy & Eggs') },
   ];
 
   const updateScrollButtons = () => {
@@ -76,15 +88,13 @@ const TopCategory: React.FC = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const cardWidth = container.querySelector('div')?.offsetWidth || 0;
-      const gap = 24; // gap-6 = 24px
+      const gap = 24;
       const scrollAmount = cardWidth + gap;
       container.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
       });
-      // Move indicator to the right, loop to left if at end
       setActiveIndicator(prev => (prev + 1) % 3);
-      // Update after scroll animation completes
       setTimeout(() => updateScrollButtons(), 400);
     }
   };
@@ -99,9 +109,7 @@ const TopCategory: React.FC = () => {
         left: -scrollAmount,
         behavior: 'smooth'
       });
-      // Move indicator to the left, loop to right if at start
       setActiveIndicator(prev => (prev - 1 + 3) % 3);
-      // Update after scroll animation completes
       setTimeout(() => updateScrollButtons(), 400);
     }
   };

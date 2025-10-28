@@ -27,7 +27,7 @@ interface SmallProductCardProps {
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
   <div className="flex gap-0.5">
     {[...Array(5)].map((_, i) => (
-      <Star key={i} size={16} className={i < rating ? 'text-warning fill-current' : 'text-gray-300 fill-current'} />
+      <Star key={i} size={15} className={i < rating ? 'text-warning fill-current' : 'text-gray-300 fill-current'} />
     ))}
   </div>
 );
@@ -157,8 +157,14 @@ const FeaturedProducts: React.FC = () => {
   const [topRated, setTopRated] = useState<SmallProductCardProps[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Use first 5 products from context for featured section
-  const featuredProductsData = products.slice(0, 5);
+  // Get latest 5 products with highest price
+  const featuredProductsData = React.useMemo(() => {
+    // Sort products by price in descending order (highest price first)
+    // and take the first 5 products
+    return [...products]
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 5);
+  }, [products]);
 
   useEffect(() => {
     const fetchDealProducts = async () => {

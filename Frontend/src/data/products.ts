@@ -142,8 +142,6 @@ description: Nutrient-dense kale with dark green curly leaves. Excellent for sal
 category: Vegetables
 tags: Vegetables, Kale, Superfood, Green, Healthy
 
---------Till this done--------
-
 name: Fresh Okra
 price: 40.00
 description: Tender okra pods perfect for traditional Indian bhindi. Ideal for stir-fries and curries. Rich in fiber, vitamins, and minerals supporting digestive health.
@@ -155,6 +153,8 @@ price: 60.00
 description: Juicy lemons with tangy flavor and bright yellow color. Essential for cooking, drinks, and garnishing. High in vitamin C, boosting immunity and adding zest to meals.
 category: Fresh Fruit
 tags: Fresh Fruit, Lemon, Citrus, Tangy, Vitamin C
+
+--------Till this done--------
 
 name: Fresh Mango
 price: 100.00

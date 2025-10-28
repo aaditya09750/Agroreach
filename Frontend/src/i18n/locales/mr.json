@@ -3,6 +3,7 @@
     "storeLocation": "स्टोअर स्थान",
     "signIn": "साइन इन करा",
     "signUp": "साइन अप करा",
+    "logout": "लॉग आउट",
     "shoppingCart": "शॉपिंग कार्ट",
     "searchPlaceholder": "येथे उत्पादने शोधा...",
     "search": "शोधा",
@@ -117,7 +118,13 @@
     "shipping": "शिपिंग",
     "tax": "कर",
     "total": "एकूण",
-    "discount": "सवलत"
+    "discount": "सवलत",
+    "gst": "जीएसटी",
+    "free": "मोफत",
+    "placeOrder": "ऑर्डर द्या",
+    "placingOrder": "ऑर्डर दिली जात आहे...",
+    "emptyMessage": "ऑर्डर देण्यापूर्वी तुमच्या कार्टमध्ये वस्तू जोडा",
+    "enterCode": "कोड टाका"
   },
   "checkout": {
     "title": "चेकआउट",

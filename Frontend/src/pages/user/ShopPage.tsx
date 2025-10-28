@@ -24,15 +24,23 @@ const ShopPage: React.FC = () => {
   const hasProcessedState = useRef(false);
   const PRODUCTS_PER_PAGE = 16;
 
-  // Handle navigation state (from search)
+  // Handle navigation state (from search or category)
   useEffect(() => {
     if (location.state && !hasProcessedState.current) {
-      const state = location.state as { searchQuery?: string; productId?: string };
+      const state = location.state as { searchQuery?: string; productId?: string; category?: string };
       
       if (state.searchQuery) {
         setSearchQuery(state.searchQuery);
         // Reset filters when searching
         setSelectedCategory(null);
+        setSelectedPrice(null);
+        setCurrentPage(1);
+      }
+      
+      if (state.category) {
+        setSelectedCategory(state.category);
+        // Reset other filters when filtering by category
+        setSearchQuery('');
         setSelectedPrice(null);
         setCurrentPage(1);
       }

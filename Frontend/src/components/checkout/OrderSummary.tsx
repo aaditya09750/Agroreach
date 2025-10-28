@@ -17,6 +17,7 @@ const OrderSummary: React.FC = () => {
   const navigate = useNavigate();
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -77,6 +78,8 @@ const OrderSummary: React.FC = () => {
     const paymentMethodInput = document.querySelector('input[name="paymentMethod"]:checked') as HTMLInputElement;
     const paymentMethod = paymentMethodInput?.value || 'cod';
 
+    setIsPlacingOrder(true);
+
     try {
       // Create order with proper format for backend
       await addOrder({
@@ -124,6 +127,8 @@ const OrderSummary: React.FC = () => {
       }
       
       alert(errorMessage);
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
@@ -185,9 +190,10 @@ const OrderSummary: React.FC = () => {
 
       <button 
         onClick={handlePlaceOrder}
-        className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors"
+        disabled={isPlacingOrder}
+        className="w-full bg-primary text-white font-semibold py-3.5 rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {t('cart.placeOrder')}
+        {isPlacingOrder ? t('cart.placingOrder') : t('cart.placeOrder')}
       </button>
 
       {/* Validation Modal */}
