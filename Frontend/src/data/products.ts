@@ -13,6 +13,7 @@ export interface Product {
   description: string;
   stock?: number;
   stockQuantity?: number;
+  stockUnit?: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
   stockStatus?: 'In Stock' | 'Out of Stock';
   tags?: string[];
   discount?: number | string;

@@ -59,6 +59,12 @@ const productSchema = new mongoose.Schema({
     min: [0, 'Stock quantity cannot be negative'],
     default: 0
   },
+  stockUnit: {
+    type: String,
+    enum: ['kg', 'litre', 'dozen', 'piece', 'grams', 'ml'],
+    default: 'kg',
+    required: true
+  },
   brand: {
     name: {
       type: String,

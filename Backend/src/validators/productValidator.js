@@ -26,6 +26,12 @@ exports.createProductValidation = [
     .withMessage('Stock quantity must be a non-negative integer')
     .default(0),
   
+  body('stockUnit')
+    .optional()
+    .isIn(['kg', 'litre', 'dozen', 'piece', 'grams', 'ml'])
+    .withMessage('Stock unit must be one of: kg, litre, dozen, piece, grams, ml')
+    .default('kg'),
+  
   body('description')
     .optional()
     .trim(),
@@ -58,6 +64,11 @@ exports.updateProductValidation = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Stock quantity must be a non-negative integer'),
+  
+  body('stockUnit')
+    .optional()
+    .isIn(['kg', 'litre', 'dozen', 'piece', 'grams', 'ml'])
+    .withMessage('Stock unit must be one of: kg, litre, dozen, piece, grams, ml'),
   
   body('discount')
     .optional()

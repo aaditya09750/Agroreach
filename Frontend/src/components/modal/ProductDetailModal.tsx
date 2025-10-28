@@ -192,16 +192,31 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               </div>
 
               {/* Price */}
-              <div className="flex items-center gap-3 mb-5">
-                {product.oldPrice && Number(product.discount || 0) > 0 && (
-                  <span className="text-lg text-gray-300 line-through opacity-60">{currencySymbol}{convertPrice(product.oldPrice).toFixed(2)}</span>
-                )}
-                <span className="text-3xl font-semibold text-primary">{currencySymbol}{convertedPrice.toFixed(2)}</span>
-                {product.discount !== undefined && product.discount !== null && Number(product.discount) > 0 && (
-                  <span className="bg-sale/10 text-sale text-sm font-medium px-2.5 py-1 rounded">
-                    {product.discount}% off
+              <div className="mb-2">
+                <div className="flex items-center gap-3">
+                  {product.oldPrice && Number(product.discount || 0) > 0 && (
+                    <span className="text-lg text-gray-300 line-through opacity-60">{currencySymbol}{convertPrice(product.oldPrice).toFixed(2)}</span>
+                  )}
+                  <span className="text-3xl font-semibold text-primary">{currencySymbol}{convertedPrice.toFixed(2)}</span>
+                  {product.discount !== undefined && product.discount !== null && Number(product.discount) > 0 && (
+                    <span className="bg-sale/10 text-sale text-sm font-medium px-2.5 py-1 rounded">
+                      {product.discount}% off
+                    </span>
+                  )}
+                </div>
+                
+                {/* Stock Unit Display - Right below price */}
+                <div className="mt-1">
+                  <span className="text-sm text-gray-600 font-medium">
+                    per {product.stockUnit === 'kg' ? 'Kg' : 
+                         product.stockUnit === 'litre' ? 'Litre' : 
+                         product.stockUnit === 'dozen' ? 'Dozen' :
+                         product.stockUnit === 'piece' ? 'Piece' :
+                         product.stockUnit === 'grams' ? 'Grams' :
+                         product.stockUnit === 'ml' ? 'ml' : 
+                         product.stockUnit || 'Kg'}
                   </span>
-                )}
+                </div>
               </div>
 
               {/* Seller */}

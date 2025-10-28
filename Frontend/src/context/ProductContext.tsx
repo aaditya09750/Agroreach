@@ -71,6 +71,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
         images?: string[];
         description: string;
         stockQuantity?: number;
+        stockUnit?: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
         stockStatus?: string;
         tags?: string[];
         discount?: number;
@@ -93,6 +94,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
           images: imageUrls,
           description: p.description,
           stock: p.stockQuantity || 0,
+          stockUnit: p.stockUnit || 'kg',
           stockStatus: (p.stockStatus as 'In Stock' | 'Out of Stock') || 'In Stock',
           tags: p.tags || [],
           discount: p.discount || 0,
@@ -131,6 +133,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
         images?: string[];
         description: string;
         stockQuantity?: number;
+        stockUnit?: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
         stockStatus?: string;
         tags?: string[];
         discount?: number;
@@ -153,6 +156,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
           images: imageUrls,
           description: p.description,
           stock: p.stockQuantity || 0,
+          stockUnit: p.stockUnit || 'kg',
           stockStatus: (p.stockStatus as 'In Stock' | 'Out of Stock') || 'In Stock',
           tags: p.tags || [],
           discount: p.discount || 0,
@@ -187,6 +191,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
         images?: string[];
         description: string;
         stockQuantity?: number;
+        stockUnit?: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
         stockStatus?: string;
         tags?: string[];
         discount?: number;
@@ -209,6 +214,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
           images: imageUrls,
           description: p.description,
           stock: p.stockQuantity || 0,
+          stockUnit: p.stockUnit || 'kg',
           stockStatus: (p.stockStatus as 'In Stock' | 'Out of Stock') || 'In Stock',
           tags: p.tags || [],
           discount: p.discount || 0,

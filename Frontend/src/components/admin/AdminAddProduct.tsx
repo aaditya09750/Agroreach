@@ -19,6 +19,7 @@ interface BackendProduct {
   reviewCount: number;
   stockStatus: 'In Stock' | 'Out of Stock';
   stockQuantity: number;
+  stockUnit: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
   discount: number;
   isHotDeal: boolean;
   isBestSeller: boolean;
@@ -36,6 +37,7 @@ const AdminAddProduct: React.FC = () => {
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
   const [stock, setStock] = useState('');
+  const [stockUnit, setStockUnit] = useState<'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml'>('kg');
   const [description, setDescription] = useState('');
   const [sellerName, setSellerName] = useState('');
   const [tags, setTags] = useState<string[]>([]);
@@ -48,7 +50,9 @@ const AdminAddProduct: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showStockUnitDropdown, setShowStockUnitDropdown] = useState(false);
   const [showEditCategoryDropdown, setShowEditCategoryDropdown] = useState(false);
+  const [showEditStockUnitDropdown, setShowEditStockUnitDropdown] = useState(false);
   const [showEditStockDropdown, setShowEditStockDropdown] = useState(false);
   const [showEditFeaturesDropdown, setShowEditFeaturesDropdown] = useState(false);
   const [recentProducts, setRecentProducts] = useState<BackendProduct[]>([]);
@@ -59,7 +63,9 @@ const AdminAddProduct: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const stockUnitDropdownRef = useRef<HTMLDivElement>(null);
   const editCategoryDropdownRef = useRef<HTMLDivElement>(null);
+  const editStockUnitDropdownRef = useRef<HTMLDivElement>(null);
   const editStockDropdownRef = useRef<HTMLDivElement>(null);
   const editFeaturesDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +80,15 @@ const AdminAddProduct: React.FC = () => {
   const stockStatuses = [
     { value: 'In Stock', label: 'In Stock' },
     { value: 'Out of Stock', label: 'Out of Stock' },
+  ];
+
+  const stockUnits = [
+    { value: 'kg', label: 'Kilogram (kg)' },
+    { value: 'grams', label: 'Grams (g)' },
+    { value: 'litre', label: 'Litre (L)' },
+    { value: 'ml', label: 'Millilitre (ml)' },
+    { value: 'dozen', label: 'Dozen' },
+    { value: 'piece', label: 'Piece' }
   ];
 
   // Load recent products on mount
@@ -119,8 +134,14 @@ const AdminAddProduct: React.FC = () => {
       if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
         setShowCategoryDropdown(false);
       }
+      if (stockUnitDropdownRef.current && !stockUnitDropdownRef.current.contains(event.target as Node)) {
+        setShowStockUnitDropdown(false);
+      }
       if (editCategoryDropdownRef.current && !editCategoryDropdownRef.current.contains(event.target as Node)) {
         setShowEditCategoryDropdown(false);
+      }
+      if (editStockUnitDropdownRef.current && !editStockUnitDropdownRef.current.contains(event.target as Node)) {
+        setShowEditStockUnitDropdown(false);
       }
       if (editStockDropdownRef.current && !editStockDropdownRef.current.contains(event.target as Node)) {
         setShowEditStockDropdown(false);
@@ -193,6 +214,7 @@ const AdminAddProduct: React.FC = () => {
       formData.append('price', price);
       formData.append('discount', discount || '0');
       formData.append('stockQuantity', stock || '0');
+      formData.append('stockUnit', stockUnit);
       formData.append('description', description || '');
       // Don't send stockStatus - let backend calculate it based on stockQuantity
       
@@ -219,6 +241,7 @@ const AdminAddProduct: React.FC = () => {
         setPrice('');
         setDiscount('');
         setStock('');
+        setStockUnit('kg');
         setDescription('');
         setSellerName('');
         setTags([]);
@@ -260,6 +283,7 @@ const AdminAddProduct: React.FC = () => {
       rating: product.rating,
       reviewCount: product.reviewCount,
       stock: product.stockQuantity || 0,
+      stockUnit: product.stockUnit || 'kg',
       stockStatus: product.stockStatus,
       discount: product.discount !== undefined && product.discount !== null ? product.discount : 0,
       isHotDeal: product.isHotDeal,
@@ -329,6 +353,7 @@ const AdminAddProduct: React.FC = () => {
         description: editingProduct.description,
         category: editingProduct.category,
         stockQuantity: editingProduct.stock || 0,
+        stockUnit: editingProduct.stockUnit || 'kg',
         discount: (editingProduct.discount && Number(editingProduct.discount) > 0) ? Number(editingProduct.discount) : 0,
         tags: editTags,
         isHotDeal: editingProduct.isHotDeal || false,
@@ -458,7 +483,7 @@ const AdminAddProduct: React.FC = () => {
                   <ChevronDown size={16} className="text-text-muted" />
                 </button>
                 {showCategoryDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto scrollbar-hide">
                     {categories.map((cat) => (
                       <button
                         key={cat.value}
@@ -539,6 +564,45 @@ const AdminAddProduct: React.FC = () => {
               />
               <p className="text-xs text-text-muted mt-1">Leave empty or 0 for out of stock</p>
             </div>
+          </div>
+
+          {/* Stock Unit */}
+          <div>
+            <label htmlFor="stockUnit" className="block text-sm font-medium text-text-dark mb-2">
+              Stock Unit <span className="text-sale">*</span>
+            </label>
+            <div className="relative" ref={stockUnitDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setShowStockUnitDropdown(!showStockUnitDropdown)}
+                className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
+              >
+                <span className="text-text-dark">
+                  {stockUnits.find(u => u.value === stockUnit)?.label || 'Select stock unit'}
+                </span>
+                <ChevronDown size={16} className="text-text-muted" />
+              </button>
+              {showStockUnitDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto scrollbar-hide">
+                  {stockUnits.map((unit) => (
+                    <button
+                      key={unit.value}
+                      type="button"
+                      onClick={() => {
+                        setStockUnit(unit.value as 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml');
+                        setShowStockUnitDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors ${
+                        stockUnit === unit.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                      }`}
+                    >
+                      {unit.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-text-muted mt-1">Select the unit for stock measurement</p>
           </div>
 
           {/* Description */}
@@ -625,6 +689,7 @@ const AdminAddProduct: React.FC = () => {
               setPrice('');
               setDiscount('');
               setStock('');
+              setStockUnit('kg');
               setDescription('');
               setSellerName('');
               setTags([]);
@@ -837,7 +902,7 @@ const AdminAddProduct: React.FC = () => {
                           <ChevronDown size={16} className="text-text-muted" />
                         </button>
                         {showEditCategoryDropdown && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto scrollbar-hide">
                             {['Fresh Fruit', 'Vegetables', 'Meat & Fish', 'Dairy & Eggs'].map((cat) => (
                               <button
                                 key={cat}
@@ -891,6 +956,44 @@ const AdminAddProduct: React.FC = () => {
                         min="0"
                         placeholder="0"
                       />
+                    </div>
+
+                    {/* Stock Unit */}
+                    <div>
+                      <label htmlFor="editStockUnit" className="block text-sm font-medium text-text-dark mb-2">
+                        Stock Unit <span className="text-sale">*</span>
+                      </label>
+                      <div className="relative" ref={editStockUnitDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={() => setShowEditStockUnitDropdown(!showEditStockUnitDropdown)}
+                          className="w-full px-4 py-2.5 border border-border-color rounded-lg focus:outline-none focus:border-primary transition-colors flex items-center justify-between text-left"
+                        >
+                          <span className="text-text-dark">
+                            {stockUnits.find(u => u.value === (editingProduct.stockUnit || 'kg'))?.label || 'Select stock unit'}
+                          </span>
+                          <ChevronDown size={16} className="text-text-muted" />
+                        </button>
+                        {showEditStockUnitDropdown && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-color rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto scrollbar-hide">
+                            {stockUnits.map((unit) => (
+                              <button
+                                key={unit.value}
+                                type="button"
+                                onClick={() => {
+                                  setEditingProduct({...editingProduct, stockUnit: unit.value as 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml'});
+                                  setShowEditStockUnitDropdown(false);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors ${
+                                  (editingProduct.stockUnit || 'kg') === unit.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-dark-gray'
+                                }`}
+                              >
+                                {unit.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Discount */}
