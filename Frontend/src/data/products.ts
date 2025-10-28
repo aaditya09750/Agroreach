@@ -258,4 +258,22 @@ description: Sweet red watermelon with juicy, refreshing flesh. Perfect summer f
 category: Fresh Fruit
 tags: Fresh Fruit, Watermelon, Red, Hydrating, Summer
 
+name: Milk
+price: 60.00
+description: Fresh and creamy milk, perfect for drinking or cooking. Rich in calcium and essential nutrients for a healthy diet.
+category: Dairy
+tags: Dairy, Milk, Fresh, Creamy, Calcium
+
+name: Cheese
+price: 200.00
+description: Rich and creamy cheese, perfect for snacking or cooking. Loaded with calcium and protein for a healthy diet.
+category: Dairy
+tags: Dairy, Cheese, Creamy, Protein, Calcium
+
+name: Paneer
+price: 250.00
+description: Fresh and soft paneer, perfect for Indian dishes. High in protein and calcium for a nutritious diet.
+category: Dairy
+tags: Dairy, Paneer, Fresh, Soft, Protein
+
 */

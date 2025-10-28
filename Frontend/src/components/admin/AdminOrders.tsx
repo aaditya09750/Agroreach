@@ -1134,9 +1134,7 @@ const AdminOrders: React.FC = () => {
                 >
                   Print Invoice
                 </button>
-                <button className="flex-1 px-6 py-3 border border-border-color text-text-dark rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                  Send Email
-                </button>
+                
               </div>
             </div>
           </div>
