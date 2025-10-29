@@ -29,6 +29,31 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
     updateQuantity(item.id, item.quantity + 1);
   };
 
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Allow empty string while typing
+    if (value === '') {
+      return;
+    }
+    
+    // Parse the input value
+    const numValue = parseInt(value, 10);
+    
+    // Only update if it's a valid positive number
+    if (!isNaN(numValue) && numValue >= 1) {
+      updateQuantity(item.id, numValue);
+    }
+  };
+
+  const handleQuantityBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // If quantity is empty or less than 1 after blur, set it to 1
+    if (value === '' || parseInt(value, 10) < 1) {
+      updateQuantity(item.id, 1);
+    }
+  };
+
   const handleRemove = () => {
     removeFromCart(item.id);
   };
@@ -61,7 +86,14 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           >
             −
           </button>
-          <span className="px-5 text-sm font-medium text-gray-800 min-w-[40px] text-center">{item.quantity}</span>
+          <input
+            type="text"
+            value={item.quantity}
+            onChange={handleQuantityChange}
+            onBlur={handleQuantityBlur}
+            className="w-[50px] text-sm font-medium text-gray-800 text-center border-0 outline-none focus:ring-0"
+            aria-label="Quantity"
+          />
           <button 
             onClick={handleIncrease}
             className="w-10 h-10 flex items-center justify-center rounded-r-full text-gray-600 hover:bg-gray-50 transition-colors"

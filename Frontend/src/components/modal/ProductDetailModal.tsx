@@ -106,6 +106,31 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
     setQuantity(quantity + 1);
   };
 
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Allow empty string while typing
+    if (value === '') {
+      setQuantity(0);
+      return;
+    }
+    
+    // Parse the input value
+    const numValue = parseInt(value, 10);
+    
+    // Only update if it's a valid positive number
+    if (!isNaN(numValue) && numValue >= 0) {
+      setQuantity(numValue);
+    }
+  };
+
+  const handleQuantityBlur = () => {
+    // If quantity is 0 or invalid after blur, set it to 1
+    if (quantity < 1) {
+      setQuantity(1);
+    }
+  };
+
   const handleAddToCart = async () => {
     // Check if user is authenticated
     if (!user) {
@@ -114,7 +139,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
       return;
     }
 
-    if (product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock') {
+    if (product.stockStatus === 'Out of Stock') {
       alert('This product is out of stock and cannot be added to cart.');
       return;
     }
@@ -128,14 +153,15 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
       setTimeout(() => {
         setIsAddingToCart(false);
         setQuantity(1); // Reset quantity after adding
-      }, 500);
+        onClose();
+      }, 300);
     } else {
       setIsAddingToCart(false);
     }
   };
 
   const handleSignInRedirect = () => {
-    onClose(); // Close the product modal
+    onClose();
     navigate('/signin');
   };
 
@@ -155,6 +181,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
         <button 
           onClick={onClose} 
           className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors z-10 bg-white rounded-full"
+          aria-label="Close modal"
+          title="Close"
         >
           <X size={20} />
         </button>
@@ -235,9 +263,9 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 <div className="flex items-center border border-border-color rounded-full overflow-hidden">
                   <button 
                     onClick={handleDecreaseQuantity}
-                    disabled={quantity <= 1 || product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock'}
+                    disabled={quantity <= 1 || product.stockStatus === 'Out of Stock'}
                     className={`w-10 h-10 flex items-center justify-center transition-colors font-semibold ${
-                      quantity <= 1 || product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock'
+                      quantity <= 1 || product.stockStatus === 'Out of Stock'
                         ? 'text-gray-300 cursor-not-allowed' 
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
@@ -245,12 +273,20 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                   >
                     -
                   </button>
-                  <span className="px-4 text-base font-medium min-w-[50px] text-center">{quantity}</span>
+                  <input
+                    type="text"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                    onBlur={handleQuantityBlur}
+                    disabled={product.stockStatus === 'Out of Stock'}
+                    className="w-[60px] text-base font-medium text-center border-0 outline-none focus:ring-0 disabled:bg-white disabled:text-gray-400"
+                    aria-label="Quantity"
+                  />
                   <button 
                     onClick={handleIncreaseQuantity}
-                    disabled={product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock'}
+                    disabled={product.stockStatus === 'Out of Stock'}
                     className={`w-10 h-10 flex items-center justify-center transition-colors font-semibold ${
-                      product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock'
+                      product.stockStatus === 'Out of Stock'
                         ? 'text-gray-300 cursor-not-allowed'
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
@@ -261,16 +297,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 </div>
                 <button 
                   onClick={handleAddToCart}
-                  disabled={isAddingToCart || product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock'}
+                  disabled={isAddingToCart || product.stockStatus === 'Out of Stock'}
                   className={`flex-1 font-semibold flex items-center justify-center gap-2 py-3 px-6 rounded-full transition-colors ${
-                    product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock'
+                    product.stockStatus === 'Out of Stock'
                       ? 'bg-gray-400 text-white cursor-not-allowed'
                       : isAddingToCart 
                         ? 'bg-primary text-white opacity-70 cursor-not-allowed' 
                         : 'bg-primary text-white hover:bg-primary/90'
                   }`}
                 >
-                  {product.status === 'out-of-stock' || product.stockStatus === 'Out of Stock' 
+                  {product.stockStatus === 'Out of Stock' 
                     ? 'Out of Stock' 
                     : isAddingToCart 
                       ? 'Adding...' 
