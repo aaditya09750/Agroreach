@@ -505,7 +505,7 @@ Agroreach/
 │   │   ├── App.tsx                  # Root component with routing
 │   │   ├── pages/                   # Page components (User & Admin)
 │   │   ├── components/              # Reusable components (Layout, Admin, Cart, UI, etc.)
-│   │   ├── context/                 # React Context (User, Product, Currency, Language)
+│   │   ├── context/                 # React Context (User, Product, Currency, Language,etc)
 │   │   ├── services/                # API service layer (Axios calls)
 │   │   ├── i18n/                    # Internationalization (en, hi, mr)
 │   │   ├── utils/                   # Utility functions (PDF, Image)
