@@ -106,7 +106,6 @@ NODE_ENV=development
 
 # Database Configuration
 MONGODB_URI=mongodb://localhost:27017/ar-ecommerce
-# For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/ar-ecommerce
 
 # JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key_here
