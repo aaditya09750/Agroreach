@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # AGROREACH - Farm To Home Marketplace
+=======
+# Agroreach - Farm To Home Marketplace
+>>>>>>> 0e3873de129de92851e99c5d9cbf9e759f7e46f5
 
 ![React](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -634,7 +638,11 @@ For technical inquiries, feature requests, bug reports, or development collabora
 
 ---
 
+<<<<<<< HEAD
 **AGROREACH - Farm To Home Marketplace** delivers a comprehensive, production-ready solution for modern online retail with multilingual support, multi-currency transactions, and enterprise-grade features. This full-stack application demonstrates expertise in React/TypeScript development, Node.js backend architecture, MongoDB database design, RESTful API development, and responsive UI/UX design with a focus on performance, security, scalability, and exceptional user experience across all touchpoints.
+=======
+**Agroreach - Farm To Home Marketplace** delivers a comprehensive, production-ready solution for modern online retail with multilingual support, multi-currency transactions, and enterprise-grade features. This full-stack application demonstrates expertise in React/TypeScript development, Node.js backend architecture, MongoDB database design, RESTful API development, and responsive UI/UX design with a focus on performance, security, scalability, and exceptional user experience across all touchpoints.
+>>>>>>> 0e3873de129de92851e99c5d9cbf9e759f7e46f5
 
 **🌐 Try it live:** [Coming Soon]
 
