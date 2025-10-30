@@ -1,4 +1,4 @@
-# AR E-Commerce Platform
+# AGROREACH - Farm To Home Marketplace
 
 ![React](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -106,7 +106,6 @@ NODE_ENV=development
 
 # Database Configuration
 MONGODB_URI=mongodb://localhost:27017/ar-ecommerce
-# For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/ar-ecommerce
 
 # JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key_here
@@ -289,51 +288,51 @@ The application implements a modern three-tier architecture optimized for scalab
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Client Layer (React + TS)                   │
-│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐      │
-│  │  User Pages   │  │ Admin Panel   │  │  Shared UI    │      │
-│  │  - Shop       │  │  - Dashboard  │  │  - Header     │      │
-│  │  - Cart       │  │  - Products   │  │  - Footer     │      │
-│  │  - Checkout   │  │  - Orders     │  │  - Modals     │      │
-│  │  - Dashboard  │  │  - Customers  │  │  - Forms      │      │
-│  └───────────────┘  └───────────────┘  └───────────────┘      │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │           Context API State Management                    │  │
-│  │  - ProductContext  - CartContext    - UserContext        │  │
-│  │  - OrderContext    - CurrencyContext - LanguageContext   │  │
-│  └──────────────────────────────────────────────────────────┘  │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐        │
+│  │  User Pages   │  │ Admin Panel   │  │  Shared UI    │        │
+│  │  - Shop       │  │  - Dashboard  │  │  - Header     │        │
+│  │  - Cart       │  │  - Products   │  │  - Footer     │        │
+│  │  - Checkout   │  │  - Orders     │  │  - Modals     │        │
+│  │  - Dashboard  │  │  - Customers  │  │  - Forms      │        │
+│  └───────────────┘  └───────────────┘  └───────────────┘        │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │           Context API State Management                   │   │
+│  │  - ProductContext  - CartContext    - UserContext        │   │
+│  │  - OrderContext    - CurrencyContext - LanguageContext   │   │
+│  └──────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                             ▼ HTTPS/REST API ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                  Application Layer (Express.js)                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │                   Middleware Stack                         │ │
-│  │  - Helmet Security  - CORS  - Rate Limiting  - JWT Auth  │ │
-│  │  - Body Parser     - Multer  - Validation  - Error Handler│ │
-│  └───────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │ Controllers  │  │  Services    │  │  Utilities   │         │
-│  │  - Auth      │  │  - Email     │  │  - Token Gen │         │
-│  │  - Products  │  │  - Image     │  │  - Helpers   │         │
-│  │  - Orders    │  │  Handler     │  │  - Validator │         │
-│  │  - Admin     │  │              │  │              │         │
-│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                   Middleware Stack                        │  │
+│  │  - Helmet Security  - CORS  - Rate Limiting  - JWT Auth   │  │
+│  │  - Body Parser     - Multer  - Validation  - Error Handler│  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │
+│  │ Controllers  │  │  Services    │  │  Utilities   │           │
+│  │  - Auth      │  │  - Email     │  │  - Token Gen │           │  
+│  │  - Products  │  │  - Image     │  │  - Helpers   │           │
+│  │  - Orders    │  │  Handler     │  │  - Validator │           │
+│  │  - Admin     │  │              │  │              │           │
+│  └──────────────┘  └──────────────┘  └──────────────┘           │
 └─────────────────────────────────────────────────────────────────┘
                             ▼ Mongoose ODM ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                   Data Layer (MongoDB)                          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │  Users   │  │ Products │  │  Orders  │  │   Cart   │       │
-│  │  Schema  │  │  Schema  │  │  Schema  │  │  Schema  │       │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘       │
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │  - Indexing for Performance                             │   │
-│  │  - Schema Validation                                    │   │
-│  │  - Middleware Hooks (pre/post)                          │   │
-│  │  - Population for References                            │   │
-│  └─────────────────────────────────────────────────────────┘   │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐         │
+│  │  Users   │  │ Products │  │  Orders  │  │   Cart   │         │
+│  │  Schema  │  │  Schema  │  │  Schema  │  │  Schema  │         │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘         │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  - Indexing for Performance                             │    │
+│  │  - Schema Validation                                    │    │  
+│  │  - Middleware Hooks (pre/post)                          │    │
+│  │  - Population for References                            │    │  
+│  └─────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -483,115 +482,37 @@ heroku open
 ## Project Structure
 
 ```
-AR/
+Agroreach/
 ├── Backend/
 │   ├── server.js                    # Express server entry point
-│   ├── package.json                 # Backend dependencies
-│   ├── .env                         # Backend environment variables
 │   ├── src/
-│   │   ├── config/
-│   │   │   ├── database.js          # MongoDB connection
-│   │   │   └── cloudinary.js        # Image upload config
-│   │   ├── controllers/             # Request handlers
-│   │   │   ├── authController.js    # Authentication logic
-│   │   │   ├── productController.js # Product CRUD operations
-│   │   │   ├── orderController.js   # Order management
-│   │   │   ├── adminController.js   # Admin dashboard logic
-│   │   │   └── ...
-│   │   ├── models/                  # Mongoose schemas
-│   │   │   ├── User.js              # User schema with auth
-│   │   │   ├── Product.js           # Product schema
-│   │   │   ├── Order.js             # Order schema
-│   │   │   └── Cart.js              # Shopping cart schema
+│   │   ├── config/                  # Configuration files
+│   │   ├── controllers/             # Request handlers (Auth, Product, Order, Admin, etc.)
+│   │   ├── models/                  # Mongoose schemas (User, Product, Order, Cart)
 │   │   ├── routes/                  # API route definitions
-│   │   │   ├── authRoutes.js        # Auth endpoints
-│   │   │   ├── productRoutes.js     # Product endpoints
-│   │   │   ├── orderRoutes.js       # Order endpoints
-│   │   │   └── ...
-│   │   ├── middleware/              # Express middleware
-│   │   │   ├── auth.js              # JWT verification
-│   │   │   ├── roleCheck.js         # Admin role verification
-│   │   │   ├── errorHandler.js      # Global error handler
-│   │   │   └── upload.js            # File upload handler
-│   │   ├── validators/              # Input validation
-│   │   │   ├── authValidator.js     # Auth data validation
-│   │   │   ├── productValidator.js  # Product data validation
-│   │   │   └── orderValidator.js    # Order data validation
-│   │   └── utils/                   # Utility functions
-│   │       ├── emailService.js      # Email sending logic
-│   │       ├── tokenGenerator.js    # JWT token creation
-│   │       ├── helpers.js           # Helper functions
-│   │       └── imageHandler.js      # Image processing
-│   ├── scripts/
-│   │   ├── createAdmin.js           # Admin user creation script
-│   │   └── updateStockUnit.js       # Stock management script
+│   │   ├── middleware/              # Express middleware (Auth, Upload, Error handling)
+│   │   ├── validators/              # Input validation schemas
+│   │   └── utils/                   # Utility functions (Email, JWT, Image processing)
+│   ├── scripts/                     # Admin & maintenance scripts
 │   └── uploads/                     # Product image storage
 │
 ├── Frontend/
-│   ├── index.html                   # HTML entry point
-│   ├── package.json                 # Frontend dependencies
-│   ├── vite.config.ts               # Vite configuration
-│   ├── tailwind.config.js           # Tailwind CSS config
-│   ├── tsconfig.json                # TypeScript configuration
-│   ├── .env                         # Frontend environment variables
+│   ├── index.html
+│   ├── vite.config.ts
+│   ├── tailwind.config.js
 │   ├── src/
 │   │   ├── main.tsx                 # React entry point
 │   │   ├── App.tsx                  # Root component with routing
-│   │   ├── index.css                # Global styles
-│   │   ├── pages/                   # Page components
-│   │   │   ├── user/                # User-facing pages
-│   │   │   │   ├── HomePage.tsx     # Landing page
-│   │   │   │   ├── ShopPage.tsx     # Product catalog
-│   │   │   │   ├── CartPage.tsx     # Shopping cart
-│   │   │   │   ├── CheckoutPage.tsx # Checkout process
-│   │   │   │   ├── DashboardPage.tsx # User dashboard
-│   │   │   │   └── ...
-│   │   │   └── admin/               # Admin pages
-│   │   │       ├── AdminDashboard.tsx # Admin dashboard
-│   │   │       └── AdminLoginPage.tsx # Admin login
-│   │   ├── components/              # Reusable components
-│   │   │   ├── layout/              # Layout components
-│   │   │   │   ├── Header.tsx       # Site header
-│   │   │   │   └── Footer.tsx       # Site footer
-│   │   │   ├── admin/               # Admin components
-│   │   │   │   ├── AdminOverview.tsx # Dashboard overview
-│   │   │   │   ├── AdminProducts.tsx # Product management
-│   │   │   │   ├── AdminOrders.tsx   # Order management
-│   │   │   │   └── ...
-│   │   │   ├── cart/                # Cart components
-│   │   │   ├── checkout/            # Checkout components
-│   │   │   ├── dashboard/           # User dashboard components
-│   │   │   ├── ui/                  # UI components
-│   │   │   └── ...
-│   │   ├── context/                 # React Context providers
-│   │   │   ├── UserContext.tsx      # User authentication state
-│   │   │   ├── ProductContext.tsx   # Product data state
-│   │   │   ├── CartContext.tsx      # Shopping cart state
-│   │   │   ├── OrderContext.tsx     # Order management state
-│   │   │   ├── CurrencyContext.tsx  # Currency conversion
-│   │   │   └── LanguageContext.tsx  # i18n language state
-│   │   ├── services/                # API service layer
-│   │   │   ├── api.ts               # Axios configuration
-│   │   │   ├── authService.ts       # Auth API calls
-│   │   │   ├── productService.ts    # Product API calls
-│   │   │   ├── orderService.ts      # Order API calls
-│   │   │   ├── cartService.ts       # Cart API calls
-│   │   │   └── ...
-│   │   ├── i18n/                    # Internationalization
-│   │   │   ├── config.ts            # i18next configuration
-│   │   │   ├── useTranslation.ts    # Translation hook
-│   │   │   └── locales/             # Language files
-│   │   │       ├── en.json          # English translations
-│   │   │       ├── hi.json          # Hindi translations
-│   │   │       └── mr.json          # Marathi translations
-│   │   ├── utils/                   # Utility functions
-│   │   │   ├── pdfGenerator.ts      # PDF invoice generation
-│   │   │   └── imageUtils.ts        # Image helper functions
-│   │   └── data/
-│   │       └── products.ts          # Product type definitions
-│   └── dist/                        # Production build output
+│   │   ├── pages/                   # Page components (User & Admin)
+│   │   ├── components/              # Reusable components (Layout, Admin, Cart, UI, etc.)
+│   │   ├── context/                 # React Context (User, Product, Currency, Language)
+│   │   ├── services/                # API service layer (Axios calls)
+│   │   ├── i18n/                    # Internationalization (en, hi, mr)
+│   │   ├── utils/                   # Utility functions (PDF, Image)
+│   │   └── data/                    # Type definitions
+│   └── dist/                        # Production build
 │
-└── README.md                        # Project documentation
+└── README.md
 ```
 
 ## Contributing Guidelines
@@ -713,7 +634,7 @@ For technical inquiries, feature requests, bug reports, or development collabora
 
 ---
 
-**AR E-Commerce Platform** delivers a comprehensive, production-ready solution for modern online retail with multilingual support, multi-currency transactions, and enterprise-grade features. This full-stack application demonstrates expertise in React/TypeScript development, Node.js backend architecture, MongoDB database design, RESTful API development, and responsive UI/UX design with a focus on performance, security, scalability, and exceptional user experience across all touchpoints.
+**AGROREACH - Farm To Home Marketplace** delivers a comprehensive, production-ready solution for modern online retail with multilingual support, multi-currency transactions, and enterprise-grade features. This full-stack application demonstrates expertise in React/TypeScript development, Node.js backend architecture, MongoDB database design, RESTful API development, and responsive UI/UX design with a focus on performance, security, scalability, and exceptional user experience across all touchpoints.
 
 **🌐 Try it live:** [Coming Soon]
 
