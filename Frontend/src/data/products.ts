@@ -1,27 +1,27 @@
 // Product Type Definition
-// export interface Product {
-//   id: string | number;
-//   _id?: string;
-//   name: string;
-//   category: string;
-//   price: number;
-//   oldPrice?: number;
-//   rating: number;
-//   reviewCount?: number;
-//   image: string;
-//   images: string[];
-//   description: string;
-//   stock?: number;
-//   stockQuantity?: number;
-//   stockUnit?: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
-//   stockStatus?: 'In Stock' | 'Out of Stock';
-//   tags?: string[];
-//   discount?: number | string;
-//   isHotDeal?: boolean;
-//   isBestSeller?: boolean;
-//   isTopRated?: boolean;
-//   status?: 'sale' | 'new' | 'hover' | null;
-// }
+export interface Product {
+  id: string | number;
+  _id?: string;
+  name: string;
+  category: string;
+  price: number;
+  oldPrice?: number;
+  rating: number;
+  reviewCount?: number;
+  image: string;
+  images: string[];
+  description: string;
+  stock?: number;
+  stockQuantity?: number;
+  stockUnit?: 'kg' | 'litre' | 'dozen' | 'piece' | 'grams' | 'ml';
+  stockStatus?: 'In Stock' | 'Out of Stock';
+  tags?: string[];
+  discount?: number | string;
+  isHotDeal?: boolean;
+  isBestSeller?: boolean;
+  isTopRated?: boolean;
+  status?: 'sale' | 'new' | 'hover' | null;
+}
 
 /*
 ==========================================
