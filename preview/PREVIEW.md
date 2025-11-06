@@ -1,6 +1,6 @@
 # AGROREACH Gallery
 
-This file contains all preview images of the AGROREACH - Farm To Home Marketplace.
+This markdown file contains all preview images of the AGROREACH - Farm To Home Marketplace.
 
 ## Preview Images
 
