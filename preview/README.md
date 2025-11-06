@@ -5,46 +5,46 @@ This markdown file contains all preview images of the AGROREACH - Farm To Home M
 ## Preview Images
 
 ### Preview 1
-![Preview 1](Preview%20(1).png)
+<img src="Preview%20(1).png" alt="Preview 1" style="border: 2px solid black;">
 
 ### Preview 2
-![Preview 2](Preview%20(2).png)
+<img src="Preview%20(2).png" alt="Preview 2" style="border: 2px solid black;">
 
 ### Preview 3
-![Preview 3](Preview%20(3).png)
+<img src="Preview%20(3).png" alt="Preview 3" style="border: 2px solid black;">
 
 ### Preview 4
-![Preview 4](Preview%20(4).png)
+<img src="Preview%20(4).png" alt="Preview 4" style="border: 2px solid black;">
 
 ### Preview 5
-![Preview 5](Preview%20(5).png)
+<img src="Preview%20(5).png" alt="Preview 5" style="border: 2px solid black;">
 
 ### Preview 6
-![Preview 6](Preview%20(6).png)
+<img src="Preview%20(6).png" alt="Preview 6" style="border: 2px solid black;">
 
 ### Preview 7
-![Preview 7](Preview%20(7).png)
+<img src="Preview%20(7).png" alt="Preview 7" style="border: 2px solid black;">
 
 ### Preview 8
-![Preview 8](Preview%20(8).png)
+<img src="Preview%20(8).png" alt="Preview 8" style="border: 2px solid black;">
 
 ### Preview 9
-![Preview 9](Preview%20(9).png)
+<img src="Preview%20(9).png" alt="Preview 9" style="border: 2px solid black;">
 
 ### Preview 10
-![Preview 10](Preview%20(10).png)
+<img src="Preview%20(10).png" alt="Preview 10" style="border: 2px solid black;">
 
 ### Preview 11
-![Preview 11](Preview%20(11).png)
+<img src="Preview%20(11).png" alt="Preview 11" style="border: 2px solid black;">
 
 ### Preview 12
-![Preview 12](Preview%20(12).png)
+<img src="Preview%20(12).png" alt="Preview 12" style="border: 2px solid black;">
 
 ### Preview 13
-![Preview 13](Preview%20(13).png)
+<img src="Preview%20(13).png" alt="Preview 13" style="border: 2px solid black;">
 
 ### Preview 14
-![Preview 14](Preview%20(14).png)
+<img src="Preview%20(14).png" alt="Preview 14" style="border: 2px solid black;">
 
 ### Preview 15
-![Preview 15](Preview%20(15).png)
+<img src="Preview%20(15).png" alt="Preview 15" style="border: 2px solid black;">
