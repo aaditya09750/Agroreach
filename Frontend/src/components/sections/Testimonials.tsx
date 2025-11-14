@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import quoteIcon from '../../assets/Vector.png';
-import tmImage from '../../assets/Home/tm.jfif';
+import tmImage from '../../assets/Home/tm.png';
 import { useCurrency } from '../../context/CurrencyContext';
 
 interface TestimonialCardProps {
