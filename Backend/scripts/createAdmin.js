@@ -15,7 +15,7 @@ const createAdmin = async () => {
     
     console.log('✅ Connected to MongoDB');
 
-    // Admin user details
+    // Admin user details     // Run the script -- node Backend/scripts/createAdmin.js----------
     const adminData = {
       email: 'agroreach25@gmail.com',
       password: 'Agroreach@321',
@@ -82,5 +82,4 @@ const createAdmin = async () => {
   }
 };
 
-// Run the script -- node Backend/scripts/createAdmin.js
 createAdmin();
