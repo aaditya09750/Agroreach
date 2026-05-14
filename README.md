@@ -13,7 +13,7 @@ A comprehensive, enterprise-grade e-commerce platform built with React, TypeScri
 
 **Experience the application live:** https://agroreach-shop.vercel.app/
 
-![Live Demo](https://img.shields.io/badge/Live%20Demo-Coming%20Soon-yellow?style=for-the-badge&logo=netlify&logoColor=white)(https://agroreach-shop.vercel.app/)
+![Live Demo](https://img.shields.io/badge/Live%20Demo-Coming%20Soon-yellow?style=for-the-badge&logo=netlify&logoColor=white)
 
 ## Core Features
 
